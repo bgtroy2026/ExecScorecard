@@ -1,0 +1,351 @@
+month,state,brand,cases,cases_ly
+2026-01,IA,Easy Eddy,2814,2541
+2026-01,IA,Tigerhawk,1945,1627
+2026-01,IA,Citrus Surfer,966,1060
+2026-01,IA,Triple Eddy,839,817
+2026-01,IA,Seasonals & Other,1293,1176
+2026-01,IL,Easy Eddy,716,621
+2026-01,IL,Tigerhawk,444,362
+2026-01,IL,Citrus Surfer,304,287
+2026-01,IL,Triple Eddy,218,203
+2026-01,IL,Seasonals & Other,309,259
+2026-01,MN,Easy Eddy,544,449
+2026-01,MN,Tigerhawk,372,288
+2026-01,MN,Citrus Surfer,187,184
+2026-01,MN,Triple Eddy,157,146
+2026-01,MN,Seasonals & Other,241,209
+2026-01,NE,Easy Eddy,416,390
+2026-01,NE,Tigerhawk,283,251
+2026-01,NE,Citrus Surfer,180,185
+2026-01,NE,Triple Eddy,126,125
+2026-01,NE,Seasonals & Other,179,174
+2026-01,MO,Easy Eddy,302,306
+2026-01,MO,Tigerhawk,185,174
+2026-01,MO,Citrus Surfer,121,134
+2026-01,MO,Triple Eddy,99,111
+2026-01,MO,Seasonals & Other,136,140
+2026-01,KS,Easy Eddy,251,200
+2026-01,KS,Tigerhawk,166,129
+2026-01,KS,Citrus Surfer,98,94
+2026-01,KS,Triple Eddy,77,70
+2026-01,KS,Seasonals & Other,98,82
+2026-01,WI,Easy Eddy,275,247
+2026-01,WI,Tigerhawk,192,157
+2026-01,WI,Citrus Surfer,108,110
+2026-01,WI,Triple Eddy,84,81
+2026-01,WI,Seasonals & Other,118,103
+2026-02,IA,Easy Eddy,2775,2463
+2026-02,IA,Tigerhawk,1984,1645
+2026-02,IA,Citrus Surfer,1021,1127
+2026-02,IA,Triple Eddy,861,887
+2026-02,IA,Seasonals & Other,1227,1118
+2026-02,IL,Easy Eddy,721,619
+2026-02,IL,Tigerhawk,475,375
+2026-02,IL,Citrus Surfer,277,277
+2026-02,IL,Triple Eddy,210,199
+2026-02,IL,Seasonals & Other,350,301
+2026-02,MN,Easy Eddy,541,463
+2026-02,MN,Tigerhawk,340,273
+2026-02,MN,Citrus Surfer,183,188
+2026-02,MN,Triple Eddy,159,152
+2026-02,MN,Seasonals & Other,233,210
+2026-02,NE,Easy Eddy,400,377
+2026-02,NE,Tigerhawk,300,245
+2026-02,NE,Citrus Surfer,170,188
+2026-02,NE,Triple Eddy,123,125
+2026-02,NE,Seasonals & Other,189,183
+2026-02,MO,Easy Eddy,328,314
+2026-02,MO,Tigerhawk,212,199
+2026-02,MO,Citrus Surfer,112,134
+2026-02,MO,Triple Eddy,92,101
+2026-02,MO,Seasonals & Other,139,149
+2026-02,KS,Easy Eddy,238,188
+2026-02,KS,Tigerhawk,161,117
+2026-02,KS,Citrus Surfer,94,90
+2026-02,KS,Triple Eddy,73,69
+2026-02,KS,Seasonals & Other,115,93
+2026-02,WI,Easy Eddy,258,229
+2026-02,WI,Tigerhawk,192,150
+2026-02,WI,Citrus Surfer,107,116
+2026-02,WI,Triple Eddy,87,83
+2026-02,WI,Seasonals & Other,129,114
+2026-03,IA,Easy Eddy,3342,2891
+2026-03,IA,Tigerhawk,2291,1849
+2026-03,IA,Citrus Surfer,1347,1408
+2026-03,IA,Triple Eddy,1017,1028
+2026-03,IA,Seasonals & Other,1487,1395
+2026-03,IL,Easy Eddy,890,732
+2026-03,IL,Tigerhawk,553,443
+2026-03,IL,Citrus Surfer,321,311
+2026-03,IL,Triple Eddy,270,253
+2026-03,IL,Seasonals & Other,369,330
+2026-03,MN,Easy Eddy,528,467
+2026-03,MN,Tigerhawk,381,312
+2026-03,MN,Citrus Surfer,227,237
+2026-03,MN,Triple Eddy,178,169
+2026-03,MN,Seasonals & Other,259,243
+2026-03,NE,Easy Eddy,473,431
+2026-03,NE,Tigerhawk,319,280
+2026-03,NE,Citrus Surfer,198,203
+2026-03,NE,Triple Eddy,156,157
+2026-03,NE,Seasonals & Other,235,218
+2026-03,MO,Easy Eddy,326,337
+2026-03,MO,Tigerhawk,244,217
+2026-03,MO,Citrus Surfer,156,171
+2026-03,MO,Triple Eddy,112,120
+2026-03,MO,Seasonals & Other,161,163
+2026-03,KS,Easy Eddy,254,209
+2026-03,KS,Tigerhawk,180,140
+2026-03,KS,Citrus Surfer,110,100
+2026-03,KS,Triple Eddy,82,76
+2026-03,KS,Seasonals & Other,119,103
+2026-03,WI,Easy Eddy,310,287
+2026-03,WI,Tigerhawk,220,179
+2026-03,WI,Citrus Surfer,121,122
+2026-03,WI,Triple Eddy,95,94
+2026-03,WI,Seasonals & Other,133,123
+2026-04,IA,Easy Eddy,3099,2860
+2026-04,IA,Tigerhawk,2368,2022
+2026-04,IA,Citrus Surfer,1436,1468
+2026-04,IA,Triple Eddy,962,1016
+2026-04,IA,Seasonals & Other,1387,1303
+2026-04,IL,Easy Eddy,926,792
+2026-04,IL,Tigerhawk,638,486
+2026-04,IL,Citrus Surfer,369,353
+2026-04,IL,Triple Eddy,286,277
+2026-04,IL,Seasonals & Other,351,318
+2026-04,MN,Easy Eddy,589,501
+2026-04,MN,Tigerhawk,421,348
+2026-04,MN,Citrus Surfer,264,259
+2026-04,MN,Triple Eddy,186,178
+2026-04,MN,Seasonals & Other,279,261
+2026-04,NE,Easy Eddy,560,490
+2026-04,NE,Tigerhawk,316,283
+2026-04,NE,Citrus Surfer,203,213
+2026-04,NE,Triple Eddy,171,177
+2026-04,NE,Seasonals & Other,228,227
+2026-04,MO,Easy Eddy,389,378
+2026-04,MO,Tigerhawk,250,222
+2026-04,MO,Citrus Surfer,161,182
+2026-04,MO,Triple Eddy,116,122
+2026-04,MO,Seasonals & Other,174,180
+2026-04,KS,Easy Eddy,285,231
+2026-04,KS,Tigerhawk,200,151
+2026-04,KS,Citrus Surfer,128,116
+2026-04,KS,Triple Eddy,90,77
+2026-04,KS,Seasonals & Other,139,112
+2026-04,WI,Easy Eddy,349,310
+2026-04,WI,Tigerhawk,257,201
+2026-04,WI,Citrus Surfer,136,136
+2026-04,WI,Triple Eddy,108,106
+2026-04,WI,Seasonals & Other,156,140
+2026-05,IA,Easy Eddy,3632,3182
+2026-05,IA,Tigerhawk,2559,2252
+2026-05,IA,Citrus Surfer,1522,1650
+2026-05,IA,Triple Eddy,1159,1160
+2026-05,IA,Seasonals & Other,1542,1525
+2026-05,IL,Easy Eddy,981,853
+2026-05,IL,Tigerhawk,656,499
+2026-05,IL,Citrus Surfer,392,370
+2026-05,IL,Triple Eddy,306,294
+2026-05,IL,Seasonals & Other,418,350
+2026-05,MN,Easy Eddy,648,549
+2026-05,MN,Tigerhawk,484,379
+2026-05,MN,Citrus Surfer,287,285
+2026-05,MN,Triple Eddy,221,207
+2026-05,MN,Seasonals & Other,279,258
+2026-05,NE,Easy Eddy,567,530
+2026-05,NE,Tigerhawk,395,337
+2026-05,NE,Citrus Surfer,226,243
+2026-05,NE,Triple Eddy,181,189
+2026-05,NE,Seasonals & Other,256,250
+2026-05,MO,Easy Eddy,380,388
+2026-05,MO,Tigerhawk,262,249
+2026-05,MO,Citrus Surfer,171,191
+2026-05,MO,Triple Eddy,120,135
+2026-05,MO,Seasonals & Other,190,190
+2026-05,KS,Easy Eddy,347,277
+2026-05,KS,Tigerhawk,207,161
+2026-05,KS,Citrus Surfer,120,115
+2026-05,KS,Triple Eddy,92,86
+2026-05,KS,Seasonals & Other,143,122
+2026-05,WI,Easy Eddy,405,356
+2026-05,WI,Tigerhawk,259,221
+2026-05,WI,Citrus Surfer,160,165
+2026-05,WI,Triple Eddy,127,124
+2026-05,WI,Seasonals & Other,168,155
+2026-06,IA,Easy Eddy,3610,3428
+2026-06,IA,Tigerhawk,2959,2501
+2026-06,IA,Citrus Surfer,1674,1787
+2026-06,IA,Triple Eddy,1188,1188
+2026-06,IA,Seasonals & Other,1615,1578
+2026-06,IL,Easy Eddy,1038,892
+2026-06,IL,Tigerhawk,757,616
+2026-06,IL,Citrus Surfer,446,433
+2026-06,IL,Triple Eddy,337,326
+2026-06,IL,Seasonals & Other,474,417
+2026-06,MN,Easy Eddy,761,636
+2026-06,MN,Tigerhawk,546,448
+2026-06,MN,Citrus Surfer,309,308
+2026-06,MN,Triple Eddy,255,235
+2026-06,MN,Seasonals & Other,311,288
+2026-06,NE,Easy Eddy,607,576
+2026-06,NE,Tigerhawk,387,344
+2026-06,NE,Citrus Surfer,227,243
+2026-06,NE,Triple Eddy,193,201
+2026-06,NE,Seasonals & Other,271,253
+2026-06,MO,Easy Eddy,462,456
+2026-06,MO,Tigerhawk,336,294
+2026-06,MO,Citrus Surfer,192,217
+2026-06,MO,Triple Eddy,152,160
+2026-06,MO,Seasonals & Other,202,205
+2026-06,KS,Easy Eddy,374,287
+2026-06,KS,Tigerhawk,246,191
+2026-06,KS,Citrus Surfer,132,125
+2026-06,KS,Triple Eddy,116,103
+2026-06,KS,Seasonals & Other,148,128
+2026-06,WI,Easy Eddy,430,372
+2026-06,WI,Tigerhawk,305,250
+2026-06,WI,Citrus Surfer,158,170
+2026-06,WI,Triple Eddy,119,118
+2026-06,WI,Seasonals & Other,176,165
+2026-07,IA,Easy Eddy,4024,3489
+2026-07,IA,Tigerhawk,3041,2545
+2026-07,IA,Citrus Surfer,1872,1884
+2026-07,IA,Triple Eddy,1307,1354
+2026-07,IA,Seasonals & Other,1771,1628
+2026-07,IL,Easy Eddy,1095,908
+2026-07,IL,Tigerhawk,779,630
+2026-07,IL,Citrus Surfer,450,435
+2026-07,IL,Triple Eddy,328,322
+2026-07,IL,Seasonals & Other,471,419
+2026-07,MN,Easy Eddy,816,682
+2026-07,MN,Tigerhawk,529,418
+2026-07,MN,Citrus Surfer,313,302
+2026-07,MN,Triple Eddy,256,246
+2026-07,MN,Seasonals & Other,338,310
+2026-07,NE,Easy Eddy,645,564
+2026-07,NE,Tigerhawk,435,370
+2026-07,NE,Citrus Surfer,281,295
+2026-07,NE,Triple Eddy,200,206
+2026-07,NE,Seasonals & Other,269,260
+2026-07,MO,Easy Eddy,489,475
+2026-07,MO,Tigerhawk,327,308
+2026-07,MO,Citrus Surfer,197,216
+2026-07,MO,Triple Eddy,148,159
+2026-07,MO,Seasonals & Other,207,202
+2026-07,KS,Easy Eddy,360,295
+2026-07,KS,Tigerhawk,240,178
+2026-07,KS,Citrus Surfer,142,138
+2026-07,KS,Triple Eddy,129,111
+2026-07,KS,Seasonals & Other,157,136
+2026-07,WI,Easy Eddy,446,393
+2026-07,WI,Tigerhawk,305,250
+2026-07,WI,Citrus Surfer,170,169
+2026-07,WI,Triple Eddy,141,142
+2026-07,WI,Seasonals & Other,191,177
+2026-08,IA,Easy Eddy,4145,3757
+2026-08,IA,Tigerhawk,2968,2415
+2026-08,IA,Citrus Surfer,1555,1597
+2026-08,IA,Triple Eddy,1263,1225
+2026-08,IA,Seasonals & Other,1815,1658
+2026-08,IL,Easy Eddy,966,830
+2026-08,IL,Tigerhawk,757,564
+2026-08,IL,Citrus Surfer,397,404
+2026-08,IL,Triple Eddy,320,305
+2026-08,IL,Seasonals & Other,468,408
+2026-08,MN,Easy Eddy,705,621
+2026-08,MN,Tigerhawk,487,385
+2026-08,MN,Citrus Surfer,288,298
+2026-08,MN,Triple Eddy,228,231
+2026-08,MN,Seasonals & Other,347,306
+2026-08,NE,Easy Eddy,620,575
+2026-08,NE,Tigerhawk,440,363
+2026-08,NE,Citrus Surfer,260,277
+2026-08,NE,Triple Eddy,175,179
+2026-08,NE,Seasonals & Other,285,261
+2026-08,MO,Easy Eddy,461,456
+2026-08,MO,Tigerhawk,305,279
+2026-08,MO,Citrus Surfer,181,210
+2026-08,MO,Triple Eddy,137,156
+2026-08,MO,Seasonals & Other,206,201
+2026-08,KS,Easy Eddy,340,267
+2026-08,KS,Tigerhawk,253,181
+2026-08,KS,Citrus Surfer,151,136
+2026-08,KS,Triple Eddy,104,95
+2026-08,KS,Seasonals & Other,165,133
+2026-08,WI,Easy Eddy,403,373
+2026-08,WI,Tigerhawk,262,212
+2026-08,WI,Citrus Surfer,181,177
+2026-08,WI,Triple Eddy,130,129
+2026-08,WI,Seasonals & Other,171,155
+2026-09,IA,Easy Eddy,3732,3405
+2026-09,IA,Tigerhawk,2644,2144
+2026-09,IA,Citrus Surfer,1366,1402
+2026-09,IA,Triple Eddy,1070,1097
+2026-09,IA,Seasonals & Other,1518,1426
+2026-09,IL,Easy Eddy,970,794
+2026-09,IL,Tigerhawk,589,481
+2026-09,IL,Citrus Surfer,404,392
+2026-09,IL,Triple Eddy,294,266
+2026-09,IL,Seasonals & Other,397,348
+2026-09,MN,Easy Eddy,618,549
+2026-09,MN,Tigerhawk,436,341
+2026-09,MN,Citrus Surfer,289,286
+2026-09,MN,Triple Eddy,196,191
+2026-09,MN,Seasonals & Other,294,262
+2026-09,NE,Easy Eddy,554,511
+2026-09,NE,Tigerhawk,377,310
+2026-09,NE,Citrus Surfer,207,224
+2026-09,NE,Triple Eddy,168,176
+2026-09,NE,Seasonals & Other,252,238
+2026-09,MO,Easy Eddy,422,424
+2026-09,MO,Tigerhawk,304,274
+2026-09,MO,Citrus Surfer,157,178
+2026-09,MO,Triple Eddy,133,143
+2026-09,MO,Seasonals & Other,170,171
+2026-09,KS,Easy Eddy,325,250
+2026-09,KS,Tigerhawk,216,156
+2026-09,KS,Citrus Surfer,127,120
+2026-09,KS,Triple Eddy,102,90
+2026-09,KS,Seasonals & Other,149,121
+2026-09,WI,Easy Eddy,386,329
+2026-09,WI,Tigerhawk,269,212
+2026-09,WI,Citrus Surfer,148,155
+2026-09,WI,Triple Eddy,115,112
+2026-09,WI,Seasonals & Other,164,157
+2026-10,IA,Easy Eddy,3344,2960
+2026-10,IA,Tigerhawk,2144,1877
+2026-10,IA,Citrus Surfer,1436,1449
+2026-10,IA,Triple Eddy,1117,1085
+2026-10,IA,Seasonals & Other,1569,1516
+2026-10,IL,Easy Eddy,932,787
+2026-10,IL,Tigerhawk,664,508
+2026-10,IL,Citrus Surfer,336,343
+2026-10,IL,Triple Eddy,291,284
+2026-10,IL,Seasonals & Other,448,378
+2026-10,MN,Easy Eddy,682,564
+2026-10,MN,Tigerhawk,484,378
+2026-10,MN,Citrus Surfer,256,251
+2026-10,MN,Triple Eddy,184,177
+2026-10,MN,Seasonals & Other,287,254
+2026-10,NE,Easy Eddy,539,489
+2026-10,NE,Tigerhawk,397,324
+2026-10,NE,Citrus Surfer,192,210
+2026-10,NE,Triple Eddy,158,155
+2026-10,NE,Seasonals & Other,248,226
+2026-10,MO,Easy Eddy,348,357
+2026-10,MO,Tigerhawk,290,255
+2026-10,MO,Citrus Surfer,148,170
+2026-10,MO,Triple Eddy,119,124
+2026-10,MO,Seasonals & Other,167,170
+2026-10,KS,Easy Eddy,289,223
+2026-10,KS,Tigerhawk,194,145
+2026-10,KS,Citrus Surfer,127,115
+2026-10,KS,Triple Eddy,100,90
+2026-10,KS,Seasonals & Other,135,116
+2026-10,WI,Easy Eddy,329,302
+2026-10,WI,Tigerhawk,239,198
+2026-10,WI,Citrus Surfer,143,154
+2026-10,WI,Triple Eddy,107,106
+2026-10,WI,Seasonals & Other,174,154

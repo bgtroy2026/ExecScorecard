@@ -1,0 +1,23 @@
+# real data never gets committed in plaintext — only the sample files under site/data/sample/
+raw/
+state/
+_site/
+site/data/*
+!site/data/sample/
+inputs/private/
+
+# secrets
+.env
+*.env
+bundle_keys.json
+.execscorecard-token
+
+# os / editor / logs
+.DS_Store
+Thumbs.db
+_deploy/*.log
+__pycache__/
+
+# local preview with real numbers (tools/build_local.py) — never committed
+site/config.local.json
+site/data/local/

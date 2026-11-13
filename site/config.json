@@ -1,0 +1,42 @@
+{
+  "dataSource": "sample",
+  "dataLabel": "Sample data (placeholders shaped like the leadership wireframe, not real results)",
+  "updated": "Nov 13, 2026",
+  "files": {
+    "taproomWeekly": "data/sample/taproom_weekly.csv",
+    "companyWeekly": "data/sample/company_weekly.csv",
+    "reputationWeekly": "data/sample/reputation_weekly.csv",
+    "distributionWeekly": "data/sample/distribution_weekly.csv",
+    "distributionYtd": "data/sample/distribution_ytd.csv",
+    "placements": "data/sample/placements.csv",
+    "vmbgTargets": "data/sample/vmbg_targets.csv",
+    "guestsDaily": "data/sample/guests_daily.csv"
+  },
+  "targets": {
+    "primeCostPct": 58,
+    "foodCostPct": 28,
+    "laborPct": 30,
+    "rating": 4.7,
+    "inIowaGrowthPct": 10,
+    "outsideIowaGrowthPct": 150,
+    "homeState": "IA"
+  },
+  "brandGoals": [
+    {
+      "brand": "Easy Eddy",
+      "goal": 250000
+    },
+    {
+      "brand": "Citrus Surfer",
+      "goal": 80000
+    }
+  ],
+  "placementsLabel": "POD count (Leadership Scorecard sheet)",
+  "holiday": {
+    "title": "Holiday Pop-Up / VMBG Guest Pacing",
+    "start": "2026-11-09",
+    "weeks": 8,
+    "kickoffLabel": "Kickoff: Nov 9 (Wk 46)"
+  },
+  "_comment": "Public defaults and placeholder goals. The real goals live in config.local.json (gitignored, built by tools/build_local.py); the page reads it first when it exists."
+}
