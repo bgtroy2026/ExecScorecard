@@ -172,6 +172,8 @@ html.locked #gate{display:block}
 .xt tr.tgt td{background:var(--plane);font-weight:600}
 .xt tr:last-child td{border-bottom:0}
 .xt .sl{color:var(--axis);margin:0 3px}
+.xt .cmpon{color:var(--ink);font-weight:700}
+.ctl[hidden]{display:none!important}
 .trend .xt td:first-child{color:var(--ink2)}
 .dt{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:4px;vertical-align:1px}
 .dt.g{background:#3a9b2e}.dt.r{background:var(--bad)}.dt.n{background:transparent;border:1px solid var(--axis)}
@@ -236,8 +238,10 @@ details.feeds .st2{font-size:10.5px}
     <div class="tools">
       <span class="who" id="who" hidden></span>
       <span class="badge" id="data-badge">Sample data</span>
-      <div class="ctl"><span class="dotlive"></span><label for="sel-week">Period</label><select id="sel-week"></select></div>
+      <div class="ctl"><span class="dotlive"></span><label for="sel-week" id="lbl-week">Period</label><select id="sel-week"></select></div>
       <div class="ctl"><label for="sel-loc">Location</label><select id="sel-loc"></select></div>
+      <div class="ctl xonly" hidden><label for="sel-gran">View by</label><select id="sel-gran"><option value="week">Week</option><option value="month">Month</option><option value="quarter">Quarter</option><option value="ytd">Year to date</option></select></div>
+      <div class="ctl xonly" hidden><label for="sel-cmp">Compare to</label><select id="sel-cmp"><option value="target">Target</option><option value="py">Prior year</option><option value="pp">Prior period</option></select></div>
     </div>
   </div>
 </header>
@@ -425,7 +429,8 @@ details.feeds .st2{font-size:10.5px}
 
   let CFG, TAP, COMP, REP, DW, DY, PODS, GD, VT, WEEKS, LOCS, charts = {};
   let VW = [], PW = [], LW = [], DSW = [];
-  const state = { week: null, loc: 'all' };
+  const state = { week: null, loc: 'all', gran: 'week', cmp: 'target' };
+  try { const v = JSON.parse(localStorage.getItem('execsc_view') || '{}'); if (v.gran) state.gran = v.gran; if (v.cmp) state.cmp = v.cmp; } catch {}
 
   async function load() {
     // Published site: everything comes from the encrypted bundle the sign-in unlocked (window.__esData).
@@ -448,6 +453,11 @@ details.feeds .st2{font-size:10.5px}
     sl.add(new Option(`All locations (${LOCS.length})`, 'all'));
     LOCS.forEach((l) => sl.add(new Option(l, l)));
     sw.addEventListener('change', () => { state.week = sw.value; render(); });
+    const sg = $('sel-gran'), sc = $('sel-cmp');
+    sg.value = state.gran; sc.value = state.cmp;
+    const keep = () => { try { localStorage.setItem('execsc_view', JSON.stringify({ gran: state.gran, cmp: state.cmp })); } catch {} };
+    sg.addEventListener('change', () => { state.gran = sg.value; keep(); window.__esRenderViews(); });
+    sc.addEventListener('change', () => { state.cmp = sc.value; keep(); window.__esRenderViews(); });
     sl.addEventListener('change', () => { state.loc = sl.value; render(); });
     $('f-reset').addEventListener('click', () => { sl.value = 'all'; state.loc = 'all'; render(); });
     $('foot').textContent = `Big Grove Brewery • Executive Leadership Scorecard • ${CFG.dataLabel}. Updated ${CFG.updated}.`;
@@ -481,8 +491,10 @@ details.feeds .st2{font-size:10.5px}
 
 
   // ================================================================ 2027 proposed views (Execution Card, Weekly Scorecard, By Location)
-  // Laid out like "2027 Proposed Weekly Leadership Scorecard" (3 slides), in this page's tokens. LCW = the week
-  // picked in the Period menu (last complete week by default). Every box carries its source chips.
+  // Laid out like "2027 Proposed Weekly Leadership Scorecard" (3 slides), in this page's tokens.
+  // Controls (header, these three pages only): View by (week / month / quarter / year to date), Compare to (target /
+  // prior year / prior period), and the Period menu, which is the "through" week. A month or quarter is the weeks whose
+  // Thursday falls in it (ISO convention), cut at the through week, so the latest one reads "to date".
   const ORDER = ['Solon', 'Iowa City', 'Des Moines', 'Cedar Rapids', 'Omaha', 'Prairie Village'];
   const SHORT = { 'Solon': 'Solon', 'Iowa City': 'IC', 'Des Moines': 'DSM', 'Cedar Rapids': 'CR', 'Omaha': 'Omaha', 'Prairie Village': 'PV' };
   const fin = (v) => v != null && isFinite(v);
@@ -490,7 +502,6 @@ details.feeds .st2{font-size:10.5px}
   const usd = (v) => (fin(v) ? money0.format(v) : '—');
   const hl$ = (v) => (fin(v) ? (v < 0 ? '(' + money0.format(-v) + ')' : money0.format(v)) : '—');
   const p1 = (v) => (fin(v) ? v.toFixed(1) + '%' : '—');
-  const hlp = (v) => (fin(v) ? (v < 0 ? '(' + Math.abs(v).toFixed(1) + ')' : v.toFixed(1)) + ' pts' : '—');
   const hln = (v) => (fin(v) ? (v < 0 ? '(' + int.format(-v) + ')' : int.format(v)) : '—');
   const usdK = (v) => (fin(v) ? (Math.abs(v) >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : Math.abs(v) >= 1e4 ? '$' + Math.round(v / 1e3) + 'k' : '$' + (v / 1e3).toFixed(1) + 'k') : '—');
   const hlK = (v) => (fin(v) ? (v < 0 ? '(' + usdK(-v) + ')' : usdK(v)) : '—');
@@ -499,15 +510,13 @@ details.feeds .st2{font-size:10.5px}
   const XO = (k) => (CFG.execTargets || {})[k] || null;
   const XT = (k) => { const o = XO(k); return o ? o.target : null; };
   const XTn = (k) => { const v = XT(k); const n = v == null ? null : parseFloat(String(v).replace(/[$,%+]/g, '')); return fin(n) ? n : null; };
-  const back = (n) => WEEKS.filter((w) => w <= state.week).slice(-n).reverse();
-  const lcwLbl = (i) => (i ? `LCW – ${i}` : 'LCW');
   const wkTitle = (w) => `${md(w)}–${md(addDays(w, 6))}`;
   const SRC = {
     toast: ['feed', 'Toast', 'Toast via the Store Director Portal, nightly'],
     me: ['feed', 'MarginEdge', 'MarginEdge purchases via the Store Director Portal, nightly'],
     ekos: ['feed', 'Ekos', 'Ekos invoices (Liberty + Gilbert) excluding keg deposits; weeks before Apr 27 from the workbook history'],
     vip: ['feed', 'VIP', 'VIP depletions / placements via the Sales Portal daily refresh'],
-    thanx: ['feed', 'Thanx via Toast', 'Thanx members identified on Toast checks and Thanx/promo redemptions as Toast discounts, via the Store Director Portal'],
+    thanx: ['feed', 'Thanx via Toast', 'Thanx members identified on Toast checks and promo redemptions as Toast discounts, via the Store Director Portal'],
     sheet: ['sheet', 'Sheet', 'Leadership Scorecard workbook'],
     google: ['none', 'Google — not connected', 'Shown from the workbook until the Places API is connected'],
     typed: ['typed', 'Typed target', "Add it to an 'Exec Targets' tab in the Leadership Scorecard workbook (column A name, B target, C actual)"],
@@ -517,50 +526,143 @@ details.feeds .st2{font-size:10.5px}
   const panel = (title, sub, src, body, cls = '') => `<section class="panel ${cls}"><div class="ph"><div><h3>${title}</h3>${sub ? `<div class="sub">${sub}</div>` : ''}</div>${src}</div>${body}</section>`;
   const notSet = (k) => `<span class="muted" title="Add '${esc(k)}' to an 'Exec Targets' tab in the workbook">not set</span>`;
 
-  // ---- per-week numbers
-  function store(w) {
-    const rows = weekRows(w);
-    if (!rows.length) return null;
-    const c = tapCost(rows), comp = rows.filter((r) => r.net_sales_ly > 0);
-    const wb = rows.every((r) => r.goal_src === 'sheet');
-    return { rev: sum(rows, (r) => r.net_sales), goal: wb ? sum(rows, (r) => r.sales_goal) || null : null, refGoal: wb ? null : sum(rows, (r) => r.sales_goal) || null,
-      dPY: comp.length ? sum(comp, (r) => r.net_sales) - sum(comp, (r) => r.net_sales_ly) : null, labor: c.labor, food: c.food };
+  // ---------------------------------------------------------------- periods
+  const GRAN = () => state.gran || 'week', CMP = () => state.cmp || 'target';
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function bucket(w, g) {
+    if (g === 'week') return w;
+    const th = addDays(w, 3), y = th.slice(0, 4), m = +th.slice(5, 7);
+    return g === 'month' ? th.slice(0, 7) : g === 'quarter' ? `${y}-Q${Math.ceil(m / 3)}` : y;
   }
-  const prevYear = (w) => addDays(w, -364);
-  function distro(w) { const c = COMP.find((r) => r.week_start === w); return c && fin(c.brewery_distro_revenue) ? { rev: c.brewery_distro_revenue, goal: c.brewery_distro_goal, py: c.brewery_distro_py } : null; }
+  // One period: its key, its weeks (cut at the through week), and labels.
+  function mkPeriod(key, weeks, g) {
+    const full = WEEKS.filter((w) => bucket(w, g) === key);
+    const partial = weeks.length < full.length || (g === 'ytd');
+    let label;
+    if (g === 'week') label = md(key);
+    else if (g === 'month') label = `${MON[+key.slice(5, 7) - 1]} ${key.slice(0, 4)}`;
+    else if (g === 'quarter') label = `${key.slice(5)} ${key.slice(0, 4)}`;
+    else label = `${key} YTD`;
+    const to = g === 'week' ? '' : partial && g !== 'ytd' ? (g === 'month' ? ' MTD' : ' QTD') : '';
+    return { key, weeks, label: label + to, title: weeks.length ? `${md(weeks[0])} – ${md(addDays(weeks[weeks.length - 1], 6), { month: 'short', day: 'numeric', year: 'numeric' })} (${weeks.length} wk)` : '' };
+  }
+  // The n most recent periods ending with the one that holds the through week (newest first).
+  function periods(n) {
+    const g = GRAN(), upto = WEEKS.filter((w) => w <= state.week);
+    if (g === 'ytd') {
+      // Year to date = Jan 1 to the same week of the year, for this year and the years before it.
+      const yr = +state.week.slice(0, 4), out = [];
+      for (let k = 0; k < n; k++) {
+        const ws = upto.filter((w) => bucket(w, 'ytd') === String(yr - k) && addDays(w, 364 * k) <= state.week);
+        if (!ws.length || ws[0] > `${yr - k}-01-08`) break;      // only years the data covers from the first week
+        out.push(mkPeriod(String(yr - k), ws, g));
+      }
+      return out;
+    }
+    const keys = [...new Set(upto.map((w) => bucket(w, g)))].slice(-n).reverse();
+    return keys.map((k) => mkPeriod(k, upto.filter((w) => bucket(w, g) === k), g));
+  }
+  const pyWeeks = (ws) => ws.map((w) => addDays(w, -364));
+  function prevPeriod(p) {
+    const g = GRAN();
+    if (g === 'ytd') return null;
+    const keys = [...new Set(WEEKS.map((w) => bucket(w, g)))], i = keys.indexOf(p.key);
+    return i > 0 ? mkPeriod(keys[i - 1], WEEKS.filter((w) => bucket(w, g) === keys[i - 1]), g) : null;
+  }
+  const colLbl = (p, i) => (GRAN() === 'week' ? (i ? `LCW – ${i}` : 'LCW') : p.label);
+  const unitWord = () => ({ week: 'week', month: 'month', quarter: 'quarter', ytd: 'year to date' }[GRAN()]);
+  const cmpWord = () => ({ target: 'target', py: 'prior year', pp: 'prior ' + ({ week: 'week', month: 'month', quarter: 'quarter', ytd: 'period' }[GRAN()]) }[CMP()]);
+
+  // ---------------------------------------------------------------- aggregates over a list of weeks
+  const wavgR = (rows, k, wk) => { const r = rows.filter((x) => fin(x[k]) && x[wk]); const d = sum(r, (x) => x[wk]); return d ? sum(r, (x) => x[k] * x[wk]) / d : null; };
+  function storeAgg(ws, loc) {
+    const rows = TAP.filter((r) => ws.includes(r.week_start) && (!loc || r.location === loc));
+    if (!rows.length) return null;
+    const wb = rows.every((r) => r.goal_src === 'sheet'), comp = rows.filter((r) => r.net_sales_ly > 0);
+    const hasFood = rows.some((r) => r.food_sales);
+    return {
+      n: new Set(rows.map((r) => r.week_start)).size, rev: sum(rows, (r) => r.net_sales), goal: wb ? sum(rows, (r) => r.sales_goal) || null : null, refGoal: wb ? null : sum(rows, (r) => r.sales_goal) || null,
+      revLfl: comp.length ? sum(comp, (r) => r.net_sales) : null, revLY: comp.length ? sum(comp, (r) => r.net_sales_ly) : null,
+      labor: wavgR(rows, 'labor_pct', 'net_sales'), food: hasFood ? wavgR(rows, 'food_cost_pct', 'food_sales') : wavgR(rows, 'food_cost_pct', 'net_sales'),
+    };
+  }
+  function distroAgg(ws) {
+    const rows = COMP.filter((r) => ws.includes(r.week_start) && fin(r.brewery_distro_revenue));
+    if (!rows.length) return null;
+    return { n: rows.length, rev: sum(rows, (r) => r.brewery_distro_revenue), goal: rows.every((r) => r.brewery_distro_goal) ? sum(rows, (r) => r.brewery_distro_goal) : null,
+      py: rows.every((r) => r.brewery_distro_py) ? sum(rows, (r) => r.brewery_distro_py) : null };
+  }
   const isHome = (st) => st === (T().homeState || 'IA');
   const H = (s) => isHome(s), X = (s) => !isHome(s), A = () => true;
-  function cases(w, f) {
-    const rows = VW.filter((r) => r.week_start === w && f(r.state)), ty = sum(rows, (r) => r.ce), ly = sum(rows, (r) => r.ce_ly);
-    return rows.length && ly ? { g: (ty / ly - 1) * 100, d: ty - ly } : null;
+  function casesAgg(ws, f) {
+    const rows = VW.filter((r) => ws.includes(r.week_start) && f(r.state)), ty = sum(rows, (r) => r.ce), ly = sum(rows, (r) => r.ce_ly);
+    return rows.length && ly ? { g: (ty / ly - 1) * 100, d: ty - ly, ty } : null;
   }
-  function pods(w, f) {
-    const wk = [...new Set(PW.map((r) => r.week_start))].filter((x) => x <= w).sort().pop();
-    if (!wk) return null;
+  function podsAt(ws, f) {
+    if (!ws.length) return null;
+    const last = ws[ws.length - 1], snaps = [...new Set(PW.map((r) => r.week_start))].filter((x) => x <= last).sort();
+    const wk = snaps.pop();
+    if (!wk || !ws.includes(wk)) return null;           // no snapshot inside this period
     const rows = PW.filter((r) => r.week_start === wk && f(r.state)), ty = sum(rows, (r) => r.placements), ly = sum(rows, (r) => r.placements_ly);
-    return ly ? { g: (ty / ly - 1) * 100, n: ty, asOf: rows[0].as_of, exact: wk === w } : null;
+    return ly ? { g: (ty / ly - 1) * 100, n: ty, asOf: rows[0].as_of } : null;
   }
-  const loyalLatest = () => LW.filter((r) => r.location === 'All' && r.week_start <= state.week).sort((a, b) => (a.week_start < b.week_start ? 1 : -1))[0] || null;
-  const promo = (w, re) => (DSW.length ? sum(DSW.filter((r) => r.location === 'All' && r.week_start === w && re.test(r.name)), (r) => r.n) : null);
+  const loyalAt = (ws) => { const r = LW.filter((x) => x.location === 'All' && ws.includes(x.week_start)).sort((a, b) => (a.week_start < b.week_start ? 1 : -1)); return r.length ? { ...r[0], first: sum(r, (x) => x.first_seen) } : null; };
   const RE_PINT = /free\s*pint/i, RE_SAMPLER = /sampler/i, RE_PENNY = /(\$?0?\.01|penny|1\s*cent)/i;
-  const promoSince = (re) => (DSW.length ? sum(DSW.filter((r) => r.location === 'All' && r.week_start <= state.week && re.test(r.name)), (r) => r.n) : null);
+  const promoAgg = (ws, re) => (DSW.length ? sum(DSW.filter((r) => r.location === 'All' && ws.includes(r.week_start) && re.test(r.name)), (r) => r.n) : null);
   const repWeeks = () => [...new Set(REP.map((r) => r.week_start))].filter((w) => w <= state.week).sort().reverse();
 
-  // ---- shared boxes
+  // ---------------------------------------------------------------- comparisons (driven by "Compare to")
+  // Each returns { ref, d, ok } for one period: the comparison value, the difference, and whether it's good.
+  function cmpRev(p, getAgg, goalKey = 'goal') {
+    const a = getAgg(p.weeks); if (!a) return null;
+    const c = CMP();
+    if (c === 'target') return a[goalKey] ? { ref: a[goalKey], d: a.rev - a[goalKey], ok: a.rev >= a[goalKey] } : null;
+    if (c === 'py') {
+      if (a.revLfl != null) return { ref: a.revLY, d: a.revLfl - a.revLY, ok: a.revLfl >= a.revLY };
+      if (a.py != null) return { ref: a.py, d: a.rev - a.py, ok: a.rev >= a.py };
+      // Last year only counts when it covers as many weeks as this period (distribution history starts Oct 2025).
+      const b = getAgg(pyWeeks(p.weeks));
+      if (!b || !b.rev || b.n !== a.n || (a.dn != null && b.dn !== a.dn)) return null;
+      return { ref: b.rev, d: a.rev - b.rev, ok: a.rev >= b.rev };
+    }
+    // A partial (to-date) period against a full prior one is pro-rated by weeks, so one week of November is
+    // compared with one week's worth of October rather than all of it.
+    const pp = prevPeriod(p); const b = pp && getAgg(pp.weeks);
+    if (!b) return null;
+    const ref = b.rev * (p.weeks.length / pp.weeks.length);
+    return { ref, d: a.rev - ref, ok: a.rev >= ref, prorated: pp.weeks.length !== p.weeks.length };
+  }
+  function cmpPct(p, k, tgt, loc) {            // lower is better (cost %)
+    const a = storeAgg(p.weeks, loc); if (!a || !fin(a[k])) return null;
+    const c = CMP();
+    const ref = c === 'target' ? tgt : c === 'py' ? (storeAgg(pyWeeks(p.weeks), loc) || {})[k] : ((prevPeriod(p) && storeAgg(prevPeriod(p).weeks, loc)) || {})[k];
+    return fin(ref) ? { v: a[k], ref, d: a[k] - ref, ok: a[k] <= ref } : { v: a[k], ref: null, d: null, ok: null };
+  }
+  function cmpGrowth(p, f, tgt) {              // case volume growth vs LY
+    const a = casesAgg(p.weeks, f); if (!a) return null;
+    const c = CMP();
+    if (c === 'target') return { v: a.g, ref: tgt, d: fin(tgt) ? a.g - tgt : null, ok: fin(tgt) ? a.g >= tgt : null };
+    if (c === 'py') return { v: a.g, ref: null, d: a.d, ok: a.d >= 0, ces: true };
+    const pp = prevPeriod(p), b = pp && casesAgg(pp.weeks, f);
+    return { v: a.g, ref: b ? b.g : null, d: b ? a.g - b.g : null, ok: b ? a.g >= b.g : null };
+  }
+  const isPerWeek = (p) => { const pp = CMP() === 'pp' ? prevPeriod(p) : null; return pp && pp.weeks.length !== p.weeks.length; };
+
+  // ---------------------------------------------------------------- shared boxes
   function reviewsBox(compact) {
     const w = repWeeks()[0], rows = w ? REP.filter((r) => r.week_start === w) : [], tgt = T().rating || 4.7;
     const body = rows.length ? `<table class="xt"><thead><tr><th></th><th>Avg stars</th><th>Reviews</th><th>Ct H/(L) LCW</th></tr></thead><tbody>${
       ORDER.map((l) => { const r = rows.find((x) => x.location === l); return r ? `<tr><td>${SHORT[l]}</td><td>${fin(r.rating) ? r.rating.toFixed(1) : '—'}${dt(fin(r.rating) ? r.rating >= tgt : null)}</td><td>${fin(r.reviews) ? int.format(r.reviews) : '—'}</td><td>${hln(r.new_reviews)}</td></tr>` : ''; }).join('')}</tbody></table>
-      <div class="owner">Week of ${md(w)} · target ${tgt}+ stars</div>` : '<div class="nofeed">No review figures captured yet.</div>';
+      <div class="owner">Latest captured week (${md(w)}) · target ${tgt}+ stars</div>` : '<div class="nofeed">No review figures captured yet.</div>';
     return panel(`Google reviews: ${tgt}+ stars`, compact ? '' : 'Average stars, total reviews, new reviews last week', chips('sheet', 'google'), body);
   }
   function rewardsBox(owner) {
-    const l = loyalLatest(), ta = XTn('Active users'), te = XTn('Engaged users');
+    const p = periods(1)[0], l = p && loyalAt(p.weeks), ta = XTn('Active users'), te = XTn('Engaged users');
     const body = l ? `<div class="mile">
-        <div><span><b>Active users</b> ${int.format(l.members_28)} <span class="owner">(seen in 28 days)</span></span>${dt(ta == null ? null : l.members_28 >= ta)}</div><div class="owner">Target active users: ${ta == null ? notSet('Active users') : int.format(ta)}</div>
-        <div><span><b>Engaged users</b> ${int.format(l.engaged_28)} <span class="owner">(2+ visits)</span></span>${dt(te == null ? null : l.engaged_28 >= te)}</div><div class="owner">Target engaged users: ${te == null ? notSet('Engaged users') : int.format(te)}</div>
-        <div class="owner">Members first seen that week: ${int.format(l.first_seen)} · week of ${md(l.week_start)}</div></div>`
-      : `<div class="nofeed">Waiting on the Store Director Portal's next nightly run (Thanx members as Toast sees them).</div>`;
+        <div><span><b>Active users</b> ${int.format(l.members_28)} <span class="owner">(seen in the 28 days to ${md(addDays(l.week_start, 6))})</span></span>${dt(ta == null ? null : l.members_28 >= ta)}</div><div class="owner">Target active users: ${ta == null ? notSet('Active users') : int.format(ta)}</div>
+        <div><span><b>Engaged users</b> ${int.format(l.engaged_28)} <span class="owner">(2+ visit days)</span></span>${dt(te == null ? null : l.engaged_28 >= te)}</div><div class="owner">Target engaged users: ${te == null ? notSet('Engaged users') : int.format(te)}</div>
+        <div class="owner">Members seen for the first time, ${esc(p.label)}: ${int.format(l.first)}</div></div>`
+      : `<div class="nofeed">No loyalty figures for this period.</div>`;
     return panel('Rewards: acquisition &amp; engagement', owner ? 'Owner: ' + owner : '', chips('thanx', 'typed'), body);
   }
   function milestoneBox(name, owner) {
@@ -569,148 +671,183 @@ details.feeds .st2{font-size:10.5px}
       `<div class="mile">${line('Target opening date', name + ' opening date')}${line('Target hire dates', name + ' hire dates')}${line('Target revenue', name + ' revenue target')}</div>`);
   }
   function promoBox(owner) {
-    const pint = promoSince(RE_PINT), samp = promoSince(RE_SAMPLER), tp = XTn('Free pint redemptions'), ts = XTn('Sampler card redemptions');
-    const since = CFG.loyaltySince ? ` · counted since ${md(CFG.loyaltySince)}` : '';
+    const p = periods(1)[0], pint = p && promoAgg(p.weeks, RE_PINT), samp = p && promoAgg(p.weeks, RE_SAMPLER), tp = XTn('Free pint redemptions'), ts = XTn('Sampler card redemptions');
     const body = DSW.length ? `<div class="mile">
-      <div><span><b>Free Pint redemptions:</b> ${int.format(pint || 0)}</span>${dt(tp == null ? null : pint >= tp)}</div><div class="owner">Target: ${tp == null ? notSet('Free pint redemptions') : int.format(tp)}${since}</div>
+      <div><span><b>Free Pint redemptions:</b> ${int.format(pint || 0)}</span>${dt(tp == null ? null : pint >= tp)}</div><div class="owner">${esc(p.label)} · target: ${tp == null ? notSet('Free pint redemptions') : int.format(tp)}</div>
       <div><span><b>Sampler card redemptions:</b> ${int.format(samp || 0)}</span>${dt(ts == null ? null : samp >= ts)}</div><div class="owner">Target: ${ts == null ? notSet('Sampler card redemptions') : int.format(ts)}</div>
       ${!pint && !samp ? '<div class="owner">No Toast discount named "Free Pint" or "Sampler" yet — tell us the exact names if they differ.</div>' : ''}</div>`
-      : `<div class="nofeed">Waiting on the Store Director Portal's next nightly run (Toast discounts by name).</div>`;
+      : `<div class="nofeed">Waiting on the Store Director Portal's nightly run (Toast discounts by name).</div>`;
     return panel('Free Pint &amp; sampler cards', owner ? 'Owner: ' + owner : '', chips('thanx', 'typed'), body);
   }
+  const head = (title) => `<div class="tier-h"><h2>${title}</h2><span>By ${unitWord()} · compared with ${cmpWord()} · through week of ${wkTitle(state.week)}</span></div>`;
+  const perWeekNote = '<div class="owner">When the current period is only partly done (to date), dollar and count comparisons with the prior period are pro-rated by weeks; percentages compare as they are.</div>';
 
-  // ---- Execution Card (slide 1)
+  // ---------------------------------------------------------------- Execution Card (slide 1)
   function viewExec() {
-    const ws = back(8), t = T();
-    const g0 = store(ws[0]) || {}, d0 = distro(ws[0]) || {};
-    const sRows = ws.map((w, i) => { const s = store(w); if (!s) return ''; return `<tr><td>${lcwLbl(i)} <span class="owner">${md(w)}</span></td>
-      <td>${usd(s.rev)}${dt(s.goal ? s.rev >= s.goal : null)}</td><td>${p1(s.labor)}${dt(fin(s.labor) ? s.labor <= t.laborPct : null)}</td><td>${p1(s.food)}${dt(fin(s.food) ? s.food <= t.foodCostPct : null)}</td></tr>`; }).join('');
+    const ps = periods(GRAN() === 'ytd' ? 3 : 8), t = T(), c = CMP();
+    const refRowLbl = { target: 'Target', py: 'Prior year', pp: 'Prior period' }[c];
+    const sRows = ps.map((p, i) => {
+      const a = storeAgg(p.weeks); if (!a) return '';
+      const r = cmpRev(p, storeAgg), fl = cmpPct(p, 'food', t.foodCostPct), lb = cmpPct(p, 'labor', t.laborPct);
+      return `<tr><td title="${p.title}">${colLbl(p, i)}${GRAN() === 'week' ? ` <span class="owner">${md(p.key)}</span>` : ''}</td>
+        <td>${usd(a.rev)}${dt(r ? r.ok : null)}</td><td>${p1(a.labor)}${dt(lb ? lb.ok : null)}</td><td>${p1(a.food)}${dt(fl ? fl.ok : null)}</td></tr>`; }).join('');
+    const p0 = ps[0], a0 = p0 && storeAgg(p0.weeks), r0 = p0 && cmpRev(p0, storeAgg), l0 = p0 && cmpPct(p0, 'labor', t.laborPct), f0 = p0 && cmpPct(p0, 'food', t.foodCostPct);
+    const refRow = c === 'target'
+      ? `<td>${a0 && a0.goal ? usd(a0.goal) : `<span class="muted" title="No workbook goal for every week of this period">—</span>`}</td><td>≤ ${t.laborPct}%</td><td>≤ ${t.foodCostPct}%</td>`
+      : `<td>${r0 ? usd(r0.ref) : '—'}</td><td>${l0 ? p1(l0.ref) : '—'}</td><td>${f0 ? p1(f0.ref) : '—'}</td>`;
     const storeP = panel('Store metrics', 'Owner: Rachel Hart · all taprooms', chips('toast', 'me', 'sheet'),
       `<table class="xt"><thead><tr><th></th><th>Revenue</th><th>Hrly labor %</th><th>Food cost %</th></tr></thead><tbody>
-       <tr class="tgt"><td>Target</td><td>${g0.goal ? usd(g0.goal) : `<span class="muted" title="Store Director monthly target, spread by day — not the workbook goal">${usd(g0.refGoal)}*</span>`}</td><td>≤ ${t.laborPct}%</td><td>≤ ${t.foodCostPct}%</td></tr>${sRows}</tbody></table>
-       <div class="owner">Revenue dot = vs that week's workbook goal; weeks before the workbook was captured have no goal here (the Store Director monthly targets run well below the workbook's, so they're not used for the dots). Labor = Toast hourly labor ÷ net sales; food cost = MarginEdge food purchases ÷ food sales.</div>`);
+       <tr class="tgt"><td>${refRowLbl}${c !== 'target' ? ` <span class="owner">(for ${esc(p0 ? colLbl(p0, 0) : '')})</span>` : ''}</td>${refRow}</tr>${sRows}</tbody></table>
+       <div class="owner">Dots compare each row with its own ${cmpWord()}. ${c === 'target' ? 'Revenue goals come from the workbook, which only holds the weeks it was captured.' : c === 'py' ? 'Prior-year revenue compares taprooms open both years.' : ''} Labor = Toast hourly labor ÷ net sales; food cost = MarginEdge food purchases ÷ food sales.</div>`);
     const tg = (k) => (fin(k) ? '+' + k + '%' : '—');
     const podT = XTn('POD growth %'), podIA = XTn('IA POD growth %'), podX = XTn('xIA POD growth %');
-    const pc = (o, tt) => (o && o.exact ? `${p1(o.g)}${dt(tt == null ? null : o.g >= tt)}` : '<span class="muted">—</span>');
-    const dRows = ws.map((w, i) => {
-      const d = distro(w), c = cases(w, A), ci = cases(w, H), cx = cases(w, X);
-      return `<tr><td>${lcwLbl(i)} <span class="owner">${md(w)}</span></td><td>${d ? usdK(d.rev) + dt(d.goal ? d.rev >= d.goal : null) : '—'}</td>
-        <td>${c ? p1(c.g) + dt(c.g >= t.totalGrowthPct) : '—'}</td><td>${ci ? p1(ci.g) + dt(ci.g >= t.inIowaGrowthPct) : '—'}</td><td>${cx ? p1(cx.g) + dt(cx.g >= t.outsideIowaGrowthPct) : '—'}</td>
-        <td>${pc(pods(w, A), podT)}</td><td>${pc(pods(w, H), podIA)}</td><td>${pc(pods(w, X), podX)}</td></tr>`; }).join('');
-    const distP = panel('Distribution metrics', 'Owner: Mike Wehr · case vol % = cases vs the same week last year', chips('ekos', 'vip', 'sheet', 'typed'),
+    const podCell = (o, tt) => (o ? `${p1(o.g)}${dt(c === 'target' ? (tt == null ? null : o.g >= tt) : null)}` : '<span class="muted">—</span>');
+    const gc = (p, f, tgt) => { const o = cmpGrowth(p, f, tgt); return o ? p1(o.v) + dt(o.ok) : '—'; };
+    const dRows = ps.map((p, i) => {
+      const d = distroAgg(p.weeks), dr = cmpRev(p, distroAgg);
+      return `<tr><td title="${p.title}">${colLbl(p, i)}${GRAN() === 'week' ? ` <span class="owner">${md(p.key)}</span>` : ''}</td><td>${d ? usdK(d.rev) + dt(dr ? dr.ok : null) : '—'}</td>
+        <td>${gc(p, A, t.totalGrowthPct)}</td><td>${gc(p, H, t.inIowaGrowthPct)}</td><td>${gc(p, X, t.outsideIowaGrowthPct)}</td>
+        <td>${podCell(podsAt(p.weeks, A), podT)}</td><td>${podCell(podsAt(p.weeks, H), podIA)}</td><td>${podCell(podsAt(p.weeks, X), podX)}</td></tr>`; }).join('');
+    const d0 = p0 && distroAgg(p0.weeks), dr0 = p0 && cmpRev(p0, distroAgg);
+    const g0 = (f, tgt) => { const o = p0 && cmpGrowth(p0, f, tgt); return c === 'target' ? tg(tgt) : c === 'py' ? (o ? `${hln(o.d)} CEs` : '—') : (o && fin(o.ref) ? p1(o.ref) : '—'); };
+    const distP = panel('Distribution metrics', `Owner: Mike Wehr · case vol % = cases vs the same weeks last year`, chips('ekos', 'vip', 'sheet', 'typed'),
       `<div style="overflow-x:auto"><table class="xt"><thead><tr><th></th><th>Rev</th><th>Case vol %</th><th>IA cs vol %</th><th>xIA cs vol %</th><th>POD %</th><th>IA POD %</th><th>xIA POD %</th></tr></thead><tbody>
-       <tr class="tgt"><td>Target</td><td>${usdK(d0.goal)}</td><td>${tg(t.totalGrowthPct)}</td><td>${tg(t.inIowaGrowthPct)}</td><td>${tg(t.outsideIowaGrowthPct)}</td><td>${podT == null ? notSet('POD growth %') : tg(podT)}</td><td>${podIA == null ? notSet('IA POD growth %') : tg(podIA)}</td><td>${podX == null ? notSet('xIA POD growth %') : tg(podX)}</td></tr>${dRows}</tbody></table></div>
-       <div class="owner">POD % = VIP effective placements YTD vs the same period last year, one snapshot per week (kept from Oct 26 on). Case growth targets are the workbook's annual goals.</div>`);
+       <tr class="tgt"><td>${refRowLbl}</td><td>${c === 'target' ? usdK(d0 && d0.goal) : dr0 ? usdK(dr0.ref) : '—'}</td><td>${g0(A, t.totalGrowthPct)}</td><td>${g0(H, t.inIowaGrowthPct)}</td><td>${g0(X, t.outsideIowaGrowthPct)}</td>
+         <td>${c !== 'target' ? '—' : podT == null ? notSet('POD growth %') : tg(podT)}</td><td>${c !== 'target' ? '—' : podIA == null ? notSet('IA POD growth %') : tg(podIA)}</td><td>${c !== 'target' ? '—' : podX == null ? notSet('xIA POD growth %') : tg(podX)}</td></tr>${dRows}</tbody></table></div>
+       <div class="owner">${c === 'py' ? 'Against prior year, a case-volume dot is green when cases grew. ' : ''}POD % = VIP effective placements YTD vs the same period last year, at the last weekly snapshot in each period (kept from Oct 26 on).</div>`);
+    // YTD revenue (always year to date)
     const yr = state.week.slice(0, 4), yw = WEEKS.filter((w) => w.startsWith(yr) && w <= state.week);
-    const ys = yw.map(store).filter(Boolean), yd = COMP.filter((r) => r.week_start.startsWith(yr) && r.week_start <= state.week);
-    const act = sum(ys, (s) => s.rev) + sum(yd, (r) => r.brewery_distro_revenue);
+    const ys = storeAgg(yw), yd = distroAgg(yw), act = (ys ? ys.rev : 0) + (yd ? yd.rev : 0);
     const annual = XTn('Annual revenue target');
     const y0 = Date.UTC(+yr, 0, 1), elapsed = Math.min(1, (D(addDays(state.week, 7)) - y0) / (Date.UTC(+yr + 1, 0, 1) - y0));
-    const tgtY = annual ? annual * elapsed : null;
-    const pctA = annual ? act / annual * 100 : null, pctT = annual ? elapsed * 100 : null;
+    const tgtY = annual ? annual * elapsed : null, pctA = annual ? act / annual * 100 : null, pctT = annual ? elapsed * 100 : null;
+    const yp = storeAgg(pyWeeks(yw)), ypd = distroAgg(pyWeeks(yw)), actPY = (yp ? yp.rev : 0) + (ypd ? ypd.rev : 0);
     const mug = (lbl, pct, cls) => `<div class="mug"><div class="mugb"><div class="mugf ${cls}" style="height:${Math.max(0, Math.min(100, pct || 0))}%"></div><div class="mugv">${fin(pct) ? Math.round(pct) + '%' : '—'}</div></div><div class="owner">${lbl}</div></div>`;
     const ytdP = panel('YTD total Big Grove revenue', `Taprooms + distribution, Jan 1 – ${md(addDays(state.week, 6))}`, chips('toast', 'ekos', 'sheet', 'typed'),
       `<div class="mugs">${mug('Actual', pctA, 'g')}${mug('Target', pctT, 'n')}</div>
-       <div class="mile"><div><span>Actual YTD</span><b>${usd(act)}</b></div><div><span>Target to date</span><b>${annual ? usd(tgtY) : notSet('Annual revenue target')}</b></div>${annual ? `<div><span>H/(L)</span><b class="${act >= tgtY ? 'good-t' : 'bad-t'}">${hl$(act - tgtY)}${dt(act >= tgtY)}</b></div>` : ''}
-       <div class="owner">${annual ? `Actual = % of the ${usd(annual)} annual target; Target = % of the year gone (straight-line).` : 'Add "Annual revenue target" to Exec Targets to fill the mugs: actual as % of the year\'s target vs the share of the year gone.'}</div></div>`);
-    $('v-exec').innerHTML = `<div class="tier-h"><h2>Leadership Execution Card — Total Big Grove</h2><span>LCW = week of ${wkTitle(state.week)}</span></div>
+       <div class="mile"><div><span>Actual YTD</span><b>${usd(act)}</b></div>
+       <div><span>Target to date</span><b>${annual ? usd(tgtY) : notSet('Annual revenue target')}</b></div>${annual ? `<div><span>vs target</span><b class="${act >= tgtY ? 'good-t' : 'bad-t'}">${hl$(act - tgtY)}${dt(act >= tgtY)}</b></div>` : ''}
+       <div><span>Same weeks last year</span><b>${actPY ? usd(actPY) : '—'}</b></div>
+       <div class="owner">${annual ? `Actual = % of the ${usd(annual)} annual target; Target = % of the year gone.` : 'Add "Annual revenue target" to Exec Targets to fill the mugs.'} Last year's distribution before Oct 2025 isn't in any feed, so the prior-year total is taprooms plus what history exists.</div></div>`);
+    $('v-exec').innerHTML = `${head('Leadership Execution Card — Total Big Grove')}
       <div class="xg2"><div class="xcol">${storeP}<div class="xg2s">${reviewsBox(true)}${rewardsBox('Bryan Farrell')}</div></div><div class="xcol">${distP}</div></div>
       <div class="tier-h"><h2>Annual goals</h2><span>Owners as on the proposal</span></div>
       <div class="xg4">${milestoneBox('Palatine', 'Mike Wehr')}${milestoneBox('Madison', 'Matt Swift')}${promoBox('Bryan Farrell')}${ytdP}</div>
       ${sourcesFor('exec')}`;
   }
 
-  // ---- Weekly Scorecard (slide 2)
-  function trendBox(title, rowsFn, src, note) {
-    const ws = back(5);
-    return `<section class="panel trend"><div class="ph"><div><h3>${title}</h3></div>${src}</div><div style="overflow-x:auto"><table class="xt"><thead><tr><th></th>${ws.map((w, i) => `<th title="${wkTitle(w)}">${lcwLbl(i)}</th>`).join('')}</tr></thead><tbody>${
-      rowsFn.map(([lbl, f]) => `<tr><td>${lbl}</td>${ws.map((w) => `<td>${f(w)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${note ? `<div class="owner">${note}</div>` : ''}</section>`;
+  // ---------------------------------------------------------------- Weekly Scorecard (slide 2)
+  function trendBox(title, rows, src, note) {
+    const ps = periods(GRAN() === 'ytd' ? 3 : 5);
+    return `<section class="panel trend"><div class="ph"><div><h3>${title}</h3></div>${src}</div><div style="overflow-x:auto"><table class="xt"><thead><tr><th></th>${ps.map((p, i) => `<th title="${p.title}">${colLbl(p, i)}</th>`).join('')}</tr></thead><tbody>${
+      rows.map(([lbl, f]) => `<tr><td>${lbl}</td>${ps.map((p) => `<td>${f(p)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${note ? `<div class="owner">${note}</div>` : ''}</section>`;
   }
   function viewWeekly() {
-    const t = T();
-    const tot = (w) => { const s = store(w), d = distro(w); return s ? { rev: s.rev + (d ? d.rev : 0), goal: s.goal ? s.goal + (d && d.goal ? d.goal : 0) : null, py: s.dPY != null && d && d.py ? s.dPY + (d.rev - d.py) : null } : null; };
-    const st = (w) => { const s = store(w); return s && { rev: s.rev, goal: s.goal, py: s.dPY }; };
-    const di = (w) => { const d = distro(w); return d && { rev: d.rev, goal: d.goal, py: d.py ? d.rev - d.py : null }; };
-    const $rows = (f) => [
-      ['$', (w) => { const o = f(w); return o && fin(o.rev) ? usdK(o.rev) : '—'; }],
-      ['vs PY', (w) => { const o = f(w); return o && fin(o.py) ? hlK(o.py) + dt(o.py >= 0) : '—'; }],
-      ['vs target', (w) => { const o = f(w); return o && o.goal ? hlK(o.rev - o.goal) + dt(o.rev >= o.goal) : '—'; }],
+    const t = T(), c = CMP();
+    // Every box shows the value plus the comparison picked in "Compare to" (and prior year / target as fixed rows,
+    // so the deck's three-row layout stays: value, vs PY, vs target — the picked one is highlighted).
+    const totAgg = (ws) => { const s = storeAgg(ws), d = distroAgg(ws); if (!s) return null;
+      return { n: s.n, dn: d ? d.n : 0, rev: s.rev + (d ? d.rev : 0), goal: s.goal ? s.goal + (d && d.goal ? d.goal : 0) : null,
+        revLfl: s.revLfl != null && d && d.py ? s.revLfl + d.rev : null, revLY: s.revLY != null && d && d.py ? s.revLY + d.py : null }; };
+    const withCmp = (k, fn) => (p) => { const saved = state.cmp; state.cmp = k; try { return fn(p); } finally { state.cmp = saved; } };
+    const $cell = (agg) => (p) => { const r = cmpRev(p, agg); return r ? hlK(r.d) + dt(r.ok) : '—'; };
+    const $rows = (agg) => [
+      ['$', (p) => { const a = agg(p.weeks); return a ? usdK(a.rev) : '—'; }],
+      [hlRow('py', 'vs PY'), withCmp('py', $cell(agg))],
+      [hlRow('target', 'vs target'), withCmp('target', $cell(agg))],
+      [hlRow('pp', 'vs prior ' + (GRAN() === 'ytd' ? 'period' : GRAN())), withCmp('pp', $cell(agg))],
     ];
+    const pctCell = (k, tgt) => (p) => { const o = cmpPct(p, k, tgt); return o && fin(o.d) ? hlpS(o.d) + dt(o.ok) : '—'; };
     const pctRows = (k, tgt) => [
-      ['%', (w) => { const s = store(w); return s ? p1(s[k]) : '—'; }],
-      ['vs PY (pts)', (w) => { const s = store(w), p = store(prevYear(w)); return s && p && fin(s[k]) && fin(p[k]) ? hlpS(s[k] - p[k]) + dt(s[k] <= p[k]) : '—'; }],
-      ['vs tgt (pts)', (w) => { const s = store(w); return s && fin(s[k]) ? hlpS(s[k] - tgt) + dt(s[k] <= tgt) : '—'; }],
+      ['%', (p) => { const a = storeAgg(p.weeks); return a ? p1(a[k]) : '—'; }],
+      [hlRow('py', 'vs PY (pts)'), withCmp('py', pctCell(k, tgt))],
+      [hlRow('target', 'vs tgt (pts)'), withCmp('target', pctCell(k, tgt))],
+      [hlRow('pp', 'vs prior (pts)'), withCmp('pp', pctCell(k, tgt))],
     ];
-    const cntRows = (re, key) => [
-      ['#', (w) => { const n = promo(w, re); return n == null ? '—' : int.format(n); }],
-      ['vs PY', () => '<span class="muted" title="New program — no prior year">n/a</span>'],
-      [XTn(key) == null ? `vs target (${notSet(key)})` : 'vs target', (w) => { const n = promo(w, re), g = XTn(key); return g == null || n == null ? '—' : hln(n - g) + dt(n >= g); }],
-    ];
+    const cntRows = (re, key) => {
+      const g = XTn(key);
+      return [
+        ['#', (p) => { const n = promoAgg(p.weeks, re); return n == null ? '—' : int.format(n); }],
+        [hlRow('py', 'vs PY'), () => '<span class="muted" title="New program — no prior year">n/a</span>'],
+        [hlRow('target', g == null ? `vs target (${notSet(key)})` : 'vs target'), (p) => { const n = promoAgg(p.weeks, re); return g == null || n == null ? '—' : hln(n - g * p.weeks.length) + dt(n >= g * p.weeks.length); }],
+        [hlRow('pp', 'vs prior'), withCmp('pp', (p) => { const pp = prevPeriod(p), n = promoAgg(p.weeks, re), m = pp && promoAgg(pp.weeks, re); if (n == null || m == null) return '—'; const r = m * (p.weeks.length / pp.weeks.length); return hln(n - r) + dt(n >= r); })],
+      ];
+    };
+    const caseCell = (f, tgt) => (p) => { const o = cmpGrowth(p, f, tgt); return !o || !fin(o.d) ? '—' : (o.ces ? hln(o.d) : hlpS(o.d)) + dt(o.ok); };
     const caseRows = (f, tgt) => [
-      ['%', (w) => { const c = cases(w, f); return c ? p1(c.g) : '—'; }],
-      ['vs PY (CEs)', (w) => { const c = cases(w, f); return c ? hln(c.d) + dt(c.d >= 0) : '—'; }],
-      ['vs tgt (pts)', (w) => { const c = cases(w, f); return c && fin(tgt) ? hlpS(c.g - tgt) + dt(c.g >= tgt) : '—'; }],
+      ['%', (p) => { const a = casesAgg(p.weeks, f); return a ? p1(a.g) : '—'; }],
+      [hlRow('py', 'vs PY (CEs)'), withCmp('py', caseCell(f, tgt))],
+      [hlRow('target', 'vs tgt (pts)'), withCmp('target', caseCell(f, tgt))],
+      [hlRow('pp', 'vs prior (pts)'), withCmp('pp', caseCell(f, tgt))],
     ];
     const boxes = [
-      trendBox('Total revenue', $rows(tot), chips('toast', 'ekos', 'sheet'), 'PY compares taprooms open both years (Prairie Village has no prior year yet).'),
-      trendBox('Store revenue', $rows(st), chips('toast', 'sheet')),
-      trendBox('Dist. revenue', $rows(di), chips('ekos', 'sheet')),
+      trendBox('Total revenue', $rows(totAgg), chips('toast', 'ekos', 'sheet'), 'vs PY compares taprooms open both years, plus distribution where last year is in the workbook history.'),
+      trendBox('Store revenue', $rows(storeAgg), chips('toast', 'sheet')),
+      trendBox('Dist. revenue', $rows(distroAgg), chips('ekos', 'sheet')),
       trendBox('Food cost %', pctRows('food', t.foodCostPct), chips('me', 'toast')),
       trendBox('Labor cost %', pctRows('labor', t.laborPct), chips('toast'), 'Hourly labor (Toast) ÷ net sales; salaried labor needs payroll.'),
-      trendBox('Free Pint count', cntRows(RE_PINT, 'Free pint weekly target'), chips('thanx', 'typed')),
+      trendBox('Free Pint count', cntRows(RE_PINT, 'Free pint weekly target'), chips('thanx', 'typed'), 'Weekly target × weeks in the period.'),
       trendBox('Sampler cards', cntRows(RE_SAMPLER, 'Sampler card weekly target'), chips('thanx', 'typed')),
       trendBox('Case vol %', caseRows(A, t.totalGrowthPct), chips('vip', 'sheet')),
       trendBox('IA case vol %', caseRows(H, t.inIowaGrowthPct), chips('vip', 'sheet')),
       trendBox('xIA case vol %', caseRows(X, t.outsideIowaGrowthPct), chips('vip', 'sheet')),
     ];
-    $('v-weekly').innerHTML = `<div class="tier-h"><h2>Leadership Scorecard — Total Big Grove</h2><span>LCW = week of ${wkTitle(state.week)} · hover a column for its dates</span></div>
+    $('v-weekly').innerHTML = `${head('Leadership Scorecard — Total Big Grove')}
       <div class="xwk"><div class="xg2b">${boxes.join('')}</div><div class="xcol">${milestoneBox('Palatine', '')}${milestoneBox('Madison', '')}${rewardsBox('')}${reviewsBox(true)}</div></div>
-      ${sourcesFor('weekly')}`;
+      ${c === 'pp' ? perWeekNote : ''}${sourcesFor('weekly')}`;
   }
+  const hlRow = (k, lbl) => (CMP() === k ? `<b class="cmpon">${lbl}</b>` : lbl);
 
-  // ---- By Location (slide 3, Option 2)
+  // ---------------------------------------------------------------- By Location (slide 3, Option 2)
   function viewByLoc() {
-    const ws = back(3), t = T();
+    const ps = periods(3), t = T(), c = CMP();
     const cell = (v, d, good, fmt, fmtD, noDot) => (fin(v) ? `${fmt(v)}<span class="sl">/</span><span class="${good == null ? '' : good ? 'good-t' : 'bad-t'}">${fmtD(d)}</span>${noDot ? '' : dt(good)}` : '—');
-    const head = `<thead><tr><th></th>${ws.map((w, i) => `<th title="${wkTitle(w)}">${lcwLbl(i)}</th>`).join('')}</tr></thead>`;
-    const revRows = ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${ws.map((w) => { const r = TAP.find((x) => x.week_start === w && x.location === l); const g = r && r.goal_src === 'sheet' ? r.sales_goal : null; return `<td>${r ? (g ? cell(r.net_sales, r.net_sales - g, r.net_sales >= g, usdK, hlK) : usdK(r.net_sales) + '<span class="sl">/</span><span class="muted" title="No workbook goal captured for this week">—</span>') : '—'}</td>`; }).join('')}</tr>`).join('')
-      + `<tr><td>Brewery</td>${ws.map((w) => { const d = distro(w); return `<td>${d ? cell(d.rev, d.goal ? d.rev - d.goal : null, d.goal ? d.rev >= d.goal : null, usdK, hlK) : '—'}</td>`; }).join('')}</tr>`
-      + `<tr class="tgt"><td>Total</td>${ws.map((w) => { const s = store(w), d = distro(w); if (!s) return '<td>—</td>'; const v = s.rev + (d ? d.rev : 0), g = s.goal ? s.goal + (d && d.goal ? d.goal : 0) : null; return `<td>${g ? cell(v, v - g, v >= g, usdK, hlK) : usdK(v) + '<span class="sl">/</span><span class="muted">—</span>'}</td>`; }).join('')}</tr>`;
-    const pctTable = (k, tk, tgt) => ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${ws.map((w) => { const r = TAP.find((x) => x.week_start === w && x.location === l); const v = r ? r[k] : null; return `<td>${cell(v, fin(v) ? v - tgt : null, fin(v) ? v <= tgt : null, p1, hlpS, true)}</td>`; }).join('')}</tr>`).join('')
-      + `<tr class="tgt"><td>Total</td>${ws.map((w) => { const s = store(w); const v = s ? s[tk] : null; return `<td>${cell(v, fin(v) ? v - tgt : null, fin(v) ? v <= tgt : null, p1, hlpS, true)}</td>`; }).join('')}</tr>`;
-    const revP = panel('Revenue H/(L) vs target', "Actual / H(L) vs that week's goal", chips('toast', 'ekos', 'sheet'), `<div style="overflow-x:auto"><table class="xt">${head}<tbody>${revRows}</tbody></table></div>`);
-    const foodP = panel('Food COGS % H/(L) vs target', `Target ≤ ${t.foodCostPct}% · actual / pts vs target`, chips('me', 'toast'), `<div style="overflow-x:auto"><table class="xt">${head}<tbody>${pctTable('food_cost_pct', 'food', t.foodCostPct)}</tbody></table></div>`);
-    const labP = panel('Labor % H/(L) vs target', `Target ≤ ${t.laborPct}% · hourly labor (Toast) · actual / pts vs target`, chips('toast'), `<div style="overflow-x:auto"><table class="xt">${head}<tbody>${pctTable('labor_pct', 'labor', t.laborPct)}</tbody></table></div>`);
+    const thead = `<thead><tr><th></th>${ps.map((p, i) => `<th title="${p.title}">${colLbl(p, i)}</th>`).join('')}</tr></thead>`;
+    const revCell = (p, agg) => { const a = agg(p.weeks); if (!a) return '—'; const r = cmpRev(p, agg); return r ? cell(a.rev, r.d, r.ok, usdK, hlK) : usdK(a.rev) + '<span class="sl">/</span><span class="muted">—</span>'; };
+    const locAgg = (l) => (ws) => storeAgg(ws, l);
+    const totAgg = (ws) => { const s = storeAgg(ws), d = distroAgg(ws); if (!s) return null;
+      return { n: s.n, dn: d ? d.n : 0, rev: s.rev + (d ? d.rev : 0), goal: s.goal ? s.goal + (d && d.goal ? d.goal : 0) : null,
+        revLfl: s.revLfl != null && d && d.py ? s.revLfl + d.rev : null, revLY: s.revLY != null && d && d.py ? s.revLY + d.py : null }; };
+    const revRows = ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${ps.map((p) => `<td>${revCell(p, locAgg(l))}</td>`).join('')}</tr>`).join('')
+      + `<tr><td>Brewery</td>${ps.map((p) => `<td>${revCell(p, distroAgg)}</td>`).join('')}</tr>`
+      + `<tr class="tgt"><td>Total</td>${ps.map((p) => `<td>${revCell(p, totAgg)}</td>`).join('')}</tr>`;
+    const pctTable = (k, tgt) => ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${ps.map((p) => { const o = cmpPct(p, k, tgt, l); return `<td>${o ? cell(o.v, o.d, o.ok, p1, hlpS, true) : '—'}</td>`; }).join('')}</tr>`).join('')
+      + `<tr class="tgt"><td>Total</td>${ps.map((p) => { const o = cmpPct(p, k, tgt); return `<td>${o ? cell(o.v, o.d, o.ok, p1, hlpS, true) : '—'}</td>`; }).join('')}</tr>`;
+    const vs = cmpWord();
+    const revP = panel(`Revenue H/(L) vs ${vs}`, `Actual / H(L) vs ${vs}`, chips('toast', 'ekos', 'sheet'), `<div style="overflow-x:auto"><table class="xt">${thead}<tbody>${revRows}</tbody></table></div>`);
+    const foodP = panel(`Food COGS % H/(L) vs ${vs}`, `Target ≤ ${t.foodCostPct}% · actual / pts`, chips('me', 'toast'), `<div style="overflow-x:auto"><table class="xt">${thead}<tbody>${pctTable('food', t.foodCostPct)}</tbody></table></div>`);
+    const labP = panel(`Labor % H/(L) vs ${vs}`, `Target ≤ ${t.laborPct}% · hourly labor (Toast) · actual / pts`, chips('toast'), `<div style="overflow-x:auto"><table class="xt">${thead}<tbody>${pctTable('labor', t.laborPct)}</tbody></table></div>`);
     const rw = repWeeks().slice(0, 3), tg = t.rating || 4.7;
-    const gP = panel('Google rating', `Target: ${tg}+ stars by location`, chips('sheet', 'google'),
-      `<div style="overflow-x:auto"><table class="xt"><thead><tr><th></th>${rw.map((w, i) => `<th colspan="2" title="${wkTitle(w)}">${lcwLbl(i)}</th>`).join('')}</tr><tr><th></th>${rw.map(() => '<th>Stars</th><th>Count</th>').join('')}</tr></thead><tbody>${
+    const gP = panel('Google rating', `Target: ${tg}+ stars by location · latest captured weeks`, chips('sheet', 'google'),
+      `<div style="overflow-x:auto"><table class="xt"><thead><tr><th></th>${rw.map((w) => `<th colspan="2" title="${wkTitle(w)}">${md(w)}</th>`).join('')}</tr><tr><th></th>${rw.map(() => '<th>Stars</th><th>Count</th>').join('')}</tr></thead><tbody>${
         ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${rw.map((w) => { const r = REP.find((x) => x.week_start === w && x.location === l); return r ? `<td>${fin(r.rating) ? r.rating.toFixed(1) : '—'}${dt(fin(r.rating) ? r.rating >= tg : null)}</td><td>${fin(r.reviews) ? int.format(r.reviews) : '—'}</td>` : '<td>—</td><td>—</td>'; }).join('')}</tr>`).join('')}</tbody></table></div>
        ${rw.length < 3 ? '<div class="owner">Earlier weeks fill in as the workbook is captured each week (or once Google is connected).</div>' : ''}`);
-    const ytd = (f) => { const rows = DY.filter((r) => f(r.state)); const ty = sum(rows, (r) => r.ce_ytd), ly = sum(rows, (r) => r.ce_ytd_ly); return ly ? (ty / ly - 1) * 100 : null; };
-    const cvP = panel('Case volume growth', 'Year to date vs last year', chips('vip', 'sheet'), `<div class="mile">
-      <div><span>Target (total)</span><b>+${t.totalGrowthPct}%</b></div>
-      <div><span>Total case volume</span><b>${p1(ytd(A))}${dt(ytd(A) >= t.totalGrowthPct)}</b></div>
-      <div><span>In Iowa case volume</span><b>${p1(ytd(H))}${dt(ytd(H) >= t.inIowaGrowthPct)}</b></div><div class="owner">target +${t.inIowaGrowthPct}%</div>
-      <div><span>Outside Iowa case volume</span><b>${p1(ytd(X))}${dt(ytd(X) >= t.outsideIowaGrowthPct)}</b></div><div class="owner">target +${t.outsideIowaGrowthPct}%</div></div>`);
+    const p0 = ps[0];
+    const gl = (f, tgt) => { const o = p0 && cmpGrowth(p0, f, tgt); return o ? `${p1(o.v)}${dt(o.ok)}` : '—'; };
+    const ref = (f, tgt) => { const o = p0 && cmpGrowth(p0, f, tgt); return c === 'target' ? `target +${tgt}%` : c === 'py' ? (o ? `${hln(o.d)} CEs vs last year` : '') : (o && fin(o.ref) ? `prior period ${p1(o.ref)}` : ''); };
+    const cvP = panel('Case volume growth', `${p0 ? esc(p0.label) : ''} vs the same weeks last year`, chips('vip', 'sheet'), `<div class="mile">
+      <div><span>Total case volume</span><b>${gl(A, t.totalGrowthPct)}</b></div><div class="owner">${ref(A, t.totalGrowthPct)}</div>
+      <div><span>In Iowa case volume</span><b>${gl(H, t.inIowaGrowthPct)}</b></div><div class="owner">${ref(H, t.inIowaGrowthPct)}</div>
+      <div><span>Outside Iowa case volume</span><b>${gl(X, t.outsideIowaGrowthPct)}</b></div><div class="owner">${ref(X, t.outsideIowaGrowthPct)}</div></div>`);
     const line = (lbl, val, key, note) => `<div><span><b>${lbl}:</b> ${val}</span>${dt(null)}</div><div class="owner">Goal: ${XT(key) ? esc(XT(key)) : notSet(key)}${note ? ' · ' + note : ''}</div>`;
     const waiting = '<span class="muted">waiting on feed</span>';
-    const gc = XO('Golden Can rollout date');
-    const goldP = panel('Leveraging the Golden Triangle', '', chips('thanx', 'none', 'typed'), `<div class="mile">
-      ${line('Free Pint coupon on 12-packs — redemptions', DSW.length ? int.format(promoSince(RE_PINT) || 0) : waiting, 'Free pint redemptions', 'Toast discount')}
-      ${line('6-pack for $0.01 with Rewards sign-up', DSW.length ? int.format(promoSince(RE_PENNY) || 0) : waiting, '6-pack sign-up count', 'Toast discount')}
-      ${line('Trade industry nights, month to date', '<span class="muted">not connected</span>', 'Industry nights per month', 'where are they booked?')}
-      ${line('Golden Can campaign rollout', gc && gc.actual ? esc(gc.actual) : '<span class="muted">—</span>', 'Golden Can rollout date', '')}</div>`);
+    const gcan = XO('Golden Can rollout date');
+    const goldP = panel('Leveraging the Golden Triangle', p0 ? esc(p0.label) : '', chips('thanx', 'none', 'typed'), `<div class="mile">
+      ${line('Free Pint coupon on 12-packs — redemptions', DSW.length ? int.format(promoAgg(p0.weeks, RE_PINT) || 0) : waiting, 'Free pint redemptions', 'Toast discount')}
+      ${line('6-pack for $0.01 with Rewards sign-up', DSW.length ? int.format(promoAgg(p0.weeks, RE_PENNY) || 0) : waiting, '6-pack sign-up count', 'Toast discount')}
+      ${line('Trade industry nights', '<span class="muted">not connected</span>', 'Industry nights per month', 'where are they booked?')}
+      ${line('Golden Can campaign rollout', gcan && gcan.actual ? esc(gcan.actual) : '<span class="muted">—</span>', 'Golden Can rollout date', '')}</div>`);
     const techP = panel("Implementing Big Grove's technology for the future", '', chips('typed'), `<div class="mile">${
       ['Big Grove Brain', 'Brewery and Finance ERP', 'LMS', 'Security'].map((n) => { const o = XO(n + ' launch date'); return `<div><span><b>${n}:</b> ${o && o.actual ? esc(o.actual) : '<span class="muted">not launched</span>'}</span>${dt(null)}</div><div class="owner">Target launch: ${o ? esc(o.target) : notSet(n + ' launch date')}</div>`; }).join('')}</div>`);
-    $('v-byloc').innerHTML = `<div class="tier-h"><h2>Leadership Scorecard — Total Big Grove · Option 2 (by location)</h2><span>LCW = week of ${wkTitle(state.week)}</span></div>
+    $('v-byloc').innerHTML = `${head('Leadership Scorecard — Total Big Grove · Option 2 (by location)')}
       <div class="xg3">${milestoneBox('Palatine', '')}${milestoneBox('Madison', '')}${cvP}</div>
       <div class="xg3t">${revP}${foodP}${labP}</div>
       <div class="xg3">${gP}${rewardsBox('')}${goldP}</div>
       <div class="xg3">${techP}</div>
-      ${sourcesFor('byloc')}`;
+      ${c === 'pp' ? perWeekNote : ''}${sourcesFor('byloc')}`;
   }
 
-  // ---- what feeds each page
+  // ---------------------------------------------------------------- what feeds each page
   const FEEDS = {
     exec: [
       ['Store metrics — revenue, hourly labor %, food cost %', 'Toast · MarginEdge', 'connected', 'Targets: weekly taproom goals (workbook), labor / food % targets'],
@@ -724,16 +861,16 @@ details.feeds .st2{font-size:10.5px}
       ['YTD total revenue', 'Toast · Ekos · workbook', 'connected', "Annual target typed ('Annual revenue target')"],
     ],
     weekly: [
-      ['Total / store / dist. revenue, H/(L) PY and target', 'Toast · Ekos · workbook', 'connected', 'Dist. prior year from the workbook history (Oct 2025 on)'],
-      ['Food cost %, labor cost %, vs PY and target', 'MarginEdge · Toast', 'connected', 'PY = same week last year'],
+      ['Total / store / dist. revenue vs PY, target, prior period', 'Toast · Ekos · workbook', 'connected', 'Dist. prior year from the workbook history (Oct 2025 on)'],
+      ['Food cost %, labor cost %', 'MarginEdge · Toast', 'connected', 'PY = same weeks last year'],
       ['Free Pint count, sampler cards', 'Thanx via Toast', 'connected', 'Weekly targets typed; no PY (new programs)'],
-      ['Case vol % total / IA / xIA', 'VIP', 'connected', 'Same VIP week last year'],
+      ['Case vol % total / IA / xIA', 'VIP', 'connected', 'Same VIP weeks last year'],
       ['Palatine / Madison', 'Typed', 'manual', ''],
       ['Rewards', 'Thanx via Toast', 'connected', ''],
       ['Google reviews', 'Workbook → Google Places API', 'needs', ''],
     ],
     byloc: [
-      ['Revenue by location + brewery vs target', 'Toast · Ekos · workbook goals', 'connected', ''],
+      ['Revenue by location + brewery', 'Toast · Ekos · workbook goals', 'connected', ''],
       ['Food COGS % and labor % by location', 'MarginEdge · Toast', 'connected', ''],
       ['Google rating and count by location', 'Workbook → Google Places API', 'needs', ''],
       ['Case volume growth', 'VIP', 'connected', ''],
@@ -1198,7 +1335,13 @@ details.feeds .st2{font-size:10.5px}
     const show = (v) => {
       views.forEach(([id]) => { $(id).hidden = id !== v; links[id].classList.toggle('on', id === v); });
       const period = ['app', 'exec', 'weekly', 'byloc'].includes(v);
-      document.querySelectorAll('header .ctl').forEach((c) => { c.style.visibility = (c.querySelector('#sel-loc') ? v === 'app' : period) ? '' : 'hidden'; });
+      const xv = ['exec', 'weekly', 'byloc'].includes(v);
+      document.querySelectorAll('header .ctl').forEach((c) => {
+        if (c.classList.contains('xonly')) { c.hidden = !xv; return; }
+        if (c.querySelector('#sel-loc')) { c.hidden = v !== 'app'; return; }
+        c.hidden = !period;
+      });
+      $('lbl-week').textContent = xv ? 'Through' : 'Period';
       if (v === 'usage') showUsage(a); else if (v === 'sources') window.__esRenderSources(); else if (window.__esRenderViews) window.__esRenderViews();
       window.scrollTo(0, 0);
     };
