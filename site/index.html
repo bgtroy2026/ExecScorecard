@@ -151,6 +151,27 @@ html.locked #gate{display:block}
 .who a{color:var(--green);margin-left:6px}
 .who a.on{color:#fff;text-decoration:underline}
 [hidden]{display:none!important}
+#sources{padding-top:18px;padding-bottom:40px}
+#sources h2{font:600 20px/1.2 Jost,system-ui,sans-serif;margin:0 0 4px}
+#sources .sub{color:var(--muted);font-size:13px;margin-bottom:14px;max-width:900px}
+#sources .scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+#sources .sc{background:#fff;border:1px solid var(--grid);border-radius:10px;padding:12px 14px;border-left:4px solid var(--c)}
+#sources .sc b{display:block;font-size:24px;font-weight:600}
+#sources .sc span{font-size:12px;color:var(--muted)}
+#sources .plats{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-bottom:22px}
+#sources .pl{background:#fff;border:1px solid var(--grid);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--ink2)}
+#sources .pl h4{margin:0 0 3px;font:600 13.5px/1.3 Jost,system-ui,sans-serif;color:var(--ink);display:flex;justify-content:space-between;gap:8px}
+#sources details{background:#fff;border:1px solid var(--grid);border-radius:10px;margin-bottom:10px;overflow:hidden}
+#sources summary{cursor:pointer;padding:11px 14px;font:600 14.5px/1.3 Jost,system-ui,sans-serif;display:flex;justify-content:space-between;gap:10px;align-items:center}
+#sources summary .mini{display:flex;gap:4px;flex-wrap:wrap;font:500 11px/1 system-ui,sans-serif}
+#sources table{width:100%;border-collapse:collapse;font-size:13px}
+#sources th,#sources td{padding:7px 12px;text-align:left;border-top:1px solid var(--grid);vertical-align:top}
+#sources th{background:#f6f7f9;font-weight:600;font-size:12px}
+#sources td.snote{color:var(--muted);font-size:12px}
+.st2{display:inline-block;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap;color:#fff;background:var(--c)}
+.st2.connected{--c:#2f6b12}.st2.ready{--c:#2b6cb0}.st2.needs{--c:#a86a00}.st2.manual{--c:#7a7f95}
+#sources .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:0 0 16px}
+
 #usage{padding-top:18px;padding-bottom:40px}
 #usage h2{font:600 20px/1.2 Jost,system-ui,sans-serif;margin:0 0 4px}
 #usage .sub{color:var(--muted,#667);font-size:13px;margin-bottom:14px}
@@ -189,6 +210,21 @@ html.locked #gate{display:block}
   <div id="gbtn"></div>
   <div class="gerr" id="gerr"></div>
 </section>
+
+<main class="wrap" id="sources" hidden>
+  <h2>Data sources — Leadership Scorecard workbook</h2>
+  <div class="sub">Every number on the Leadership Scorecard spreadsheet, tab by tab: which platform can supply it, and whether the scorecard already pulls it. Use it to decide what to connect next and what stays typed.</div>
+  <div class="scards" id="src-cards"></div>
+  <div class="legend">
+    <span><span class="st2 connected">Connected</span> pulled automatically today</span>
+    <span><span class="st2 ready">Ready</span> already in a platform we pull — just needs wiring</span>
+    <span><span class="st2 needs">Needs a connector</span> lives in a platform we don't pull yet</span>
+    <span><span class="st2 manual">Typed</span> goals and judgments no system holds</span>
+  </div>
+  <div class="plats" id="src-plats"></div>
+  <div id="src-tabs"></div>
+  <div class="sub" style="margin-top:14px">Last reviewed Nov 14, 2026, from all 16 tabs of the workbook.</div>
+</main>
 
 <main class="wrap" id="usage" hidden>
   <h2>Usage</h2>
@@ -650,6 +686,127 @@ html.locked #gate{display:block}
 </script>
 
 <script>
+/* ---------- Data sources page (static map of the Leadership Scorecard workbook) ---------- */
+(() => {
+  const P = {
+    toast: ['Toast', 'Point of sale for all six taprooms: sales, categories, labor, guests, comps, discounts, DoorDash orders.', 'Connected — via the Store Director Portal, nightly'],
+    me: ['MarginEdge', 'Purchases and inventory counts by category (food, beer, liquor, wine).', 'Connected — via the Store Director Portal, nightly'],
+    ts: ['Tripleseat', 'Private events, bookings and leads, with event revenue.', 'Connected — via the Store Director Portal, nightly'],
+    vip: ['VIP', 'Distributor depletions (cases), placements and accounts.', 'Connected — via the Sales Portal daily refresh'],
+    ekos: ['Ekos', 'Brewery invoices for Liberty and Gilbert (distribution revenue); production and orders.', 'Connected for invoices — via the Sales Portal daily download'],
+    karma: ['KARMA', 'Sales rep account visits and activity.', 'Pulled by the Sales Portal — not yet wired here'],
+    google: ['Google reviews', 'Star rating and review count per taproom (Places API).', 'Not connected — waiting on Google Cloud billing OK'],
+    thanx: ['Thanx (loyalty)', 'Loyalty sign-ups and rewards customers.', 'Not connected'],
+    payroll: ['Payroll', 'Salaried and hourly totals, production labor.', 'Not connected — system to confirm'],
+    resv: ['Reservations', '"A Very Merry Big Grove" pop-up reservations (not in Tripleseat).', 'Not connected — system to confirm'],
+    sheet: ['Typed in the workbook', 'Goals, targets and audit scores.', 'Stays manual'],
+  };
+  const C = 'connected', R = 'ready', N = 'needs', M = 'manual';
+  const T = [
+    ['2026 Leadership Scorecard', 'The weekly leadership summary', [
+      ['Google reviews: last-week score, average score, review counts', 'google', N, 'Rating + total count via Places API; weekly new reviews from the change in count. The weekly average of new reviews needs the Business Profile API, which is not being pursued.'],
+      ['Revenue by location: current year, prior year', 'toast', C, ''],
+      ['Revenue goals by location', 'sheet', M, 'Store Director also holds monthly targets — pick one source of truth.'],
+      ['Brewery revenue', 'ekos', C, 'Invoice lines excluding keg deposits, by delivery date; matches the sheet within ~1-2%.'],
+      ['Brewery prior year and goal', 'sheet', M, 'Ekos starts May 2026, so no prior year from it yet.'],
+      ['Food cost % by location, rolling 4-week average', 'me', C, 'From purchases; the inventory-adjusted version needs weekly counts in MarginEdge.'],
+      ['Direct labor % by location, rolling 4-week average', 'toast', C, ''],
+      ['Holiday pop-up guests vs goal', 'toast', C, 'Actual guests from Toast; goals typed.'],
+      ['Total case volume growth: last 4 weeks, YTD (in / outside Iowa)', 'vip', C, 'YTD connected; last-4-week view ready.'],
+      ['Case volume growth goals', 'sheet', M, ''],
+      ['POD count (in / outside Iowa) vs prior year', 'vip', C, 'Scorecard uses YTD effective placements; the sheet uses last 90 days. A 90-day VIP report would match it.'],
+    ]],
+    ['2026 Taproom Scorecard', 'Week vs prior year, goal and 4-week average, per taproom', [
+      ['Location total revenue, prior year, avg L4W', 'toast', C, ''],
+      ['Location food revenue and beer revenue', 'toast', C, ''],
+      ['Location total labor', 'toast', C, ''],
+      ['Location food costs', 'me', C, ''],
+      ['Event revenue and event count', 'ts', C, ''],
+      ['Guest count and prior year', 'toast', C, ''],
+      ['DoorDash sales', 'toast', R, 'Toast order channels.'],
+      ['Comp % of sales', 'toast', R, 'Toast discounts (loyalty redemptions excluded).'],
+      ['Loyalty sign-ups', 'thanx', N, ''],
+      ['Distro revenue and CEs', 'ekos', C, 'Revenue from Ekos; CEs from VIP.'],
+      ['Production labor and labor %', 'payroll', N, ''],
+      ['Order fulfillment', 'ekos', N, 'Needs an order (not invoice) export; calculation to confirm.'],
+      ['Goals', 'sheet', M, ''],
+    ]],
+    ['All Company Scorecard', 'Owner rows by week', [
+      ['Location revenue, labor, labor %', 'toast', C, ''],
+      ['Location food revenue, food costs, food cost %', 'me', C, 'Food revenue from Toast, costs from MarginEdge.'],
+      ['Location bar sales, bar costs, bar cost %', 'me', R, 'Bar sales from Toast, costs from MarginEdge.'],
+      ['Total guests, average spend per guest', 'toast', C, ''],
+      ['Total comps, comp % of sales', 'toast', R, ''],
+      ['Event revenue, total events', 'ts', C, ''],
+      ['DoorDash sales', 'toast', R, ''],
+      ['Distribution revenue', 'ekos', C, ''],
+      ["CE's weekly vs weekly goal; total CEs weekly / annual vs LY", 'vip', C, 'Goals typed.'],
+      ["New market CE's (1st year)", 'vip', R, 'Distributors / states with no prior-year volume.'],
+      ['Quality account visits', 'karma', R, ''],
+      ['Hourly production labor, hourly total, salary total, total labor %', 'payroll', N, ''],
+      ['Beer waste %', 'ekos', N, 'Calculation to confirm.'],
+      ['Order fulfillment', 'ekos', N, 'Calculation to confirm.'],
+    ]],
+    ['Location tabs (DSM, Cedar Rapids, Iowa City, Omaha, Solon, Prairie Village)', 'One weekly ledger per taproom', [
+      ['Food cost: beginning inventory, purchases, ending inventory, food cost %', 'me', R, 'Purchases are in; inventory needs weekly counts in MarginEdge.'],
+      ['Bar costs: inventory, purchases, bar cost %', 'me', R, ''],
+      ['Food sales, bar sales, beer sales, total sales', 'toast', C, ''],
+      ['Labor weekly $, labor %', 'toast', C, ''],
+      ['Hourly labor %', 'toast', R, ''],
+      ['Total guests, average spend per guest', 'toast', C, ''],
+      ['Total comps, comp % of sales', 'toast', R, ''],
+      ['% of comps from Thanx', 'thanx', N, ''],
+      ['Loyalty sign-ups', 'thanx', N, ''],
+      ['DoorDash sales', 'toast', R, ''],
+      ['Event revenue, total events', 'ts', C, ''],
+      ['"A Very Merry Big Grove" reservation count', 'resv', N, 'Not found in Tripleseat — confirm where the pop-up books.'],
+    ]],
+    ['VMBG Targets', 'Holiday pop-up weekly guest targets', [
+      ['2025 weekly guests by location', 'toast', R, 'Toast history via the Store Director Portal.'],
+      ['2026 weekly guest goals', 'sheet', M, ''],
+      ['2026 actual guests (cumulative)', 'toast', C, ''],
+    ]],
+    ['Rewards by Week', 'Loyalty program', [
+      ['Location-attributed sign-ups, total sign-ups', 'thanx', N, ''],
+      ['Unique customer purchases', 'thanx', N, 'Toast sees loyalty check-ins, which could stand in once confirmed.'],
+    ]],
+    ['Distributor Data - L4W', 'VIP export, last 4 weeks', [['Cases by distributor, last 4 weeks vs LY; IA vs outside IA', 'vip', R, '']]],
+    ['Distributor - YTD', 'VIP export, year to date', [['Cases by distributor, YTD vs LY; IA vs outside IA', 'vip', C, '']]],
+    ['Placements', 'VIP export, 90 days', [['Effective placements by distributor, 90 days vs LY', 'vip', C, 'Connected as YTD; 90-day window needs that report in the daily VIP download.']]],
+    ['Location Overview', 'Toast summary, last week and rolling 4 weeks', [
+      ['Net sales, labor %', 'toast', C, ''],
+      ['Discounts, refunds, gross sales', 'toast', R, ''],
+    ]],
+    ['Audit Scores / Mystery Shops', 'Monthly scores by location', [
+      ['Mystery shop scores', 'sheet', M, 'Third-party reports.'],
+      ['Audit results', 'sheet', M, 'Internal audit sheets.'],
+    ]],
+  ];
+  const LBL = { connected: 'Connected', ready: 'Ready', needs: 'Needs a connector', manual: 'Typed' };
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  window.__esRenderSources = () => {
+    if ($id('src-tabs').firstChild) return;
+    const all = T.flatMap((t) => t[2]), cnt = (k) => all.filter((r) => r[2] === k).length;
+    $id('src-cards').innerHTML = [['connected', '#2f6b12'], ['ready', '#2b6cb0'], ['needs', '#a86a00'], ['manual', '#7a7f95']]
+      .map(([k, c]) => `<div class="sc" style="--c:${c}"><b>${cnt(k)}</b><span>${LBL[k]}</span></div>`).join('');
+    const used = new Set(all.map((r) => r[1]));
+    $id('src-plats').innerHTML = Object.entries(P).filter(([k]) => used.has(k)).map(([k, p]) => {
+      const n = all.filter((r) => r[1] === k).length;
+      return `<div class="pl"><h4><span>${esc(p[0])}</span><span style="font-weight:500;color:var(--muted)">${n} item${n === 1 ? '' : 's'}</span></h4>${esc(p[1])}<div style="margin-top:4px;font-weight:600;color:var(--ink)">${esc(p[2])}</div></div>`;
+    }).join('');
+    $id('src-tabs').innerHTML = T.map(([tab, sub, rows], i) => {
+      const mini = ['connected', 'ready', 'needs', 'manual'].map((k) => { const n = rows.filter((r) => r[2] === k).length; return n ? `<span class="st2 ${k}">${n} ${LBL[k]}</span>` : ''; }).join('');
+      return `<details${i < 2 ? ' open' : ''}><summary><span>${esc(tab)} <span style="font:400 12px system-ui;color:var(--muted)">— ${esc(sub)}</span></span><span class="mini">${mini}</span></summary>
+        <table><thead><tr><th style="width:38%">Number on the sheet</th><th style="width:16%">Platform</th><th style="width:14%">Status</th><th>Notes</th></tr></thead><tbody>
+        ${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(P[r[1]][0])}</td><td><span class="st2 ${r[2]}">${LBL[r[2]]}</span></td><td class="snote">${esc(r[3])}</td></tr>`).join('')}
+        </tbody></table></details>`;
+    }).join('');
+  };
+  function $id(i) { return document.getElementById(i); }
+})();
+</script>
+
+<script>
 /* ---------- Sign-in gate + encrypted data ----------
    Google ID token -> "Exec Scorecard Login" Apps Script (its own roster sheet) -> {bundle:{id,key}, sid}.
    The data is published only as data/enc/<id>.bin (AES-256-GCM over gzip JSON, tools/build_bundle.py); without a
@@ -720,10 +877,17 @@ html.locked #gate{display:block}
     document.documentElement.classList.remove('locked');
     const w = $('who'); w.hidden = false; w.innerHTML = '';
     w.append(document.createTextNode(a.name || a.email));
-    if (/^admin$/i.test(a.role || '')) {               // usage view: Admins only (the backend checks too)
-      const u = document.createElement('a'); u.href = '#'; u.textContent = 'Usage'; w.append(u);
-      u.onclick = (e) => { e.preventDefault(); const on = $('usage').hidden; $('usage').hidden = !on; $('app').hidden = on; u.classList.toggle('on', on); u.textContent = on ? 'Scorecard' : 'Usage'; if (on) showUsage(a); };
-    }
+    // views: Scorecard | Data sources | Usage (Admins only — the backend checks too)
+    const views = [['app', 'Scorecard'], ['sources', 'Data sources']].concat(/^admin$/i.test(a.role || '') ? [['usage', 'Usage']] : []);
+    const links = {};
+    const show = (v) => {
+      views.forEach(([id]) => { $(id).hidden = id !== v; links[id].classList.toggle('on', id === v); });
+      document.querySelectorAll('header .ctl').forEach((c) => { c.style.visibility = v === 'app' ? '' : 'hidden'; });
+      if (v === 'usage') showUsage(a); else if (v === 'sources') window.__esRenderSources();
+      window.scrollTo(0, 0);
+    };
+    views.forEach(([id, label]) => { const l = document.createElement('a'); l.href = '#'; l.textContent = label; l.onclick = (e) => { e.preventDefault(); show(id); }; links[id] = l; w.append(l); });
+    links.app.classList.add('on');
     const so = document.createElement('a'); so.href = '#'; so.textContent = 'Sign out'; w.append(so);
     so.onclick = (e) => { e.preventDefault(); forget(); try { google.accounts.id.disableAutoSelect(); } catch {} location.reload(); };
     window.__esStart();
