@@ -16,6 +16,10 @@
  * Protocol (POST, Content-Type text/plain):
  *   {"a":"signin","t":<Google ID token>} → { ok, profile:{email,name,role}, bundle:{id,key}, sid }
  *   {"a":"refresh","s":<sid>}            → the same, re-checked against the roster today (sid lasts 30 days)
+ *   {"a":"usage","s":<sid>}              → Admin only: the Logins log (newest first, up to 2,000 rows) + the roster
+ *
+ * Every sign-in is logged as "signin", every return visit (a remembered session re-checked) as "open",
+ * and refusals as "refused". The usage view on the page reads them back for roster Admins only.
  */
 var CLIENT_ID = '169287489700-t5en62nibhp9ttn24vfimd7k974dgl9i.apps.googleusercontent.com';
 var SHEET_ID = '1g9rdbN1eT9or3StT_WoH3woguSIkOYvpgv7D27TquJA';
@@ -31,6 +35,7 @@ function doPost(e) {
     var req = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     if (req.a === 'signin') return json(signin(String(req.t || '')));
     if (req.a === 'refresh') return json(refresh(String(req.s || '')));
+    if (req.a === 'usage') return json(usage(String(req.s || '')));
     return json({ ok: false, error: 'unknown action' });
   } catch (err) { return json({ ok: false, error: 'server error: ' + err }); }
 }
@@ -53,7 +58,28 @@ function signin(token) {
 function refresh(sid) {
   var s = readSid(sid);
   if (!s) return { ok: false, error: 'expired session' };
-  return grant(s.e, '');
+  var out = grant(s.e, '');
+  log(s.e, out.ok ? out.profile.name : '', out.ok ? 'open' : 'refused');
+  return out;
+}
+
+function usage(sid) {
+  var s = readSid(sid);
+  if (!s) return { ok: false, error: 'expired session' };
+  var g = grant(s.e, '');
+  if (!g.ok || !/^admin$/i.test(g.profile.role)) return { ok: false, error: 'admins only' };
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sh = ss.getSheetByName('Logins');
+  var rows = [];
+  if (sh && sh.getLastRow() > 1) {
+    var n = Math.min(sh.getLastRow() - 1, 2000);
+    rows = sh.getRange(sh.getLastRow() - n + 1, 1, n, 4).getValues().reverse().map(function (r) {
+      return [r[0] instanceof Date ? r[0].toISOString() : String(r[0]), String(r[1]), String(r[2]), String(r[3])];
+    });
+  }
+  var roster = ss.getSheets()[0].getDataRange().getValues().slice(1).filter(function (r) { return r[0]; })
+    .map(function (r) { return [String(r[0]).toLowerCase().trim(), String(r[1] || ''), String(r[2] || '')]; });
+  return { ok: true, rows: rows, roster: roster };
 }
 
 function grant(email, googleName) {

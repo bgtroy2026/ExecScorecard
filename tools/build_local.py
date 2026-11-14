@@ -253,6 +253,33 @@ def file_history(name, header, key_cols, new_rows):
     return rows
 
 
+# ------------------------------------------------------------------------------------------------ VIP placements (PODs)
+def vip_pods(sales_portal: str):
+    """Effective placements YTD vs the same period last year, per state, from the Sales Portal's
+    'Yearly Distributor Data.csv' VIP export (one row per distributor; the state is the name's last ', XX')."""
+    path = os.path.join(sales_portal, "Yearly Distributor Data", "Yearly Distributor Data.csv")
+    if not os.path.exists(path):
+        return None, None
+    rows = list(csv.reader(open(path, encoding="utf-8-sig")))
+    hi = next(i for i, r in enumerate(rows) if r and r[0].strip() == "Distributors")
+    h = rows[hi]
+    eff = [i for i, c in enumerate(h) if c.strip().endswith("Effective Placements") and c.startswith("1 Year")]
+    if len(eff) < 2:
+        return None, None
+    ty, ly = eff[0], eff[1]                      # this year first, then last year (VIP column order)
+    m = re.search(r"thru (\d+/\d+/\d{4})", h[ty])
+    as_of = datetime.strptime(m.group(1), "%m/%d/%Y").date().isoformat() if m else ""
+    by = defaultdict(lambda: [0.0, 0.0])
+    for r in rows[hi + 1:]:
+        if not r or not r[0].strip() or len(r) <= ly or r[0].strip().lower().startswith("total"):
+            continue
+        st = r[0].rsplit(",", 1)[-1].strip().upper()[:2]
+        by[st][0] += num(r[ty]) or 0
+        by[st][1] += num(r[ly]) or 0
+    out = [[as_of, st, round(v[0]), round(v[1])] for st, v in sorted(by.items())]
+    return out, h[ty]
+
+
 # ------------------------------------------------------------------------------------------------ Store Director Portal (feed)
 def taprooms_from_sdp(payload: dict, sheet_goals: dict):
     keys = payload["meta"]["daily_keys"]
@@ -341,9 +368,8 @@ def main():
         write("company_weekly.csv", ["week_start", "brewery_distro_revenue", "brewery_distro_goal", "brewery_distro_py"], comp)
         write("reputation_weekly.csv", ["week_start", "location", "rating_week", "rating", "new_reviews", "reviews"], rep)
         pods = L["pods"]
-        if pods.get("In Iowa") and pods.get("Outside of Iowa"):
-            write("placements.csv", ["as_of", "state", "placements", "placements_ly"],
-                  [[ws, "IA", *pods["In Iowa"]], [ws, "Outside IA", *pods["Outside of Iowa"]]])
+        if pods.get("Total"):
+            print(f"  sheet POD count (for comparison): {pods['Total'][0]}")
         gg = L["growth_goal"]
         if gg.get("In Iowa") is not None: cfg["targets"]["inIowaGrowthPct"] = gg["In Iowa"]
         if gg.get("Outside of Iowa") is not None: cfg["targets"]["outsideIowaGrowthPct"] = gg["Outside of Iowa"]
@@ -386,7 +412,15 @@ def main():
     cfg["dataLabel"] = (f"Local preview — VIP through {vip_asof:%b %-d}; taprooms from the "
                         f"{'Store Director Portal' if payload else 'Leadership Scorecard sheet'}; sheet items as last entered")
     cfg["updated"] = f"{today:%b %-d, %Y}"
-    cfg["placementsLabel"] = "POD count (Leadership Scorecard sheet)"
+    vp, vp_col = vip_pods(a.sales_portal)
+    if vp:
+        write("placements.csv", ["as_of", "state", "placements", "placements_ly"], vp)
+        tot, tly = sum(r[2] for r in vp), sum(r[3] for r in vp)
+        print(f"  VIP effective placements through {vp[0][0]}: {tot:,} vs {tly:,} LY ({len(vp)} states)")
+        cfg["placementsLabel"] = f"VIP effective placements, YTD through {date.fromisoformat(vp[0][0]):%b %-d} vs same period LY"
+    else:
+        write("placements.csv", ["as_of", "state", "placements", "placements_ly"], [])
+        print("  ! VIP 'Yearly Distributor Data.csv' not found — POD panel left empty")
     cfg["files"] = {k: v.replace("data/sample/", "data/local/") for k, v in base["files"].items()}
     for k, f in list(cfg["files"].items()):
         if not os.path.exists(os.path.join(ROOT, "site", f)):

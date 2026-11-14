@@ -149,6 +149,20 @@ html.locked #gate{display:block}
 #gate .gerr:empty{display:none}
 .who{font-size:12px;color:rgba(255,255,255,.72);white-space:nowrap}
 .who a{color:var(--green);margin-left:6px}
+.who a.on{color:#fff;text-decoration:underline}
+[hidden]{display:none!important}
+#usage{padding-top:18px;padding-bottom:40px}
+#usage h2{font:600 20px/1.2 Jost,system-ui,sans-serif;margin:0 0 4px}
+#usage .sub{color:var(--muted,#667);font-size:13px;margin-bottom:14px}
+#usage .ucards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
+#usage .uc{background:#fff;border:1px solid var(--grid,#e3e6ea);border-radius:10px;padding:12px 14px}
+#usage .uc b{display:block;font-size:24px;font-weight:600}
+#usage .uc span{font-size:12px;color:var(--muted,#667)}
+#usage table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--grid,#e3e6ea);border-radius:10px;overflow:hidden;font-size:13px;margin-bottom:18px}
+#usage th,#usage td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--grid,#e3e6ea)}
+#usage th{background:#f6f7f9;font-weight:600;font-size:12px}
+#usage td.n{text-align:right;font-variant-numeric:tabular-nums}
+#usage .ev-signin{color:#1a7f37}#usage .ev-refused{color:#b42318}#usage .never{color:var(--muted,#999)}
 </style>
 </head>
 <body>
@@ -176,6 +190,12 @@ html.locked #gate{display:block}
   <div class="gerr" id="gerr"></div>
 </section>
 
+<main class="wrap" id="usage" hidden>
+  <h2>Usage</h2>
+  <div class="sub" id="u-sub">Who has signed in and opened the scorecard. Visible to roster Admins only.</div>
+  <div id="u-body">Loading…</div>
+</main>
+
 <main class="wrap" id="app">
   <div class="note" id="sample-note">Framework preview. Every figure is a placeholder shaped like the leadership wireframe until the Store Director Portal and Sales Portal feeds are switched on. Labels show where each number comes from: <span class="src feed" title="System feed">Feed</span> is pulled automatically; <span class="src sheet" title="Spreadsheet">Sheet</span> is typed into the Leadership Scorecard workbook and is only as current as its last edit.</div>
   <div class="filter" id="filter"><span>Filtered view: highlighting <b id="f-loc"></b> across revenue vs goal, revenue mix, the efficiency quadrant, guest traffic and holiday pacing.</span><button type="button" id="f-reset">Reset to all</button></div>
@@ -197,7 +217,7 @@ html.locked #gate{display:block}
         <div class="lines num"><div><span>COGS %</span><span id="l-cogs"></span></div><div><span>Food cost %</span><span id="l-food"></span></div><div><span>Direct labor %</span><span id="l-labor"></span></div></div>
       </div>
       <div class="panel kpi">
-        <div class="top"><span class="lbl">YTD distribution volume</span><span class="srcs"><span class="src feed" title="VIP depletions, Sales Portal daily VIP refresh">Feed</span></span></div>
+        <div class="top"><span class="lbl">YTD distribution volume</span><span class="srcs"><span class="src feed" title="YTD volume, YoY growth and brand progress: VIP depletions, Sales Portal daily VIP refresh">Feed</span><span class="src sheet" title="Brand full-year goals only: Top Priorities tab of the Leadership Scorecard workbook (VIP carries no goals)">Sheet</span></span></div>
         <div class="row"><div class="val num" id="k-dist">—</div><svg class="spark" id="sp-dist" aria-hidden="true"></svg></div>
         <span class="pill" id="p-dist"></span>
         <div class="lines num" id="l-brands"></div>
@@ -244,7 +264,7 @@ html.locked #gate{display:block}
     <div class="tier-h"><h2>Tier 3 — Growth Engines &amp; Q4 Initiatives</h2><span>Strategic priorities &amp; seasonal pacing</span></div>
     <div class="grid2 t3">
       <div class="panel">
-        <div class="ph"><div><h3>Distribution &amp; POD expansion</h3><div class="sub">YTD case growth and retail footprint</div></div><div class="srcs"><span class="src feed" title="Case growth: Sales Portal daily VIP refresh">Feed</span><span class="src sheet" title="Growth goals and POD counts: Typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></div></div>
+        <div class="ph"><div><h3>Distribution &amp; POD expansion</h3><div class="sub">YTD case growth and retail footprint</div></div><div class="srcs"><span class="src feed" title="In/outside-state case growth and POD counts (VIP effective placements, YTD vs same period LY): Sales Portal daily VIP refresh">Feed</span><span class="src sheet" title="Growth goals only: Leadership Scorecard workbook (VIP carries no goals)">Sheet</span></div></div>
         <div class="prog" id="pg-home"></div>
         <div class="prog" id="pg-out"></div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-top:12px;border-top:1px solid var(--grid)" id="pods"></div>
@@ -274,7 +294,7 @@ html.locked #gate{display:block}
         <tr><td>Google rating, reviews</td><td>Each taproom’s score for the week, review counts</td><td>Leadership Scorecard workbook, “2026 Leadership Scorecard” tab (typed in weekly)</td><td><span class="st part">Spreadsheet</span></td></tr>
         <tr><td>Distribution volume, brand progress</td><td>Distributor depletions to retail in case equivalents, year to date vs same span last year</td><td>Sales Portal — VIP Rolling Scorecard export</td><td><span class="st ok">Available</span></td></tr>
         <tr><td>In-state / out-of-state growth</td><td>YTD case growth for the home state and for everywhere else</td><td>Sales Portal — VIP Rolling Scorecard export</td><td><span class="st ok">Available</span></td></tr>
-        <tr><td>POD count</td><td>Points of distribution in and outside Iowa, vs prior year</td><td>Leadership Scorecard workbook, Pod Count. (VIP effective placements from the Sales Portal are available but count differently.)</td><td><span class="st part">Spreadsheet</span></td></tr>
+        <tr><td>POD count</td><td>Points of distribution in and outside Iowa, vs prior year</td><td>Sales Portal — VIP Yearly Distributor Data (effective placements, YTD vs same period LY, by distributor state). The sheet&#39;s Pod Count uses a different definition.</td><td><span class="st ok">Available</span></td></tr>
         <tr><td>Growth and brand goals</td><td>In/outside-Iowa growth goals; full-year brand CE goals</td><td>Leadership Scorecard workbook, “2026 Leadership Scorecard” and “Top Priorities” tabs</td><td><span class="st part">Spreadsheet</span></td></tr>
         <tr><td>Holiday pacing</td><td>Cumulative guests at the pop-up taprooms by week vs goal and last season</td><td>Goal and last season: workbook “VMBG Targets” tab. This season: Store Director Portal — Toast guests</td><td><span class="st part">Sheet + feed</span></td></tr>
       </tbody>
@@ -657,6 +677,35 @@ html.locked #gate{display:block}
     const text = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
     return JSON.parse(text);
   }
+  const uesc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ago = (ms) => { const m = Math.round(ms / 6e4); return m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
+  async function showUsage(a) {
+    const body = $('u-body'); body.textContent = 'Loading…';
+    let j;
+    try { j = await post({ a: 'usage', s: a.sid }); } catch (e) { body.textContent = 'Could not reach the sign-in service.'; return; }
+    if (!j || !j.ok) { body.textContent = (j && j.error) === 'admins only' ? 'Usage is visible to roster Admins only.' : 'Could not load usage: ' + ((j && j.error) || 'unknown'); return; }
+    const now = Date.now(), D = 864e5, rows = j.rows.map((r) => ({ t: new Date(r[0]).getTime(), email: String(r[1]).toLowerCase(), name: r[2], ev: r[3] }));
+    const seen = rows.filter((r) => r.ev === 'signin' || r.ev === 'open');
+    const people = new Map(j.roster.map((r) => [r[0], { email: r[0], name: r[1] || r[0], role: r[2], last: 0, d7: 0, d30: 0, all: 0 }]));
+    seen.forEach((r) => { const p = people.get(r.email) || people.set(r.email, { email: r.email, name: r.name || r.email, role: '(not on roster)', last: 0, d7: 0, d30: 0, all: 0 }).get(r.email);
+      p.all++; if (r.t > p.last) p.last = r.t; if (now - r.t < 7 * D) p.d7++; if (now - r.t < 30 * D) p.d30++; });
+    const list = [...people.values()].sort((x, y) => y.last - x.last);
+    const act7 = list.filter((p) => p.d7).length, act30 = list.filter((p) => p.d30).length;
+    const refused = rows.filter((r) => r.ev === 'refused' && now - r.t < 30 * D).length;
+    const fmt = (t) => new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    body.innerHTML = `<div class="ucards">
+        <div class="uc"><b>${act7} / ${people.size}</b><span>people active in the last 7 days</span></div>
+        <div class="uc"><b>${act30} / ${people.size}</b><span>people active in the last 30 days</span></div>
+        <div class="uc"><b>${seen.filter((r) => now - r.t < 7 * D).length}</b><span>visits in the last 7 days</span></div>
+        <div class="uc"><b>${refused}</b><span>refused sign-ins, last 30 days</span></div></div>
+      <table><thead><tr><th>Person</th><th>Role</th><th>Last visit</th><th class="n">7 days</th><th class="n">30 days</th><th class="n">All</th></tr></thead><tbody>
+      ${list.map((p) => `<tr><td>${uesc(p.name)}<br><span class="never">${uesc(p.email)}</span></td><td>${uesc(p.role)}</td>
+        <td>${p.last ? fmt(p.last) + ' <span class="never">(' + ago(now - p.last) + ')</span>' : '<span class="never">never</span>'}</td>
+        <td class="n">${p.d7}</td><td class="n">${p.d30}</td><td class="n">${p.all}</td></tr>`).join('')}</tbody></table>
+      <table><thead><tr><th>When</th><th>Person</th><th>Event</th></tr></thead><tbody>
+      ${rows.slice(0, 100).map((r) => `<tr><td>${fmt(r.t)}</td><td>${uesc(r.name || r.email)} <span class="never">${uesc(r.email)}</span></td><td class="ev-${uesc(r.ev)}">${uesc(r.ev === 'open' ? 'opened' : r.ev === 'signin' ? 'signed in' : r.ev)}</td></tr>`).join('') || '<tr><td colspan="3" class="never">No visits logged yet.</td></tr>'}</tbody></table>`;
+    $('u-sub').textContent = `Who has signed in and opened the scorecard — ${rows.length} events logged (latest 100 listed). Visible to roster Admins only; logins before Nov 14 were not logged as visits.`;
+  }
   let started = false;
   async function unlock(a) {
     if (started) return;
@@ -667,6 +716,10 @@ html.locked #gate{display:block}
     document.documentElement.classList.remove('locked');
     const w = $('who'); w.hidden = false; w.innerHTML = '';
     w.append(document.createTextNode(a.name || a.email));
+    if (/^admin$/i.test(a.role || '')) {               // usage view: Admins only (the backend checks too)
+      const u = document.createElement('a'); u.href = '#'; u.textContent = 'Usage'; w.append(u);
+      u.onclick = (e) => { e.preventDefault(); const on = $('usage').hidden; $('usage').hidden = !on; $('app').hidden = on; u.classList.toggle('on', on); u.textContent = on ? 'Scorecard' : 'Usage'; if (on) showUsage(a); };
+    }
     const so = document.createElement('a'); so.href = '#'; so.textContent = 'Sign out'; w.append(so);
     so.onclick = (e) => { e.preventDefault(); forget(); try { google.accounts.id.disableAutoSelect(); } catch {} location.reload(); };
     window.__esStart();
@@ -680,7 +733,7 @@ html.locked #gate{display:block}
     return r.json();
   }
   function remember(j) {
-    const a = { sid: j.sid, email: j.profile.email, name: j.profile.name, bundle: j.bundle };
+    const a = { sid: j.sid, email: j.profile.email, name: j.profile.name, role: j.profile.role, bundle: j.bundle };
     save(a); return a;
   }
   async function onCred(resp) {
@@ -711,6 +764,7 @@ html.locked #gate{display:block}
       if (j && j.ok && j.bundle) {
         const n = remember(j);
         if (n.bundle.id !== a.bundle.id) location.reload();   // keys were rotated
+        else if ((n.role || '') !== (a.role || '')) location.reload();   // role changed (e.g. first visit since roles were remembered)
       } else if (j && !j.ok) { forget(); lockUI(j.error === 'not on the roster' ? NO : 'Your sign-in has ended — please sign in again.'); }
     }).catch(() => {});
   }
