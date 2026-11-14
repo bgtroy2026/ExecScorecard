@@ -4,6 +4,8 @@ state/
 _site/
 site/data/*
 !site/data/sample/
+# the AES-256-GCM bundle (tools/build_bundle.py) is safe to publish
+!site/data/enc/
 inputs/private/
 
 # secrets
@@ -11,6 +13,7 @@ inputs/private/
 *.env
 bundle_keys.json
 .execscorecard-token
+.exec-secret.json
 
 # os / editor / logs
 .DS_Store
@@ -21,3 +24,4 @@ __pycache__/
 # local preview with real numbers (tools/build_local.py) — never committed
 site/config.local.json
 site/data/local/
+_to_delete/

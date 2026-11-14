@@ -68,21 +68,29 @@ fi
 git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$REPO.git"
 
 # ---------------------------------------------------------- safety: never publish real data or secrets
-for bad in raw state _site .env bundle_keys.json .execscorecard-token; do
+for bad in raw state _site .env bundle_keys.json .execscorecard-token .exec-secret.json; do
   if git ls-files --error-unmatch "$bad" >/dev/null 2>&1; then die "'$bad' is tracked by git — it must stay ignored. Nothing was pushed."; fi
 done
 if git ls-files site/config.local.json | grep -q .; then
   die "site/config.local.json is tracked — it carries real goals and must stay on this Mac. Nothing was pushed."
 fi
-if git ls-files site/data | grep -v '^site/data/sample/' | grep -q .; then
+if git ls-files site/data | grep -vE '^site/data/(sample/|enc/[0-9a-f]{16}\.bin$)' | grep -q .; then
   die "Real data files under site/data/ are tracked — only site/data/sample/ may be published. Nothing was pushed."
 fi
+
+# ---------------------------------------------------------- encrypt the data bundle (only signed-in leadership can open it)
+[ -f .exec-secret.json ] || die ".exec-secret.json is missing — the encrypted bundle can't be built. Nothing was pushed."
+say "Fetching the Store Director Portal feed..."
+python3 tools/fetch_sdp.py || echo "  (continuing — taprooms fall back to the last feed fetched, or the Leadership sheet)"
+say "Building the real numbers (VIP + Store Director + Leadership sheet)..."
+python3 tools/build_local.py || die "The data build failed (tools/build_local.py). Nothing was pushed."
+python3 tools/build_bundle.py || die "Could not build the encrypted bundle (python3 needs the 'cryptography' package: pip3 install cryptography). Nothing was pushed."
 
 # ---------------------------------------------------------- commit
 MSG="${1:-Update ExecScorecard $(date '+%Y-%m-%d %H:%M')}"
 git add -A
 # second guard, after staging: nothing private may be about to go up, whatever .gitignore says
-if git diff --cached --name-only | grep -E '^site/config\.local\.json$|^site/data/' | grep -v '^site/data/sample/' | grep -q .; then
+if git diff --cached --name-only | grep -E '^site/config\.local\.json$|^site/data/|exec-secret' | grep -vE '^site/data/(sample/|enc/[0-9a-f]{16}\.bin$)' | grep -q .; then
   git reset -q
   die "Private files were staged (site/config.local.json or site/data/ outside sample/). Unstaged them; nothing was pushed."
 fi

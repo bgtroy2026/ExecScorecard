@@ -316,6 +316,8 @@ def main():
     today = date.fromisoformat(a.today)
     base = json.load(open(os.path.join(ROOT, "site", "config.json")))
     cfg = json.loads(json.dumps(base))
+    if not a.sdp_json and os.path.exists(os.path.join(PRIVATE, "sdp_payload.json")):
+        a.sdp_json = os.path.join(PRIVATE, "sdp_payload.json")   # written by tools/fetch_sdp.py
     payload = json.load(open(a.sdp_json)) if a.sdp_json else None
     print("Executive Scorecard — local build")
 

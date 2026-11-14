@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>document.documentElement.classList.add('locked');</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Big Grove Brewery — Executive Leadership Scorecard</title>
 <link rel="icon" href="images/bgb-medallion-black.png">
@@ -136,6 +137,18 @@ details ul{margin:6px 0 10px 1.2em;line-height:1.6;font-size:13px}
 footer{font-size:12px;color:var(--muted);padding-block:0 32px}
 .err{color:var(--bad);font-size:14px;padding:20px 0}
 :focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+/* ---------- sign-in gate (Google sign-in, Store Director Portal backend) ---------- */
+html.locked main,html.locked footer,html.locked header .tools{display:none!important}
+#gate{display:none;max-width:440px;margin:56px auto;padding:28px 26px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-align:center}
+html.locked #gate{display:block}
+#gate h2{font-size:18px;font-weight:600;margin-bottom:8px}
+#gate p{color:var(--ink2);margin-bottom:18px}
+#gate #gbtn{display:flex;justify-content:center;min-height:44px}
+#gate .gerr{color:var(--bad);margin-top:14px;font-size:13.5px}
+#gate .gerr:empty{display:none}
+.who{font-size:12px;color:rgba(255,255,255,.72);white-space:nowrap}
+.who a{color:var(--green);margin-left:6px}
 </style>
 </head>
 <body>
@@ -147,12 +160,21 @@ footer{font-size:12px;color:var(--muted);padding-block:0 32px}
       <span class="eyebrow">Big Grove Brewery &amp; Taprooms • Consolidated performance view</span>
     </div>
     <div class="tools">
+      <span class="who" id="who" hidden></span>
       <span class="badge" id="data-badge">Sample data</span>
       <div class="ctl"><span class="dotlive"></span><label for="sel-week">Period</label><select id="sel-week"></select></div>
       <div class="ctl"><label for="sel-loc">Location</label><select id="sel-loc"></select></div>
     </div>
   </div>
 </header>
+
+
+<section id="gate" aria-live="polite">
+  <h2>Leadership sign-in</h2>
+  <p>Sign in with your Big Grove Google account to view the scorecard.</p>
+  <div id="gbtn"></div>
+  <div class="gerr" id="gerr"></div>
+</section>
 
 <main class="wrap" id="app">
   <div class="note" id="sample-note">Framework preview. Every figure is a placeholder shaped like the leadership wireframe until the Store Director Portal and Sales Portal feeds are switched on. Labels show where each number comes from: <span class="src feed" title="System feed">Feed</span> is pulled automatically; <span class="src sheet" title="Spreadsheet">Sheet</span> is typed into the Leadership Scorecard workbook and is only as current as its last edit.</div>
@@ -306,13 +328,17 @@ footer{font-size:12px;color:var(--muted);padding-block:0 32px}
   const state = { week: null, loc: 'all' };
 
   async function load() {
-    CFG = await fetch('config.local.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
-      || await (await fetch('config.json', { cache: 'no-store' })).json();
+    // Published site: everything comes from the encrypted bundle the sign-in unlocked (window.__esData).
+    // Local preview on Troy's Mac: config.local.json / config.json and the CSVs beside them.
+    const B = window.__esData || null;
+    CFG = B ? B.config : (await fetch('config.local.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+      || await (await fetch('config.json', { cache: 'no-store' })).json());
     const f = CFG.files;
-    [TAP, COMP, REP, DW, DY, PODS, GD, VT] = await Promise.all([f.taproomWeekly, f.companyWeekly, f.reputationWeekly, f.distributionWeekly, f.distributionYtd, f.placements, f.guestsDaily, f.vmbgTargets].map(getCSV));
+    const get = (name) => (B ? Promise.resolve(B.files[name] ? parseCSV(B.files[name]) : []) : getCSV(f[name]));
+    [TAP, COMP, REP, DW, DY, PODS, GD, VT] = await Promise.all(['taproomWeekly', 'companyWeekly', 'reputationWeekly', 'distributionWeekly', 'distributionYtd', 'placements', 'guestsDaily', 'vmbgTargets'].map(get));
     if (!TAP.length) throw new Error('No taproom data at ' + f.taproomWeekly);
     if (CFG.dataSource === 'sample') { $('data-badge').textContent = 'Sample data'; }
-    else { $('data-badge').textContent = CFG.dataSource === 'local' ? 'Local preview' : 'Live'; $('sample-note').hidden = true; }
+    else { $('data-badge').textContent = B ? 'Live' : (CFG.dataSource === 'local' ? 'Local preview' : 'Live'); $('sample-note').hidden = true; }
     WEEKS = [...new Set(TAP.map((r) => r.week_start))].sort();
     LOCS = [...new Set(TAP.map((r) => r.location))];
     const sw = $('sel-week');
@@ -595,8 +621,101 @@ footer{font-size:12px;color:var(--muted);padding-block:0 32px}
     }).sort((x, y) => y.g - x.g).map((x) => x.html).join('');
   }
 
-  load().catch((e) => { $('app').insertAdjacentHTML('afterbegin', `<p class="err">Could not load the scorecard: ${esc(e.message)}</p>`); console.error(e); });
+  window.__esStart = () => load().catch((e) => { $('app').insertAdjacentHTML('afterbegin', `<p class="err">Could not load the scorecard: ${esc(e.message)}</p>`); console.error(e); });
 })();
 </script>
+
+<script>
+/* ---------- Sign-in gate + encrypted data ----------
+   Google ID token -> "Exec Scorecard Login" Apps Script (its own roster sheet) -> {bundle:{id,key}, sid}.
+   The data is published only as data/enc/<id>.bin (AES-256-GCM over gzip JSON, tools/build_bundle.py); without a
+   key from the backend there is nothing readable on the site. The remembered session (30 days) is re-checked on
+   every open, so removing someone from the roster signs them out on their next visit. To revoke keys already
+   handed out, bump the epoch in .exec-secret.json AND the EXEC_EPOCH script property, then deploy. */
+(() => {
+  const AUTH = {
+    CLIENT_ID: '169287489700-t5en62nibhp9ttn24vfimd7k974dgl9i.apps.googleusercontent.com',
+    API_URL: 'https://script.google.com/macros/s/AKfycbzkjZ81_MikqQCvEU_8dW27mrAhUuoEI-MlacDIY2M5SXk-7YaVFzqaOkCVhyY0pDkeaA/exec',
+    KEY: 'execsc_auth_v2',
+  };
+  const $ = (id) => document.getElementById(id);
+  const local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  const store = (() => { try { localStorage.setItem('_t', '1'); localStorage.removeItem('_t'); return localStorage; } catch { return sessionStorage; } })();
+  const save = (a) => { try { store.setItem(AUTH.KEY, JSON.stringify(a)); } catch {} };
+  const read = () => { try { return JSON.parse(store.getItem(AUTH.KEY) || 'null'); } catch { return null; } };
+  const forget = () => { try { store.removeItem(AUTH.KEY); localStorage.removeItem('execsc_auth'); } catch {} };
+  const setErr = (m) => { $('gerr').innerHTML = m || ''; };
+  const NO = 'This account doesn’t have access to the Executive Scorecard. Ask Troy to add you.';
+
+  const ub64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  async function openBundle(b) {
+    const r = await fetch('data/enc/' + b.id + '.bin', { cache: 'no-store' });
+    if (!r.ok) throw new Error('data bundle not found (' + r.status + ')');
+    const buf = new Uint8Array(await r.arrayBuffer());
+    const key = await crypto.subtle.importKey('raw', ub64(b.key), 'AES-GCM', false, ['decrypt']);
+    const gz = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.slice(0, 12) }, key, buf.slice(12));
+    const text = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+    return JSON.parse(text);
+  }
+  let started = false;
+  async function unlock(a) {
+    if (started) return;
+    setErr('');
+    try { window.__esData = await openBundle(a.bundle); }
+    catch (e) { forget(); return lockUI('Could not open the scorecard data — please sign in again.'); }
+    started = true;
+    document.documentElement.classList.remove('locked');
+    const w = $('who'); w.hidden = false; w.innerHTML = '';
+    w.append(document.createTextNode(a.name || a.email));
+    const so = document.createElement('a'); so.href = '#'; so.textContent = 'Sign out'; w.append(so);
+    so.onclick = (e) => { e.preventDefault(); forget(); try { google.accounts.id.disableAutoSelect(); } catch {} location.reload(); };
+    window.__esStart();
+  }
+  function lockUI(msg) {
+    document.documentElement.classList.add('locked'); $('who').hidden = true; setErr(msg); renderButton();
+    if (started) location.reload();
+  }
+  async function post(body) {
+    const r = await fetch(AUTH.API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+    return r.json();
+  }
+  function remember(j) {
+    const a = { sid: j.sid, email: j.profile.email, name: j.profile.name, bundle: j.bundle };
+    save(a); return a;
+  }
+  async function onCred(resp) {
+    setErr(''); $('gbtn').style.opacity = .5;
+    try {
+      const j = await post({ a: 'signin', t: resp.credential });
+      if (!j || !j.ok || !j.bundle) { forget(); return lockUI(j && j.error === 'not on the roster' ? NO : 'Sign-in refused: ' + ((j && j.error) || 'unknown')); }
+      await unlock(remember(j));
+    } catch (e) { setErr('Could not reach the sign-in service. Check your connection and try again.'); }
+    finally { $('gbtn').style.opacity = 1; }
+  }
+  let gsiReady = false;
+  function renderButton() {
+    if (!gsiReady || $('gbtn').firstChild) return;
+    google.accounts.id.renderButton($('gbtn'), { theme: 'filled_blue', size: 'large', shape: 'pill', width: 280 });
+  }
+  window.__esGsi = () => {
+    try { google.accounts.id.initialize({ client_id: AUTH.CLIENT_ID, callback: onCred, auto_select: false }); gsiReady = true; if (!started) renderButton(); }
+    catch (e) { setErr('The Google sign-in button could not load. Open this page directly in Chrome or Safari and try again.'); }
+  };
+  window.__esGsiFail = () => setErr('The Google sign-in button could not load. Open this page directly in Chrome or Safari (not inside Gmail or Messages) and try again.');
+
+  if (local) { started = true; document.documentElement.classList.remove('locked'); window.__esStart(); return; }   // Troy's local preview
+  const a = read();
+  if (a && a.sid && a.bundle) {
+    unlock(a);                                     // open right away from the remembered key, then re-check the roster
+    post({ a: 'refresh', s: a.sid }).then((j) => {
+      if (j && j.ok && j.bundle) {
+        const n = remember(j);
+        if (n.bundle.id !== a.bundle.id) location.reload();   // keys were rotated
+      } else if (j && !j.ok) { forget(); lockUI(j.error === 'not on the roster' ? NO : 'Your sign-in has ended — please sign in again.'); }
+    }).catch(() => {});
+  }
+})();
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="__esGsi()" onerror="__esGsiFail()"></script>
 </body>
 </html>

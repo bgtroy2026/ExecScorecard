@@ -31,5 +31,8 @@
 - Add a scheduled GitHub Action that builds the data files nightly, like StorePortal's `refresh.yml`.
 
 ## Phase 3 — access
+- [x] Nov 13: Google sign-in on the page. Uses the Store Director Portal's Apps Script + roster; allowed: Troy, Matt Swift,
+  Mike Wehr, Sarah Heinrich, Bryan Farrell, Rachel Hart (`EXEC` list in `site/index.html`, must also be Admin/Leadership on the roster).
+  This gates the page only — the data files are still public, so only sample data until the encrypted exec bundle lands.
 - Google sign-in + AES-encrypted data bundle, same approach as the Sales Portal and StorePortal
   (Apps Script roster → bundle keys). Until then, only sample data is published.
