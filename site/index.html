@@ -151,6 +151,45 @@ html.locked #gate{display:block}
 .who a{color:var(--green);margin-left:6px}
 .who a.on{color:#fff;text-decoration:underline}
 [hidden]{display:none!important}
+/* ---------- 2027 proposed views ---------- */
+.xview{padding-top:18px}
+.xview > div{display:flex;flex-direction:column;gap:14px}
+.xg2{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:12px;align-items:start}
+.xg2s{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px}
+.xview .ph{flex-wrap:wrap}.xview .panel{padding:14px 12px}.xview .ph > div:first-child{flex:1 1 170px}.xview .ph .srcs{justify-content:flex-start}
+.xg3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;align-items:start}
+.xg3t{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:1100px){.xg3t{grid-template-columns:1fr}}
+.xg4{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;align-items:start}
+.xwk{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;align-items:start}
+.xg2b{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+.xcol{display:flex;flex-direction:column;gap:12px;min-width:0}
+@media (max-width:980px){.xg2,.xwk,.xg2s{grid-template-columns:1fr}}
+.xt{width:100%;border-collapse:collapse;font-size:12px}
+.xt th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:right;padding:5px 4px;border-bottom:1px solid var(--border);white-space:nowrap}
+.xt th:first-child,.xt td:first-child{text-align:left}
+.xt td{padding:5px 4px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.xt tr.tgt td{background:var(--plane);font-weight:600}
+.xt tr:last-child td{border-bottom:0}
+.xt .sl{color:var(--axis);margin:0 3px}
+.trend .xt td:first-child{color:var(--ink2)}
+.dt{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:4px;vertical-align:1px}
+.dt.g{background:#3a9b2e}.dt.r{background:var(--bad)}.dt.n{background:transparent;border:1px solid var(--axis)}
+.src.none{color:var(--bad);border:1px solid rgba(200,55,47,.35);background:var(--bad-bg)}
+.src.typed{color:var(--muted);border:1px solid var(--axis)}
+.owner{font-size:11.5px;color:var(--muted)}
+.mile{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.mile > div{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.mile > div.owner{display:block;margin-top:-3px}
+.mugs{display:flex;gap:28px;justify-content:center;padding:4px 0}
+.mug{display:flex;flex-direction:column;align-items:center;gap:6px}
+.mugb{position:relative;width:58px;height:84px;border:2px solid var(--ink2);border-top-width:5px;border-radius:4px 4px 10px 10px;overflow:hidden;background:var(--plane)}
+.mugf{position:absolute;left:0;right:0;bottom:0;background:#f2b632}
+.mugf.g{background:#f2b632}.mugf.r{background:#e8a33a}.mugf.n{background:#d8dbe6}
+.mugv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:var(--ink)}
+details.feeds{margin-top:4px}
+details.feeds .st2{font-size:10.5px}
+
 #sources{padding-top:18px;padding-bottom:40px}
 #sources h2{font:600 20px/1.2 Jost,system-ui,sans-serif;margin:0 0 4px}
 #sources .sub{color:var(--muted);font-size:13px;margin-bottom:14px;max-width:900px}
@@ -210,6 +249,10 @@ html.locked #gate{display:block}
   <div id="gbtn"></div>
   <div class="gerr" id="gerr"></div>
 </section>
+
+<main class="wrap xview" id="exec" hidden><div id="v-exec"></div></main>
+<main class="wrap xview" id="weekly" hidden><div id="v-weekly"></div></main>
+<main class="wrap xview" id="byloc" hidden><div id="v-byloc"></div></main>
 
 <main class="wrap" id="sources" hidden>
   <h2>Data sources — Leadership Scorecard workbook</h2>
@@ -381,6 +424,7 @@ html.locked #gate{display:block}
   }
 
   let CFG, TAP, COMP, REP, DW, DY, PODS, GD, VT, WEEKS, LOCS, charts = {};
+  let VW = [], PW = [], LW = [], DSW = [];
   const state = { week: null, loc: 'all' };
 
   async function load() {
@@ -391,7 +435,7 @@ html.locked #gate{display:block}
       || await (await fetch('config.json', { cache: 'no-store' })).json());
     const f = CFG.files;
     const get = (name) => (B ? Promise.resolve(B.files[name] ? parseCSV(B.files[name]) : []) : getCSV(f[name]));
-    [TAP, COMP, REP, DW, DY, PODS, GD, VT] = await Promise.all(['taproomWeekly', 'companyWeekly', 'reputationWeekly', 'distributionWeekly', 'distributionYtd', 'placements', 'guestsDaily', 'vmbgTargets'].map(get));
+    [TAP, COMP, REP, DW, DY, PODS, GD, VT, VW, PW, LW, DSW] = await Promise.all(['taproomWeekly', 'companyWeekly', 'reputationWeekly', 'distributionWeekly', 'distributionYtd', 'placements', 'guestsDaily', 'vmbgTargets', 'vipWeekly', 'podsWeekly', 'loyaltyWeekly', 'discountsWeekly'].map(get));
     if (!TAP.length) throw new Error('No taproom data at ' + f.taproomWeekly);
     if (CFG.dataSource === 'sample') { $('data-badge').textContent = 'Sample data'; }
     else { $('data-badge').textContent = B ? 'Live' : (CFG.dataSource === 'local' ? 'Local preview' : 'Live'); $('sample-note').hidden = true; }
@@ -435,8 +479,288 @@ html.locked #gate{display:block}
   }
   const markLoc = (name) => (state.loc === 'all' ? '' : name === state.loc ? ' hl' : ' dim');
 
+
+  // ================================================================ 2027 proposed views (Execution Card, Weekly Scorecard, By Location)
+  // Laid out like "2027 Proposed Weekly Leadership Scorecard" (3 slides), in this page's tokens. LCW = the week
+  // picked in the Period menu (last complete week by default). Every box carries its source chips.
+  const ORDER = ['Solon', 'Iowa City', 'Des Moines', 'Cedar Rapids', 'Omaha', 'Prairie Village'];
+  const SHORT = { 'Solon': 'Solon', 'Iowa City': 'IC', 'Des Moines': 'DSM', 'Cedar Rapids': 'CR', 'Omaha': 'Omaha', 'Prairie Village': 'PV' };
+  const fin = (v) => v != null && isFinite(v);
+  const dt = (ok) => `<i class="dt ${ok == null ? 'n' : ok ? 'g' : 'r'}"></i>`;
+  const usd = (v) => (fin(v) ? money0.format(v) : '—');
+  const hl$ = (v) => (fin(v) ? (v < 0 ? '(' + money0.format(-v) + ')' : money0.format(v)) : '—');
+  const p1 = (v) => (fin(v) ? v.toFixed(1) + '%' : '—');
+  const hlp = (v) => (fin(v) ? (v < 0 ? '(' + Math.abs(v).toFixed(1) + ')' : v.toFixed(1)) + ' pts' : '—');
+  const hln = (v) => (fin(v) ? (v < 0 ? '(' + int.format(-v) + ')' : int.format(v)) : '—');
+  const usdK = (v) => (fin(v) ? (Math.abs(v) >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : Math.abs(v) >= 1e4 ? '$' + Math.round(v / 1e3) + 'k' : '$' + (v / 1e3).toFixed(1) + 'k') : '—');
+  const hlK = (v) => (fin(v) ? (v < 0 ? '(' + usdK(-v) + ')' : usdK(v)) : '—');
+  const hlpS = (v) => (fin(v) ? (v < 0 ? '(' + Math.abs(v).toFixed(1) + ')' : '+' + v.toFixed(1)) : '—');
+  const T = () => CFG.targets || {};
+  const XO = (k) => (CFG.execTargets || {})[k] || null;
+  const XT = (k) => { const o = XO(k); return o ? o.target : null; };
+  const XTn = (k) => { const v = XT(k); const n = v == null ? null : parseFloat(String(v).replace(/[$,%+]/g, '')); return fin(n) ? n : null; };
+  const back = (n) => WEEKS.filter((w) => w <= state.week).slice(-n).reverse();
+  const lcwLbl = (i) => (i ? `LCW – ${i}` : 'LCW');
+  const wkTitle = (w) => `${md(w)}–${md(addDays(w, 6))}`;
+  const SRC = {
+    toast: ['feed', 'Toast', 'Toast via the Store Director Portal, nightly'],
+    me: ['feed', 'MarginEdge', 'MarginEdge purchases via the Store Director Portal, nightly'],
+    ekos: ['feed', 'Ekos', 'Ekos invoices (Liberty + Gilbert) excluding keg deposits; weeks before Apr 27 from the workbook history'],
+    vip: ['feed', 'VIP', 'VIP depletions / placements via the Sales Portal daily refresh'],
+    thanx: ['feed', 'Thanx via Toast', 'Thanx members identified on Toast checks and Thanx/promo redemptions as Toast discounts, via the Store Director Portal'],
+    sheet: ['sheet', 'Sheet', 'Leadership Scorecard workbook'],
+    google: ['none', 'Google — not connected', 'Shown from the workbook until the Places API is connected'],
+    typed: ['typed', 'Typed target', "Add it to an 'Exec Targets' tab in the Leadership Scorecard workbook (column A name, B target, C actual)"],
+    none: ['none', 'Not connected', 'No platform connected for this yet'],
+  };
+  const chips = (...ks) => `<div class="srcs">${ks.map((k) => { const s = SRC[k]; return `<span class="src ${s[0]}" title="${esc(s[2])}">${esc(s[1])}</span>`; }).join('')}</div>`;
+  const panel = (title, sub, src, body, cls = '') => `<section class="panel ${cls}"><div class="ph"><div><h3>${title}</h3>${sub ? `<div class="sub">${sub}</div>` : ''}</div>${src}</div>${body}</section>`;
+  const notSet = (k) => `<span class="muted" title="Add '${esc(k)}' to an 'Exec Targets' tab in the workbook">not set</span>`;
+
+  // ---- per-week numbers
+  function store(w) {
+    const rows = weekRows(w);
+    if (!rows.length) return null;
+    const c = tapCost(rows), comp = rows.filter((r) => r.net_sales_ly > 0);
+    const wb = rows.every((r) => r.goal_src === 'sheet');
+    return { rev: sum(rows, (r) => r.net_sales), goal: wb ? sum(rows, (r) => r.sales_goal) || null : null, refGoal: wb ? null : sum(rows, (r) => r.sales_goal) || null,
+      dPY: comp.length ? sum(comp, (r) => r.net_sales) - sum(comp, (r) => r.net_sales_ly) : null, labor: c.labor, food: c.food };
+  }
+  const prevYear = (w) => addDays(w, -364);
+  function distro(w) { const c = COMP.find((r) => r.week_start === w); return c && fin(c.brewery_distro_revenue) ? { rev: c.brewery_distro_revenue, goal: c.brewery_distro_goal, py: c.brewery_distro_py } : null; }
+  const isHome = (st) => st === (T().homeState || 'IA');
+  const H = (s) => isHome(s), X = (s) => !isHome(s), A = () => true;
+  function cases(w, f) {
+    const rows = VW.filter((r) => r.week_start === w && f(r.state)), ty = sum(rows, (r) => r.ce), ly = sum(rows, (r) => r.ce_ly);
+    return rows.length && ly ? { g: (ty / ly - 1) * 100, d: ty - ly } : null;
+  }
+  function pods(w, f) {
+    const wk = [...new Set(PW.map((r) => r.week_start))].filter((x) => x <= w).sort().pop();
+    if (!wk) return null;
+    const rows = PW.filter((r) => r.week_start === wk && f(r.state)), ty = sum(rows, (r) => r.placements), ly = sum(rows, (r) => r.placements_ly);
+    return ly ? { g: (ty / ly - 1) * 100, n: ty, asOf: rows[0].as_of, exact: wk === w } : null;
+  }
+  const loyalLatest = () => LW.filter((r) => r.location === 'All' && r.week_start <= state.week).sort((a, b) => (a.week_start < b.week_start ? 1 : -1))[0] || null;
+  const promo = (w, re) => (DSW.length ? sum(DSW.filter((r) => r.location === 'All' && r.week_start === w && re.test(r.name)), (r) => r.n) : null);
+  const RE_PINT = /free\s*pint/i, RE_SAMPLER = /sampler/i, RE_PENNY = /(\$?0?\.01|penny|1\s*cent)/i;
+  const promoSince = (re) => (DSW.length ? sum(DSW.filter((r) => r.location === 'All' && r.week_start <= state.week && re.test(r.name)), (r) => r.n) : null);
+  const repWeeks = () => [...new Set(REP.map((r) => r.week_start))].filter((w) => w <= state.week).sort().reverse();
+
+  // ---- shared boxes
+  function reviewsBox(compact) {
+    const w = repWeeks()[0], rows = w ? REP.filter((r) => r.week_start === w) : [], tgt = T().rating || 4.7;
+    const body = rows.length ? `<table class="xt"><thead><tr><th></th><th>Avg stars</th><th>Reviews</th><th>Ct H/(L) LCW</th></tr></thead><tbody>${
+      ORDER.map((l) => { const r = rows.find((x) => x.location === l); return r ? `<tr><td>${SHORT[l]}</td><td>${fin(r.rating) ? r.rating.toFixed(1) : '—'}${dt(fin(r.rating) ? r.rating >= tgt : null)}</td><td>${fin(r.reviews) ? int.format(r.reviews) : '—'}</td><td>${hln(r.new_reviews)}</td></tr>` : ''; }).join('')}</tbody></table>
+      <div class="owner">Week of ${md(w)} · target ${tgt}+ stars</div>` : '<div class="nofeed">No review figures captured yet.</div>';
+    return panel(`Google reviews: ${tgt}+ stars`, compact ? '' : 'Average stars, total reviews, new reviews last week', chips('sheet', 'google'), body);
+  }
+  function rewardsBox(owner) {
+    const l = loyalLatest(), ta = XTn('Active users'), te = XTn('Engaged users');
+    const body = l ? `<div class="mile">
+        <div><span><b>Active users</b> ${int.format(l.members_28)} <span class="owner">(seen in 28 days)</span></span>${dt(ta == null ? null : l.members_28 >= ta)}</div><div class="owner">Target active users: ${ta == null ? notSet('Active users') : int.format(ta)}</div>
+        <div><span><b>Engaged users</b> ${int.format(l.engaged_28)} <span class="owner">(2+ visits)</span></span>${dt(te == null ? null : l.engaged_28 >= te)}</div><div class="owner">Target engaged users: ${te == null ? notSet('Engaged users') : int.format(te)}</div>
+        <div class="owner">Members first seen that week: ${int.format(l.first_seen)} · week of ${md(l.week_start)}</div></div>`
+      : `<div class="nofeed">Waiting on the Store Director Portal's next nightly run (Thanx members as Toast sees them).</div>`;
+    return panel('Rewards: acquisition &amp; engagement', owner ? 'Owner: ' + owner : '', chips('thanx', 'typed'), body);
+  }
+  function milestoneBox(name, owner) {
+    const line = (lbl, key) => { const o = XO(key); return `<div><span><b>${lbl}:</b> ${o ? esc(o.target) : notSet(key)}${o && o.actual ? ` <span class="owner">· ${esc(o.actual)}</span>` : ''}</span>${dt(null)}</div>`; };
+    return panel(`${name} opening`, owner ? 'Owner: ' + owner : '', chips('typed'),
+      `<div class="mile">${line('Target opening date', name + ' opening date')}${line('Target hire dates', name + ' hire dates')}${line('Target revenue', name + ' revenue target')}</div>`);
+  }
+  function promoBox(owner) {
+    const pint = promoSince(RE_PINT), samp = promoSince(RE_SAMPLER), tp = XTn('Free pint redemptions'), ts = XTn('Sampler card redemptions');
+    const since = CFG.loyaltySince ? ` · counted since ${md(CFG.loyaltySince)}` : '';
+    const body = DSW.length ? `<div class="mile">
+      <div><span><b>Free Pint redemptions:</b> ${int.format(pint || 0)}</span>${dt(tp == null ? null : pint >= tp)}</div><div class="owner">Target: ${tp == null ? notSet('Free pint redemptions') : int.format(tp)}${since}</div>
+      <div><span><b>Sampler card redemptions:</b> ${int.format(samp || 0)}</span>${dt(ts == null ? null : samp >= ts)}</div><div class="owner">Target: ${ts == null ? notSet('Sampler card redemptions') : int.format(ts)}</div>
+      ${!pint && !samp ? '<div class="owner">No Toast discount named "Free Pint" or "Sampler" yet — tell us the exact names if they differ.</div>' : ''}</div>`
+      : `<div class="nofeed">Waiting on the Store Director Portal's next nightly run (Toast discounts by name).</div>`;
+    return panel('Free Pint &amp; sampler cards', owner ? 'Owner: ' + owner : '', chips('thanx', 'typed'), body);
+  }
+
+  // ---- Execution Card (slide 1)
+  function viewExec() {
+    const ws = back(8), t = T();
+    const g0 = store(ws[0]) || {}, d0 = distro(ws[0]) || {};
+    const sRows = ws.map((w, i) => { const s = store(w); if (!s) return ''; return `<tr><td>${lcwLbl(i)} <span class="owner">${md(w)}</span></td>
+      <td>${usd(s.rev)}${dt(s.goal ? s.rev >= s.goal : null)}</td><td>${p1(s.labor)}${dt(fin(s.labor) ? s.labor <= t.laborPct : null)}</td><td>${p1(s.food)}${dt(fin(s.food) ? s.food <= t.foodCostPct : null)}</td></tr>`; }).join('');
+    const storeP = panel('Store metrics', 'Owner: Rachel Hart · all taprooms', chips('toast', 'me', 'sheet'),
+      `<table class="xt"><thead><tr><th></th><th>Revenue</th><th>Hrly labor %</th><th>Food cost %</th></tr></thead><tbody>
+       <tr class="tgt"><td>Target</td><td>${g0.goal ? usd(g0.goal) : `<span class="muted" title="Store Director monthly target, spread by day — not the workbook goal">${usd(g0.refGoal)}*</span>`}</td><td>≤ ${t.laborPct}%</td><td>≤ ${t.foodCostPct}%</td></tr>${sRows}</tbody></table>
+       <div class="owner">Revenue dot = vs that week's workbook goal; weeks before the workbook was captured have no goal here (the Store Director monthly targets run well below the workbook's, so they're not used for the dots). Labor = Toast hourly labor ÷ net sales; food cost = MarginEdge food purchases ÷ food sales.</div>`);
+    const tg = (k) => (fin(k) ? '+' + k + '%' : '—');
+    const podT = XTn('POD growth %'), podIA = XTn('IA POD growth %'), podX = XTn('xIA POD growth %');
+    const pc = (o, tt) => (o && o.exact ? `${p1(o.g)}${dt(tt == null ? null : o.g >= tt)}` : '<span class="muted">—</span>');
+    const dRows = ws.map((w, i) => {
+      const d = distro(w), c = cases(w, A), ci = cases(w, H), cx = cases(w, X);
+      return `<tr><td>${lcwLbl(i)} <span class="owner">${md(w)}</span></td><td>${d ? usdK(d.rev) + dt(d.goal ? d.rev >= d.goal : null) : '—'}</td>
+        <td>${c ? p1(c.g) + dt(c.g >= t.totalGrowthPct) : '—'}</td><td>${ci ? p1(ci.g) + dt(ci.g >= t.inIowaGrowthPct) : '—'}</td><td>${cx ? p1(cx.g) + dt(cx.g >= t.outsideIowaGrowthPct) : '—'}</td>
+        <td>${pc(pods(w, A), podT)}</td><td>${pc(pods(w, H), podIA)}</td><td>${pc(pods(w, X), podX)}</td></tr>`; }).join('');
+    const distP = panel('Distribution metrics', 'Owner: Mike Wehr · case vol % = cases vs the same week last year', chips('ekos', 'vip', 'sheet', 'typed'),
+      `<div style="overflow-x:auto"><table class="xt"><thead><tr><th></th><th>Rev</th><th>Case vol %</th><th>IA cs vol %</th><th>xIA cs vol %</th><th>POD %</th><th>IA POD %</th><th>xIA POD %</th></tr></thead><tbody>
+       <tr class="tgt"><td>Target</td><td>${usdK(d0.goal)}</td><td>${tg(t.totalGrowthPct)}</td><td>${tg(t.inIowaGrowthPct)}</td><td>${tg(t.outsideIowaGrowthPct)}</td><td>${podT == null ? notSet('POD growth %') : tg(podT)}</td><td>${podIA == null ? notSet('IA POD growth %') : tg(podIA)}</td><td>${podX == null ? notSet('xIA POD growth %') : tg(podX)}</td></tr>${dRows}</tbody></table></div>
+       <div class="owner">POD % = VIP effective placements YTD vs the same period last year, one snapshot per week (kept from Oct 26 on). Case growth targets are the workbook's annual goals.</div>`);
+    const yr = state.week.slice(0, 4), yw = WEEKS.filter((w) => w.startsWith(yr) && w <= state.week);
+    const ys = yw.map(store).filter(Boolean), yd = COMP.filter((r) => r.week_start.startsWith(yr) && r.week_start <= state.week);
+    const act = sum(ys, (s) => s.rev) + sum(yd, (r) => r.brewery_distro_revenue);
+    const annual = XTn('Annual revenue target');
+    const y0 = Date.UTC(+yr, 0, 1), elapsed = Math.min(1, (D(addDays(state.week, 7)) - y0) / (Date.UTC(+yr + 1, 0, 1) - y0));
+    const tgtY = annual ? annual * elapsed : null;
+    const pctA = annual ? act / annual * 100 : null, pctT = annual ? elapsed * 100 : null;
+    const mug = (lbl, pct, cls) => `<div class="mug"><div class="mugb"><div class="mugf ${cls}" style="height:${Math.max(0, Math.min(100, pct || 0))}%"></div><div class="mugv">${fin(pct) ? Math.round(pct) + '%' : '—'}</div></div><div class="owner">${lbl}</div></div>`;
+    const ytdP = panel('YTD total Big Grove revenue', `Taprooms + distribution, Jan 1 – ${md(addDays(state.week, 6))}`, chips('toast', 'ekos', 'sheet', 'typed'),
+      `<div class="mugs">${mug('Actual', pctA, 'g')}${mug('Target', pctT, 'n')}</div>
+       <div class="mile"><div><span>Actual YTD</span><b>${usd(act)}</b></div><div><span>Target to date</span><b>${annual ? usd(tgtY) : notSet('Annual revenue target')}</b></div>${annual ? `<div><span>H/(L)</span><b class="${act >= tgtY ? 'good-t' : 'bad-t'}">${hl$(act - tgtY)}${dt(act >= tgtY)}</b></div>` : ''}
+       <div class="owner">${annual ? `Actual = % of the ${usd(annual)} annual target; Target = % of the year gone (straight-line).` : 'Add "Annual revenue target" to Exec Targets to fill the mugs: actual as % of the year\'s target vs the share of the year gone.'}</div></div>`);
+    $('v-exec').innerHTML = `<div class="tier-h"><h2>Leadership Execution Card — Total Big Grove</h2><span>LCW = week of ${wkTitle(state.week)}</span></div>
+      <div class="xg2"><div class="xcol">${storeP}<div class="xg2s">${reviewsBox(true)}${rewardsBox('Bryan Farrell')}</div></div><div class="xcol">${distP}</div></div>
+      <div class="tier-h"><h2>Annual goals</h2><span>Owners as on the proposal</span></div>
+      <div class="xg4">${milestoneBox('Palatine', 'Mike Wehr')}${milestoneBox('Madison', 'Matt Swift')}${promoBox('Bryan Farrell')}${ytdP}</div>
+      ${sourcesFor('exec')}`;
+  }
+
+  // ---- Weekly Scorecard (slide 2)
+  function trendBox(title, rowsFn, src, note) {
+    const ws = back(5);
+    return `<section class="panel trend"><div class="ph"><div><h3>${title}</h3></div>${src}</div><div style="overflow-x:auto"><table class="xt"><thead><tr><th></th>${ws.map((w, i) => `<th title="${wkTitle(w)}">${lcwLbl(i)}</th>`).join('')}</tr></thead><tbody>${
+      rowsFn.map(([lbl, f]) => `<tr><td>${lbl}</td>${ws.map((w) => `<td>${f(w)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${note ? `<div class="owner">${note}</div>` : ''}</section>`;
+  }
+  function viewWeekly() {
+    const t = T();
+    const tot = (w) => { const s = store(w), d = distro(w); return s ? { rev: s.rev + (d ? d.rev : 0), goal: s.goal ? s.goal + (d && d.goal ? d.goal : 0) : null, py: s.dPY != null && d && d.py ? s.dPY + (d.rev - d.py) : null } : null; };
+    const st = (w) => { const s = store(w); return s && { rev: s.rev, goal: s.goal, py: s.dPY }; };
+    const di = (w) => { const d = distro(w); return d && { rev: d.rev, goal: d.goal, py: d.py ? d.rev - d.py : null }; };
+    const $rows = (f) => [
+      ['$', (w) => { const o = f(w); return o && fin(o.rev) ? usdK(o.rev) : '—'; }],
+      ['vs PY', (w) => { const o = f(w); return o && fin(o.py) ? hlK(o.py) + dt(o.py >= 0) : '—'; }],
+      ['vs target', (w) => { const o = f(w); return o && o.goal ? hlK(o.rev - o.goal) + dt(o.rev >= o.goal) : '—'; }],
+    ];
+    const pctRows = (k, tgt) => [
+      ['%', (w) => { const s = store(w); return s ? p1(s[k]) : '—'; }],
+      ['vs PY (pts)', (w) => { const s = store(w), p = store(prevYear(w)); return s && p && fin(s[k]) && fin(p[k]) ? hlpS(s[k] - p[k]) + dt(s[k] <= p[k]) : '—'; }],
+      ['vs tgt (pts)', (w) => { const s = store(w); return s && fin(s[k]) ? hlpS(s[k] - tgt) + dt(s[k] <= tgt) : '—'; }],
+    ];
+    const cntRows = (re, key) => [
+      ['#', (w) => { const n = promo(w, re); return n == null ? '—' : int.format(n); }],
+      ['vs PY', () => '<span class="muted" title="New program — no prior year">n/a</span>'],
+      [XTn(key) == null ? `vs target (${notSet(key)})` : 'vs target', (w) => { const n = promo(w, re), g = XTn(key); return g == null || n == null ? '—' : hln(n - g) + dt(n >= g); }],
+    ];
+    const caseRows = (f, tgt) => [
+      ['%', (w) => { const c = cases(w, f); return c ? p1(c.g) : '—'; }],
+      ['vs PY (CEs)', (w) => { const c = cases(w, f); return c ? hln(c.d) + dt(c.d >= 0) : '—'; }],
+      ['vs tgt (pts)', (w) => { const c = cases(w, f); return c && fin(tgt) ? hlpS(c.g - tgt) + dt(c.g >= tgt) : '—'; }],
+    ];
+    const boxes = [
+      trendBox('Total revenue', $rows(tot), chips('toast', 'ekos', 'sheet'), 'PY compares taprooms open both years (Prairie Village has no prior year yet).'),
+      trendBox('Store revenue', $rows(st), chips('toast', 'sheet')),
+      trendBox('Dist. revenue', $rows(di), chips('ekos', 'sheet')),
+      trendBox('Food cost %', pctRows('food', t.foodCostPct), chips('me', 'toast')),
+      trendBox('Labor cost %', pctRows('labor', t.laborPct), chips('toast'), 'Hourly labor (Toast) ÷ net sales; salaried labor needs payroll.'),
+      trendBox('Free Pint count', cntRows(RE_PINT, 'Free pint weekly target'), chips('thanx', 'typed')),
+      trendBox('Sampler cards', cntRows(RE_SAMPLER, 'Sampler card weekly target'), chips('thanx', 'typed')),
+      trendBox('Case vol %', caseRows(A, t.totalGrowthPct), chips('vip', 'sheet')),
+      trendBox('IA case vol %', caseRows(H, t.inIowaGrowthPct), chips('vip', 'sheet')),
+      trendBox('xIA case vol %', caseRows(X, t.outsideIowaGrowthPct), chips('vip', 'sheet')),
+    ];
+    $('v-weekly').innerHTML = `<div class="tier-h"><h2>Leadership Scorecard — Total Big Grove</h2><span>LCW = week of ${wkTitle(state.week)} · hover a column for its dates</span></div>
+      <div class="xwk"><div class="xg2b">${boxes.join('')}</div><div class="xcol">${milestoneBox('Palatine', '')}${milestoneBox('Madison', '')}${rewardsBox('')}${reviewsBox(true)}</div></div>
+      ${sourcesFor('weekly')}`;
+  }
+
+  // ---- By Location (slide 3, Option 2)
+  function viewByLoc() {
+    const ws = back(3), t = T();
+    const cell = (v, d, good, fmt, fmtD, noDot) => (fin(v) ? `${fmt(v)}<span class="sl">/</span><span class="${good == null ? '' : good ? 'good-t' : 'bad-t'}">${fmtD(d)}</span>${noDot ? '' : dt(good)}` : '—');
+    const head = `<thead><tr><th></th>${ws.map((w, i) => `<th title="${wkTitle(w)}">${lcwLbl(i)}</th>`).join('')}</tr></thead>`;
+    const revRows = ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${ws.map((w) => { const r = TAP.find((x) => x.week_start === w && x.location === l); const g = r && r.goal_src === 'sheet' ? r.sales_goal : null; return `<td>${r ? (g ? cell(r.net_sales, r.net_sales - g, r.net_sales >= g, usdK, hlK) : usdK(r.net_sales) + '<span class="sl">/</span><span class="muted" title="No workbook goal captured for this week">—</span>') : '—'}</td>`; }).join('')}</tr>`).join('')
+      + `<tr><td>Brewery</td>${ws.map((w) => { const d = distro(w); return `<td>${d ? cell(d.rev, d.goal ? d.rev - d.goal : null, d.goal ? d.rev >= d.goal : null, usdK, hlK) : '—'}</td>`; }).join('')}</tr>`
+      + `<tr class="tgt"><td>Total</td>${ws.map((w) => { const s = store(w), d = distro(w); if (!s) return '<td>—</td>'; const v = s.rev + (d ? d.rev : 0), g = s.goal ? s.goal + (d && d.goal ? d.goal : 0) : null; return `<td>${g ? cell(v, v - g, v >= g, usdK, hlK) : usdK(v) + '<span class="sl">/</span><span class="muted">—</span>'}</td>`; }).join('')}</tr>`;
+    const pctTable = (k, tk, tgt) => ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${ws.map((w) => { const r = TAP.find((x) => x.week_start === w && x.location === l); const v = r ? r[k] : null; return `<td>${cell(v, fin(v) ? v - tgt : null, fin(v) ? v <= tgt : null, p1, hlpS, true)}</td>`; }).join('')}</tr>`).join('')
+      + `<tr class="tgt"><td>Total</td>${ws.map((w) => { const s = store(w); const v = s ? s[tk] : null; return `<td>${cell(v, fin(v) ? v - tgt : null, fin(v) ? v <= tgt : null, p1, hlpS, true)}</td>`; }).join('')}</tr>`;
+    const revP = panel('Revenue H/(L) vs target', "Actual / H(L) vs that week's goal", chips('toast', 'ekos', 'sheet'), `<div style="overflow-x:auto"><table class="xt">${head}<tbody>${revRows}</tbody></table></div>`);
+    const foodP = panel('Food COGS % H/(L) vs target', `Target ≤ ${t.foodCostPct}% · actual / pts vs target`, chips('me', 'toast'), `<div style="overflow-x:auto"><table class="xt">${head}<tbody>${pctTable('food_cost_pct', 'food', t.foodCostPct)}</tbody></table></div>`);
+    const labP = panel('Labor % H/(L) vs target', `Target ≤ ${t.laborPct}% · hourly labor (Toast) · actual / pts vs target`, chips('toast'), `<div style="overflow-x:auto"><table class="xt">${head}<tbody>${pctTable('labor_pct', 'labor', t.laborPct)}</tbody></table></div>`);
+    const rw = repWeeks().slice(0, 3), tg = t.rating || 4.7;
+    const gP = panel('Google rating', `Target: ${tg}+ stars by location`, chips('sheet', 'google'),
+      `<div style="overflow-x:auto"><table class="xt"><thead><tr><th></th>${rw.map((w, i) => `<th colspan="2" title="${wkTitle(w)}">${lcwLbl(i)}</th>`).join('')}</tr><tr><th></th>${rw.map(() => '<th>Stars</th><th>Count</th>').join('')}</tr></thead><tbody>${
+        ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${rw.map((w) => { const r = REP.find((x) => x.week_start === w && x.location === l); return r ? `<td>${fin(r.rating) ? r.rating.toFixed(1) : '—'}${dt(fin(r.rating) ? r.rating >= tg : null)}</td><td>${fin(r.reviews) ? int.format(r.reviews) : '—'}</td>` : '<td>—</td><td>—</td>'; }).join('')}</tr>`).join('')}</tbody></table></div>
+       ${rw.length < 3 ? '<div class="owner">Earlier weeks fill in as the workbook is captured each week (or once Google is connected).</div>' : ''}`);
+    const ytd = (f) => { const rows = DY.filter((r) => f(r.state)); const ty = sum(rows, (r) => r.ce_ytd), ly = sum(rows, (r) => r.ce_ytd_ly); return ly ? (ty / ly - 1) * 100 : null; };
+    const cvP = panel('Case volume growth', 'Year to date vs last year', chips('vip', 'sheet'), `<div class="mile">
+      <div><span>Target (total)</span><b>+${t.totalGrowthPct}%</b></div>
+      <div><span>Total case volume</span><b>${p1(ytd(A))}${dt(ytd(A) >= t.totalGrowthPct)}</b></div>
+      <div><span>In Iowa case volume</span><b>${p1(ytd(H))}${dt(ytd(H) >= t.inIowaGrowthPct)}</b></div><div class="owner">target +${t.inIowaGrowthPct}%</div>
+      <div><span>Outside Iowa case volume</span><b>${p1(ytd(X))}${dt(ytd(X) >= t.outsideIowaGrowthPct)}</b></div><div class="owner">target +${t.outsideIowaGrowthPct}%</div></div>`);
+    const line = (lbl, val, key, note) => `<div><span><b>${lbl}:</b> ${val}</span>${dt(null)}</div><div class="owner">Goal: ${XT(key) ? esc(XT(key)) : notSet(key)}${note ? ' · ' + note : ''}</div>`;
+    const waiting = '<span class="muted">waiting on feed</span>';
+    const gc = XO('Golden Can rollout date');
+    const goldP = panel('Leveraging the Golden Triangle', '', chips('thanx', 'none', 'typed'), `<div class="mile">
+      ${line('Free Pint coupon on 12-packs — redemptions', DSW.length ? int.format(promoSince(RE_PINT) || 0) : waiting, 'Free pint redemptions', 'Toast discount')}
+      ${line('6-pack for $0.01 with Rewards sign-up', DSW.length ? int.format(promoSince(RE_PENNY) || 0) : waiting, '6-pack sign-up count', 'Toast discount')}
+      ${line('Trade industry nights, month to date', '<span class="muted">not connected</span>', 'Industry nights per month', 'where are they booked?')}
+      ${line('Golden Can campaign rollout', gc && gc.actual ? esc(gc.actual) : '<span class="muted">—</span>', 'Golden Can rollout date', '')}</div>`);
+    const techP = panel("Implementing Big Grove's technology for the future", '', chips('typed'), `<div class="mile">${
+      ['Big Grove Brain', 'Brewery and Finance ERP', 'LMS', 'Security'].map((n) => { const o = XO(n + ' launch date'); return `<div><span><b>${n}:</b> ${o && o.actual ? esc(o.actual) : '<span class="muted">not launched</span>'}</span>${dt(null)}</div><div class="owner">Target launch: ${o ? esc(o.target) : notSet(n + ' launch date')}</div>`; }).join('')}</div>`);
+    $('v-byloc').innerHTML = `<div class="tier-h"><h2>Leadership Scorecard — Total Big Grove · Option 2 (by location)</h2><span>LCW = week of ${wkTitle(state.week)}</span></div>
+      <div class="xg3">${milestoneBox('Palatine', '')}${milestoneBox('Madison', '')}${cvP}</div>
+      <div class="xg3t">${revP}${foodP}${labP}</div>
+      <div class="xg3">${gP}${rewardsBox('')}${goldP}</div>
+      <div class="xg3">${techP}</div>
+      ${sourcesFor('byloc')}`;
+  }
+
+  // ---- what feeds each page
+  const FEEDS = {
+    exec: [
+      ['Store metrics — revenue, hourly labor %, food cost %', 'Toast · MarginEdge', 'connected', 'Targets: weekly taproom goals (workbook), labor / food % targets'],
+      ['Google reviews', 'Workbook today → Google Places API', 'needs', 'Waiting on Google Cloud billing OK'],
+      ['Rewards: active / engaged users', 'Thanx via Toast', 'connected', 'Active = members seen in 28 days; engaged = 2+ visit days. Sign-ups need Thanx itself. Targets typed'],
+      ['Distribution — revenue', 'Ekos (+ workbook history before Apr 27)', 'connected', 'Weekly goal from the workbook'],
+      ['Distribution — case vol % (total / IA / xIA)', 'VIP', 'connected', 'Growth goals from the workbook'],
+      ['Distribution — POD % (total / IA / xIA)', 'VIP', 'connected', 'Weekly snapshots kept from Oct 26; POD targets typed'],
+      ['Palatine / Madison openings', 'Typed', 'manual', "Exec Targets rows: '<Name> opening date', '<Name> hire dates', '<Name> revenue target'"],
+      ['Free Pint / sampler redemptions', 'Thanx via Toast (discount names)', 'connected', 'Counts Toast discounts named "Free Pint" / "Sampler"; targets typed'],
+      ['YTD total revenue', 'Toast · Ekos · workbook', 'connected', "Annual target typed ('Annual revenue target')"],
+    ],
+    weekly: [
+      ['Total / store / dist. revenue, H/(L) PY and target', 'Toast · Ekos · workbook', 'connected', 'Dist. prior year from the workbook history (Oct 2025 on)'],
+      ['Food cost %, labor cost %, vs PY and target', 'MarginEdge · Toast', 'connected', 'PY = same week last year'],
+      ['Free Pint count, sampler cards', 'Thanx via Toast', 'connected', 'Weekly targets typed; no PY (new programs)'],
+      ['Case vol % total / IA / xIA', 'VIP', 'connected', 'Same VIP week last year'],
+      ['Palatine / Madison', 'Typed', 'manual', ''],
+      ['Rewards', 'Thanx via Toast', 'connected', ''],
+      ['Google reviews', 'Workbook → Google Places API', 'needs', ''],
+    ],
+    byloc: [
+      ['Revenue by location + brewery vs target', 'Toast · Ekos · workbook goals', 'connected', ''],
+      ['Food COGS % and labor % by location', 'MarginEdge · Toast', 'connected', ''],
+      ['Google rating and count by location', 'Workbook → Google Places API', 'needs', ''],
+      ['Case volume growth', 'VIP', 'connected', ''],
+      ['Rewards: active / engaged users', 'Thanx via Toast', 'connected', ''],
+      ['Golden Triangle — Free Pint coupon, $0.01 6-pack', 'Thanx via Toast (discount names)', 'connected', 'Confirm the Toast discount names'],
+      ['Golden Triangle — trade industry nights', 'Not connected', 'needs', 'Where are they booked (Tripleseat event type? Toast?)'],
+      ['Golden Can rollout; technology launches', 'Typed', 'manual', ''],
+    ],
+  };
+  function sourcesFor(v) {
+    const L = { connected: 'Connected', needs: 'Needs a connector', manual: 'Typed' };
+    return `<details class="feeds"><summary>What feeds this page</summary><table><thead><tr><th>Box</th><th>Platform</th><th>Status</th><th>Notes</th></tr></thead><tbody>${
+      FEEDS[v].map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td><span class="st2 ${r[2]}">${L[r[2]]}</span></td><td class="muted">${esc(r[3])}</td></tr>`).join('')}</tbody></table>
+      <div class="owner">Typed targets come from an optional <b>Exec Targets</b> tab in the Leadership Scorecard workbook: column A the name shown next to "not set", column B the target, column C the actual or status. The nightly feed picks it up.</div></details>`;
+  }
+  function renderViews() {
+    if (!WEEKS || !WEEKS.length) return;
+    const on = (id) => $(id) && !$(id).hidden;
+    if (on('exec')) viewExec();
+    if (on('weekly')) viewWeekly();
+    if (on('byloc')) viewByLoc();
+  }
+  window.__esRenderViews = () => { try { renderViews(); } catch (e) { console.error(e); } };
+
   // ---------------------------------------------------------------- render
   function render() {
+    if (window.__esRenderViews) window.__esRenderViews();
     const rows = weekRows(state.week);
     $('yr').textContent = state.week.slice(0, 4);
     $('filter').classList.toggle('on', state.loc !== 'all');
@@ -867,6 +1191,20 @@ html.locked #gate{display:block}
       ${rows.slice(0, 100).map((r) => `<tr><td>${fmt(r.t)}</td><td>${uesc(r.name || r.email)} <span class="never">${uesc(r.email)}</span></td><td class="ev-${uesc(r.ev)}">${uesc(r.ev === 'open' ? 'opened' : r.ev === 'signin' ? 'signed in' : r.ev)}</td></tr>`).join('') || '<tr><td colspan="3" class="never">No visits logged yet.</td></tr>'}</tbody></table>`;
     $('u-sub').textContent = `Who has signed in and opened the scorecard — ${rows.length} events logged (latest 100 listed). Visible to roster Admins only; logins before Nov 14 were not logged as visits.`;
   }
+  function buildNav(a, w) {
+    // views: Scorecard | Data sources | Usage (Admins only — the backend checks too)
+    const views = [['app', 'Dashboard'], ['exec', 'Execution Card'], ['weekly', 'Weekly Scorecard'], ['byloc', 'By Location'], ['sources', 'Data sources']].concat(/^admin$/i.test(a.role || '') && a.sid ? [['usage', 'Usage']] : []);
+    const links = {};
+    const show = (v) => {
+      views.forEach(([id]) => { $(id).hidden = id !== v; links[id].classList.toggle('on', id === v); });
+      const period = ['app', 'exec', 'weekly', 'byloc'].includes(v);
+      document.querySelectorAll('header .ctl').forEach((c) => { c.style.visibility = (c.querySelector('#sel-loc') ? v === 'app' : period) ? '' : 'hidden'; });
+      if (v === 'usage') showUsage(a); else if (v === 'sources') window.__esRenderSources(); else if (window.__esRenderViews) window.__esRenderViews();
+      window.scrollTo(0, 0);
+    };
+    views.forEach(([id, label]) => { const l = document.createElement('a'); l.href = '#'; l.textContent = label; l.onclick = (e) => { e.preventDefault(); show(id); }; links[id] = l; w.append(l); });
+    links.app.classList.add('on');
+  }
   let started = false;
   async function unlock(a) {
     if (started) return;
@@ -877,17 +1215,7 @@ html.locked #gate{display:block}
     document.documentElement.classList.remove('locked');
     const w = $('who'); w.hidden = false; w.innerHTML = '';
     w.append(document.createTextNode(a.name || a.email));
-    // views: Scorecard | Data sources | Usage (Admins only — the backend checks too)
-    const views = [['app', 'Scorecard'], ['sources', 'Data sources']].concat(/^admin$/i.test(a.role || '') ? [['usage', 'Usage']] : []);
-    const links = {};
-    const show = (v) => {
-      views.forEach(([id]) => { $(id).hidden = id !== v; links[id].classList.toggle('on', id === v); });
-      document.querySelectorAll('header .ctl').forEach((c) => { c.style.visibility = v === 'app' ? '' : 'hidden'; });
-      if (v === 'usage') showUsage(a); else if (v === 'sources') window.__esRenderSources();
-      window.scrollTo(0, 0);
-    };
-    views.forEach(([id, label]) => { const l = document.createElement('a'); l.href = '#'; l.textContent = label; l.onclick = (e) => { e.preventDefault(); show(id); }; links[id] = l; w.append(l); });
-    links.app.classList.add('on');
+    buildNav(a, w);
     const so = document.createElement('a'); so.href = '#'; so.textContent = 'Sign out'; w.append(so);
     so.onclick = (e) => { e.preventDefault(); forget(); try { google.accounts.id.disableAutoSelect(); } catch {} location.reload(); };
     window.__esStart();
@@ -924,7 +1252,7 @@ html.locked #gate{display:block}
   };
   window.__esGsiFail = () => setErr('The Google sign-in button could not load. Open this page directly in Chrome or Safari (not inside Gmail or Messages) and try again.');
 
-  if (local) { started = true; document.documentElement.classList.remove('locked'); window.__esStart(); return; }   // Troy's local preview
+  if (local) { started = true; document.documentElement.classList.remove('locked'); const w = $('who'); w.hidden = false; w.textContent = 'Local preview'; buildNav({ role: '' }, w); window.__esStart(); return; }   // Troy's local preview
   const a = read();
   if (a && a.sid && a.bundle) {
     unlock(a);                                     // open right away from the remembered key, then re-check the roster

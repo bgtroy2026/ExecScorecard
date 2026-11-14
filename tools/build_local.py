@@ -295,10 +295,10 @@ def ekos_weekly(sales_portal: str, today: date):
 
 
 # ------------------------------------------------------------------------------------------------ VIP placements (PODs)
-def vip_pods(sales_portal: str):
+def vip_pods(sales_portal: str, path: str | None = None):
     """Effective placements YTD vs the same period last year, per state, from the Sales Portal's
     'Yearly Distributor Data.csv' VIP export (one row per distributor; the state is the name's last ', XX')."""
-    path = os.path.join(sales_portal, "Yearly Distributor Data", "Yearly Distributor Data.csv")
+    path = path or os.path.join(sales_portal, "Yearly Distributor Data", "Yearly Distributor Data.csv")
     if not os.path.exists(path):
         return None, None
     rows = list(csv.reader(open(path, encoding="utf-8-sig")))
@@ -319,6 +319,93 @@ def vip_pods(sales_portal: str):
         by[st][1] += num(r[ly]) or 0
     out = [[as_of, st, round(v[0]), round(v[1])] for st, v in sorted(by.items())]
     return out, h[ty]
+
+
+# ------------------------------------------------------------------------------------------------ Execution Card feeds
+def pods_history(sales_portal: str):
+    """Weekly POD snapshots: the current 'Yearly Distributor Data.csv' plus every daily copy the Sales Portal keeps
+    in _prev_YYYYMMDD folders. One snapshot per Mon-Sun week (the latest in it), per state."""
+    base = os.path.join(sales_portal, "Yearly Distributor Data")
+    paths = [os.path.join(base, "Yearly Distributor Data.csv")]
+    if os.path.isdir(base):
+        paths += [os.path.join(base, d, "Yearly Distributor Data.csv") for d in sorted(os.listdir(base)) if d.startswith("_prev_")]
+    best = {}
+    for pth in paths:
+        try:
+            rows, _ = vip_pods(sales_portal, pth)
+        except Exception:
+            continue
+        if not rows or not rows[0][0]:
+            continue
+        d = date.fromisoformat(rows[0][0])
+        ws = (d - timedelta(days=d.weekday())).isoformat()
+        if ws not in best or best[ws][0] < d:
+            best[ws] = (d, rows)
+    out = []
+    for ws, (d, rows) in sorted(best.items()):
+        out += [[ws, d.isoformat(), r[1], r[2], r[3]] for r in rows]
+    return out
+
+
+def vip_weekly(sales_portal: str):
+    """Cases per week and state, this year and the same week last year (VIP weeks run Sun-Sat; filed under the
+    Monday after the Sunday so they sit beside the Mon-Sun taproom weeks)."""
+    def read(fn):
+        path = os.path.join(sales_portal, "Rolling Scorecard", fn)
+        if not os.path.exists(path):
+            return {}
+        rows = [r for r in csv.reader(open(path, encoding="utf-8-sig")) if r and any(c.strip() for c in r)]
+        cols = []
+        for i, h in enumerate(rows[0]):
+            m = re.match(r"\s*1 Week (\d+/\d+/\d{4}) thru (\d+/\d+/\d{4})", h)
+            if m:
+                cols.append((i, datetime.strptime(m.group(1), "%m/%d/%Y").date()))
+        agg = defaultdict(float)
+        for r in rows[1:]:
+            dist = r[0].strip()
+            st = dist.rsplit(",", 1)[-1].strip().upper() if "," in dist else ""
+            if not re.fullmatch(r"[A-Z]{2}", st):
+                continue
+            for i, ws in cols:
+                agg[(ws, st)] += (num(r[i]) or 0) if i < len(r) else 0
+        return agg
+    ty, ly = read("Rolling Scorecard CLAUDE.csv"), read("Rolling Scorecard LY CLAUDE.csv")
+    out = []
+    for (ws, st), v in sorted(ty.items()):
+        out.append([(ws + timedelta(days=1)).isoformat(), st, round(v, 1), round(ly.get((ws - timedelta(days=364), st), 0.0), 1)])
+    return out
+
+
+def sheet_week_series(payload: dict | None, metric: str, through: date):
+    """One row of the All Company Scorecard as {monday: value}. Week labels ('11/2-11/8') carry no year; the
+    newest is the latest such Monday not after `through`, and each older column is seven days earlier."""
+    sc = (payload or {}).get("scorecard") or {}
+    weeks = sc.get("weeks") or []
+    m = next((x for x in sc.get("metrics") or [] if x.get("metric") == metric), None)
+    if not weeks or not m:
+        return {}, None
+    mo, dy = (int(x) for x in weeks[0].split("-")[0].split("/"))
+    first = date(through.year, mo, dy)
+    if first > through:
+        first = date(through.year - 1, mo, dy)
+    out = {}
+    for i, lbl in enumerate(weeks):
+        cell = (m.get("cells") or {}).get(lbl)
+        if cell and cell[0] is not None:
+            out[(first - timedelta(days=7 * i)).isoformat()] = float(cell[0])
+    return out, ((m.get("goal") or [None])[0])
+
+
+def exec_targets(tabs: dict):
+    """Optional 'Exec Targets' tab in the Leadership Scorecard workbook: column A a key, column B the target,
+    column C (optional) the actual / status. Lets leadership keep Execution Card goals in the workbook they already edit."""
+    grid = tabs.get("Exec Targets")
+    out = {}
+    for r in grid or []:
+        cells = [str(c).strip() for c in r]
+        if len(cells) >= 2 and cells[0] and cells[1] and cells[0].lower() not in ("key", "metric"):
+            out[cells[0]] = {"target": cells[1], "actual": cells[2] if len(cells) > 2 and cells[2] else None}
+    return out
 
 
 # ------------------------------------------------------------------------------------------------ Store Director Portal (feed)
@@ -346,6 +433,9 @@ def taprooms_from_sdp(payload: dict, sheet_goals: dict):
             ev[(monday(date.fromisoformat(e[2][:10])).isoformat(), lid)] += float(e[6] or e[5] or 0)
     targets = payload.get("targets") or {}
 
+    def goal_src(ws, lid):
+        return "sheet" if sheet_goals.get((ws, names[lid])) else "sdp"
+
     def goal_for(ws, lid):
         g = sheet_goals.get((ws, names[lid]))
         if g:
@@ -370,7 +460,7 @@ def taprooms_from_sdp(payload: dict, sheet_goals: dict):
                     round(w["pf"] / food * 100, 1) if food and w["pf"] else "",
                     round(w["p"] / net * 100, 1) if w["p"] else "",
                     round(w["lc"] / net * 100, 1) if w["lc"] else "",
-                    int(w["guests"]) if w["guests"] else ""])
+                    int(w["guests"]) if w["guests"] else "", goal_src(ws, lid)])
     return out, guests_daily
 
 
@@ -411,9 +501,17 @@ def main():
         sheet_comp = {}
     # ---- brewery distro revenue: Ekos invoices (feed); the sheet keeps the goal and last year
     ek, ek_last = ekos_weekly(a.sales_portal, today)
+    sh_dist, sh_goal = sheet_week_series(payload, "Distribution Revenue", today)
     if ek:
-        weeks = sorted(set(ek) | set(sheet_comp))
-        comp_rows = [[w, ek.get(w, ""), (sheet_comp.get(w) or ["", "", "", ""])[2], (sheet_comp.get(w) or ["", "", "", ""])[3]] for w in weeks]
+        ek0 = min(ek)
+        merged = {w: v for w, v in sh_dist.items() if w < ek0}      # the sheet's history before Ekos starts
+        merged.update(ek)
+        weeks = sorted(set(merged) | set(sheet_comp))
+        def py(w):
+            v = merged.get((date.fromisoformat(w) - timedelta(days=364)).isoformat())
+            return round(v) if v else (sheet_comp.get(w) or ["", "", "", ""])[3]
+        comp_rows = [[w, round(merged[w]) if w in merged else "", (sheet_comp.get(w) or ["", "", "", ""])[2] or (round(sh_goal) if sh_goal else ""), py(w)] for w in weeks]
+        cfg["distroBackfill"] = {"sheetBefore": ek0, "weeks": sum(1 for w in merged if w < ek0)}
         cfg["breweryDistroSource"] = "ekos"
         last_w = max(ek)
         sh = sheet_comp.get(last_w)
@@ -458,14 +556,36 @@ def main():
         cfg["taproomSource"] = "feed"
         write("guests_daily.csv", ["date", "location", "guests"], gd)
     else:
-        tap = [[r[0], r[1], r[2], r[3], r[4], "", "", "", "", r[5], "", r[6], ""] for r in
+        tap = [[r[0], r[1], r[2], r[3], r[4], "", "", "", "", r[5], "", r[6], "", "sheet"] for r in
                (list(csv.reader(open(os.path.join(PRIVATE, "sheet_history", "taproom_sheet.csv"))))[1:] if L else [])]
         cfg["taproomSource"] = "sheet"
         write("guests_daily.csv", ["date", "location", "guests"], [])
         print("  ! no Store Director Portal payload: taproom revenue, goal, food cost and labor come from the sheet;"
               " mix, COGS and guests stay empty")
     write("taproom_weekly.csv", ["week_start", "location", "net_sales", "net_sales_ly", "sales_goal", "food_sales", "beer_sales",
-                                 "event_sales", "other_sales", "food_cost_pct", "cogs_pct", "labor_pct", "guests"], tap)
+                                 "event_sales", "other_sales", "food_cost_pct", "cogs_pct", "labor_pct", "guests", "goal_src"], tap)
+
+    if L and L["growth_goal"].get("Total") is not None:
+        cfg["targets"]["totalGrowthPct"] = L["growth_goal"]["Total"]
+    cfg["execTargets"] = exec_targets(tabs)
+    # ---- Execution Card feeds
+    write("vip_weekly.csv", ["week_start", "state", "ce", "ce_ly"], vip_weekly(a.sales_portal))
+    write("pods_weekly.csv", ["week_start", "as_of", "state", "placements", "placements_ly"], pods_history(a.sales_portal))
+    ew = (payload or {}).get("exec_weekly") or {}
+    names = {l["id"]: l["name"] for l in (payload or {}).get("locations", [])}
+    lw, dw = [], []
+    for lid, blk in ew.items():
+        if not blk:
+            continue
+        loc = "All" if lid == "_all" else names.get(lid, lid)
+        lw += [[w[0], loc, *w[1:]] for w in blk.get("weeks", [])]
+        dw += [[d[0], loc, d[1].replace(",", " "), d[2], d[3], d[4]] for d in blk.get("discounts", [])]
+        if lid == "_all":
+            cfg["loyaltySince"] = blk.get("capture_since")
+    write("loyalty_weekly.csv", ["week_start", "location", "members_week", "checks", "members_28", "engaged_28", "first_seen"], sorted(lw))
+    write("discounts_weekly.csv", ["week_start", "location", "name", "vendor", "n", "amt"], sorted(dw))
+    if not ew:
+        print("  ! no exec_weekly in the Store Director feed yet — Rewards / Free Pint / sampler stay empty until its next nightly run")
 
     cfg["dataSource"] = "local"
     cfg["dataLabel"] = (f"Local preview — VIP through {vip_asof:%b %-d}; taprooms from the "

@@ -10,7 +10,11 @@
     "distributionYtd": "data/sample/distribution_ytd.csv",
     "placements": "data/sample/placements.csv",
     "vmbgTargets": "data/sample/vmbg_targets.csv",
-    "guestsDaily": "data/sample/guests_daily.csv"
+    "guestsDaily": "data/sample/guests_daily.csv",
+    "vipWeekly": "data/sample/vip_weekly.csv",
+    "podsWeekly": "data/sample/pods_weekly.csv",
+    "loyaltyWeekly": "data/sample/loyalty_weekly.csv",
+    "discountsWeekly": "data/sample/discounts_weekly.csv"
   },
   "targets": {
     "primeCostPct": 58,
