@@ -257,7 +257,7 @@ def file_history(name, header, key_cols, new_rows):
 def ekos_weekly(sales_portal: str, today: date):
     """Brewery distribution revenue per Mon-Sun week from the Ekos invoice exports the Sales Portal's daily refresh
     downloads (Ekos/invoices_liberty.csv + invoices_gilbert.csv, parsed by the portal's own _build/build_eko_csv.py).
-    Revenue = invoice totals by DELIVERY date, posted and draft (a delivered order not yet posted is still revenue).
+    Revenue = invoice line totals excluding keg deposits, by DELIVERY date, posted and draft (a delivered order not yet posted is still revenue).
     Only complete weeks. Ekos starts May 2026, so there is no last year from it."""
     ek = os.path.join(sales_portal, "Ekos")
     mod_path = os.path.join(sales_portal, "_build", "build_eko_csv.py")
@@ -287,7 +287,9 @@ def ekos_weekly(sales_portal: str, today: date):
         ws = d - timedelta(days=d.weekday())
         if ws >= this_monday:
             continue                     # this week and future deliveries: not complete yet
-        wk[ws.isoformat()] += float(r[6] or 0)
+        # beer revenue only: keg deposits are refundable, not sales (with them out, weeks match the sheet's
+        # "Distribution Revenue" within ~1-2%)
+        wk[ws.isoformat()] += sum(float(it[4] or 0) for it in (r[7] or []) if "deposit" not in str(it[0]).lower())
         last = max(last or d, d)
     return {w: round(v) for w, v in wk.items()}, last
 
