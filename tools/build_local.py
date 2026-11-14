@@ -253,6 +253,45 @@ def file_history(name, header, key_cols, new_rows):
     return rows
 
 
+# ------------------------------------------------------------------------------------------------ Ekos (brewery distro revenue)
+def ekos_weekly(sales_portal: str, today: date):
+    """Brewery distribution revenue per Mon-Sun week from the Ekos invoice exports the Sales Portal's daily refresh
+    downloads (Ekos/invoices_liberty.csv + invoices_gilbert.csv, parsed by the portal's own _build/build_eko_csv.py).
+    Revenue = invoice totals by DELIVERY date, posted and draft (a delivered order not yet posted is still revenue).
+    Only complete weeks. Ekos starts May 2026, so there is no last year from it."""
+    ek = os.path.join(sales_portal, "Ekos")
+    mod_path = os.path.join(sales_portal, "_build", "build_eko_csv.py")
+    if not os.path.exists(mod_path):
+        return None, None
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("bgs_build_eko_csv", mod_path)
+    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+    rows = []
+    for loc in ("liberty", "gilbert"):
+        csv_path = os.path.join(ek, f"invoices_{loc}.csv")
+        if not os.path.exists(csv_path):
+            continue
+        st_path = os.path.join(ek, f"status_{loc}.json")
+        smap = json.load(open(st_path)) if os.path.exists(st_path) else {}
+        rows += m.to_eko(m.parse_invoice_csv(csv_path, loc.title()), smap)
+    if not rows:
+        return None, None
+    this_monday = today - timedelta(days=today.weekday())
+    wk = defaultdict(float)
+    last = None
+    for r in rows:
+        try:
+            d = datetime.strptime(str(r[4])[:10], "%m/%d/%Y").date()
+        except ValueError:
+            continue
+        ws = d - timedelta(days=d.weekday())
+        if ws >= this_monday:
+            continue                     # this week and future deliveries: not complete yet
+        wk[ws.isoformat()] += float(r[6] or 0)
+        last = max(last or d, d)
+    return {w: round(v) for w, v in wk.items()}, last
+
+
 # ------------------------------------------------------------------------------------------------ VIP placements (PODs)
 def vip_pods(sales_portal: str):
     """Effective placements YTD vs the same period last year, per state, from the Sales Portal's
@@ -365,7 +404,25 @@ def main():
         tsh = file_history("taproom_sheet.csv", ["week_start", "location", "net_sales", "net_sales_ly", "sales_goal", "food_cost_pct", "labor_pct"], [0, 1],
                            [[ws, l, v["net"], v["py"], v["goal"], v["food"], v["labor"]] for l, v in L["taprooms"].items()])
         sheet_goals = {(r[0], r[1]): num(r[4]) for r in tsh}
-        write("company_weekly.csv", ["week_start", "brewery_distro_revenue", "brewery_distro_goal", "brewery_distro_py"], comp)
+        sheet_comp = {r[0]: r for r in comp}
+    else:
+        sheet_comp = {}
+    # ---- brewery distro revenue: Ekos invoices (feed); the sheet keeps the goal and last year
+    ek, ek_last = ekos_weekly(a.sales_portal, today)
+    if ek:
+        weeks = sorted(set(ek) | set(sheet_comp))
+        comp_rows = [[w, ek.get(w, ""), (sheet_comp.get(w) or ["", "", "", ""])[2], (sheet_comp.get(w) or ["", "", "", ""])[3]] for w in weeks]
+        cfg["breweryDistroSource"] = "ekos"
+        last_w = max(ek)
+        sh = sheet_comp.get(last_w)
+        print(f"  Ekos brewery distro: {len(ek)} weeks, latest {last_w} ${ek[last_w]:,}"
+              + (f" (sheet said ${float(sh[1]):,.0f})" if sh and sh[1] else ""))
+    else:
+        comp_rows = [list(r) for r in sheet_comp.values()]
+        cfg["breweryDistroSource"] = "sheet"
+        print("  ! Ekos invoice exports not found — brewery distro revenue from the sheet")
+    write("company_weekly.csv", ["week_start", "brewery_distro_revenue", "brewery_distro_goal", "brewery_distro_py"], sorted(comp_rows))
+    if L:
         write("reputation_weekly.csv", ["week_start", "location", "rating_week", "rating", "new_reviews", "reviews"], rep)
         pods = L["pods"]
         if pods.get("Total"):

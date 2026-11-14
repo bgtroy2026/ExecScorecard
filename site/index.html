@@ -205,7 +205,7 @@ html.locked #gate{display:block}
     <div class="tier-h"><h2>Tier 1 — Executive Pulse</h2><span>12-week trend sparklines</span></div>
     <div class="grid4">
       <div class="panel kpi">
-        <div class="top"><span class="lbl">Total weekly revenue <span class="unit" id="u-rev"></span></span><span class="srcs"><span class="src feed" title="Taproom net sales: Store Director Portal pipeline (Toast), refreshed nightly">Feed</span><span class="src sheet" title="Brewery distro revenue and all revenue goals: typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></span></div>
+        <div class="top"><span class="lbl">Total weekly revenue <span class="unit" id="u-rev"></span></span><span class="srcs"><span class="src feed" title="Taproom net sales: Store Director Portal pipeline (Toast), refreshed nightly • Brewery distro revenue: Ekos invoices (Liberty + Gilbert) by delivery date, from the Sales Portal daily Ekos download">Feed</span><span class="src sheet" title="Revenue goals and brewery distro last year: typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></span></div>
         <div class="row"><div class="val num" id="k-rev">—</div><svg class="spark" id="sp-rev" aria-hidden="true"></svg></div>
         <span class="pill" id="p-rev"></span>
         <div class="lines num"><div><span id="l-tapn">Taprooms</span><span id="l-tap"></span></div><div><span>Brewery distro <sup class="warn-t" title="From the Leadership Scorecard workbook">sheet</sup></span><span id="l-dist"></span></div></div>
@@ -284,7 +284,7 @@ html.locked #gate{display:block}
       <thead><tr><th>Measure</th><th>Definition</th><th>Feed</th><th>Status</th></tr></thead>
       <tbody>
         <tr><td>Taproom revenue, goal</td><td>Net sales after discounts, before tax and tips; goal is the monthly location target spread over the days of the week</td><td>Store Director Portal — Toast orders, <code>inputs/targets.csv</code></td><td><span class="st ok">Available</span></td></tr>
-        <tr><td>Brewery distro revenue, goal</td><td>Wholesale revenue for the week, prior year and goal</td><td>Leadership Scorecard workbook, “2026 Leadership Scorecard” tab, Brewery row</td><td><span class="st part">Spreadsheet</span></td></tr>
+        <tr><td>Brewery distro revenue, goal</td><td>Wholesale revenue for the week, prior year and goal</td><td>Revenue: Ekos invoices (Liberty + Gilbert), invoice totals by delivery date, complete weeks since May 2026 — Sales Portal daily Ekos download. Goal and prior year: Leadership Scorecard workbook, Brewery row.</td><td><span class="st ok">Available</span></td></tr>
         <tr><td>Revenue goals</td><td>Weekly goal per taproom and for the brewery</td><td>Leadership Scorecard workbook, Revenue by Location</td><td><span class="st part">Spreadsheet</span></td></tr>
         <tr><td>Revenue mix</td><td>Food and beer from Toast sales categories; events from Tripleseat; other = the rest of net sales</td><td>Store Director Portal — Toast + Tripleseat</td><td><span class="st ok">Available</span></td></tr>
         <tr><td>Food cost %, COGS %</td><td>Purchases ÷ sales (food purchases ÷ food sales; all purchases ÷ net sales). A purchasing proxy, not counted usage</td><td>Store Director Portal — MarginEdge invoices</td><td><span class="st part">Provisional</span></td></tr>
@@ -417,8 +417,12 @@ html.locked #gate{display:block}
     const dist = c ? c.brewery_distro_revenue : null, distGoal = c ? c.brewery_distro_goal : null;
     const tot = tap + (dist || 0), goal = tapGoal + (distGoal || 0);
     $('k-rev').textContent = money0.format(tot);
-    const vg = goal ? (tot / goal - 1) * 100 : null;
+    // Ekos has distro revenue for every week, but the sheet only carries a distro goal for the weeks it was filled in.
+    // Without that goal, compare the taprooms with their own goal rather than all revenue with a partial goal.
+    const noDistGoal = dist != null && !distGoal;
+    const vg = noDistGoal ? (tapGoal ? (tap / tapGoal - 1) * 100 : null) : (goal ? (tot / goal - 1) * 100 : null);
     if (vg == null) pill('p-rev', 'na', 'No goal loaded');
+    else if (noDistGoal) pill('p-rev', vg >= 0 ? 'good' : 'bad', `${vg >= 0 ? '▲' : '▼'} ${sgn(vg)}% taprooms vs goal (no distro goal this week)`);
     else pill('p-rev', vg >= 0 ? 'good' : 'bad', `${vg >= 0 ? '▲' : '▼'} ${sgn(vg)}% vs goal (${'$' + k1(goal)})`);
     const vt = tapGoal ? (tap / tapGoal - 1) * 100 : null;
     $('l-tapn').textContent = `Taprooms (${rows.length})`;
