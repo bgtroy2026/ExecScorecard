@@ -16,7 +16,7 @@
   --navy:#1b2449;--navy2:#313757;--green:#94bb36;--ink:#1b2449;--ink2:#474e69;--muted:#6e7590;--grid:#e4e6ef;--axis:#c3c7d6;
   --surface:#ffffff;--plane:#f2f3f7;--border:rgba(27,36,73,.13);--good:#2f6b12;--warn:#a86a00;--bad:#c8372f;
   --good-bg:#eaf3dc;--warn-bg:#fbf0dc;--bad-bg:#fae3e1;--hl-bg:#eef0f8;
-  --s1:#3d4e9a;--s2:#cc8544;--s3:#557523;--sx:#9a9eb0;
+  --s1:#3d4e9a;--s2:#cc8544;--s3:#7b62a8;--sx:#9a9eb0;
   --radius:10px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -225,6 +225,40 @@ details.feeds .st2{font-size:10.5px}
 #usage th{background:#f6f7f9;font-weight:600;font-size:12px}
 #usage td.n{text-align:right;font-variant-numeric:tabular-nums}
 #usage .ev-signin{color:#1a7f37}#usage .ev-refused{color:#b42318}#usage .never{color:var(--muted,#999)}
+
+/* ---------- visual polish (Nov 2026) ---------- */
+/* nav as a real tab bar sitting on the bottom edge of the band */
+.tabs{flex-basis:100%;display:flex;gap:2px;margin:2px 0 -16px;overflow-x:auto;scrollbar-width:none}
+.tabs a{color:rgba(255,255,255,.66);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.02em;padding:9px 14px 10px;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.tabs a:hover{color:#fff}
+.tabs a.on{color:#fff;border-bottom-color:var(--green)}
+.tabs:empty{display:none}
+/* source labels: quiet dot + word instead of boxed badges; hover still gives the detail */
+#app .srcs{gap:9px;align-items:center;flex-wrap:nowrap;padding-top:2px}
+#app .srcs .src{border:0;background:none;padding:0;font-size:9.5px;font-weight:500;letter-spacing:.07em;color:var(--muted)}
+#app .srcs .src::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:1px;background:#8aa86a}
+#app .srcs .src.sheet::before{background:#d6a344}
+/* tier 1: fixed header height so the hero numbers line up across tiles */
+.kpi .top{min-height:32px}
+.kpi .lbl .unit{margin-left:4px}
+.kpi svg.spark{width:96px;height:32px}
+/* tier 2 */
+.track .fill.behind{background:var(--bad);opacity:.8}
+.lr .top .amt{font-size:12px;color:var(--muted);font-weight:500}
+.sumrow{margin-top:auto;display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px solid var(--grid);padding:10px 8px 0;font-size:13px;color:var(--ink2)}
+.sumrow b{color:var(--ink);font-weight:600}
+/* tier 3 */
+.statelist{display:flex;flex-direction:column;gap:7px;margin-top:4px;padding-top:12px;border-top:1px solid var(--grid)}
+.statelist .hd{font-size:11.5px;color:var(--muted)}
+.statelist .sr{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;font-size:13px}
+.statelist .sr .st3{font-weight:600}
+.statelist .sr .bar{height:7px;border-radius:999px;background:var(--plane);position:relative}
+.statelist .sr .bar i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--s1);opacity:.75}
+.card .v{font-size:22px}
+.card .d.bad{color:var(--bad)} .card .d.warn{color:var(--warn)} .card .d.na{color:var(--muted);font-weight:500}
+.holnote{font-size:11.5px;color:var(--muted)}
+.badge-in.bad{color:var(--bad);background:var(--bad-bg)} .badge-in.warn{color:var(--warn);background:var(--warn-bg)}
+.hol-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 </style>
 </head>
 <body>
@@ -243,6 +277,7 @@ details.feeds .st2{font-size:10.5px}
       <div class="ctl xonly" hidden><label for="sel-gran">View by</label><select id="sel-gran"><option value="week">Week</option><option value="month">Month</option><option value="quarter">Quarter</option><option value="ytd">Year to date</option></select></div>
       <div class="ctl xonly" hidden><label for="sel-cmp">Compare to</label><select id="sel-cmp"><option value="target">Target</option><option value="py">Prior year</option><option value="pp">Prior period</option></select></div>
     </div>
+    <nav class="tabs" id="tabs" aria-label="Views"></nav>
   </div>
 </header>
 
@@ -291,7 +326,7 @@ details.feeds .st2{font-size:10.5px}
         <div class="top"><span class="lbl">Total weekly revenue <span class="unit" id="u-rev"></span></span><span class="srcs"><span class="src feed" title="Taproom net sales: Store Director Portal pipeline (Toast), refreshed nightly • Brewery distro revenue: Ekos invoices (Liberty + Gilbert), excluding keg deposits, by delivery date, from the Sales Portal daily Ekos download">Feed</span><span class="src sheet" title="Revenue goals and brewery distro last year: typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></span></div>
         <div class="row"><div class="val num" id="k-rev">—</div><svg class="spark" id="sp-rev" aria-hidden="true"></svg></div>
         <span class="pill" id="p-rev"></span>
-        <div class="lines num"><div><span id="l-tapn">Taprooms</span><span id="l-tap"></span></div><div><span>Brewery distro <sup class="warn-t" title="From the Leadership Scorecard workbook">sheet</sup></span><span id="l-dist"></span></div></div>
+        <div class="lines num"><div><span id="l-tapn">Taprooms</span><span id="l-tap"></span></div><div><span>Brewery distro</span><span id="l-dist"></span></div></div>
       </div>
       <div class="panel kpi">
         <div class="top"><span class="lbl">Taproom prime cost %</span><span class="srcs"><span class="src feed" title="Toast labor + MarginEdge purchases via the Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly. MarginEdge figures are provisional.">Feed</span></span></div>
@@ -321,8 +356,9 @@ details.feeds .st2{font-size:10.5px}
       <div class="panel">
         <div class="ph"><div><h3>Taproom revenue vs. goal</h3><div class="sub">Weekly net sales against location budget targets</div></div>
           <div class="srcs"><span class="src feed" title="Net sales: Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly">Feed</span><span class="src sheet" title="Goals: Typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></div></div>
-        <div class="legend" style="justify-content:flex-end;margin-top:-6px"><span><i style="background:var(--s1)"></i>Actual</span><span><i class="tick"></i>Goal</span></div>
+        <div class="legend" style="justify-content:flex-end;margin-top:-6px"><span><i style="background:var(--s1)"></i>At / above goal</span><span><i style="background:var(--bad);opacity:.8"></i>Below goal</span><span><i class="tick"></i>Goal</span></div>
         <div class="rows" id="r-rev"></div>
+        <div class="sumrow num" id="rev-sum"></div>
       </div>
       <div class="panel">
         <div class="ph"><div><h3>Revenue mix by location</h3><div class="sub">Share of net sales: food, beer, events and other</div></div><div class="srcs"><span class="src feed" title="Toast sales categories + Tripleseat events: Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly">Feed</span></div></div>
@@ -351,12 +387,14 @@ details.feeds .st2{font-size:10.5px}
         <div class="prog" id="pg-home"></div>
         <div class="prog" id="pg-out"></div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-top:12px;border-top:1px solid var(--grid)" id="pods"></div>
+        <div class="statelist num" id="states"></div>
       </div>
       <div class="panel">
         <div class="ph"><div><h3 id="h-hol">Holiday pacing</h3><div class="sub" id="s-hol"></div></div><div class="srcs"><span class="src feed" title="This season’s guests: Toast via the Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly">Feed</span><span class="src sheet" title="Weekly goals and last season: VMBG Targets tab. Typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></div></div>
-        <span class="badge-in num" id="hol-target"></span>
+        <div class="hol-head"><span class="badge-in num" id="hol-pace"></span><span class="total-chip num" id="hol-target"></span></div>
         <div class="chartbox" style="min-height:220px"><canvas id="ch-hol" role="img" aria-label="Cumulative holiday guest visits this season against last season and the goal"></canvas></div>
         <div class="cards" id="hol-cards"></div>
+        <div class="holnote" id="hol-note"></div>
       </div>
     </div>
   </section>
@@ -926,7 +964,7 @@ details.feeds .st2{font-size:10.5px}
     $('l-tap').innerHTML = `<b>${money0.format(tap)}</b>` + (vt == null ? '' : ` <span class="${vt >= 0 ? 'good-t' : 'bad-t'}">(${sgn(vt)}%)</span>`);
     $('l-dist').innerHTML = dist == null ? '<span class="muted">Feed pending</span>'
       : `<b class="${distGoal && dist < distGoal ? 'bad-t' : ''}">${money0.format(dist)}</b>` + (distGoal ? ` <span class="${dist >= distGoal ? 'good-t' : 'bad-t'}">(${sgn((dist / distGoal - 1) * 100)}%)</span>` : '');
-    spark('sp-rev', last12().map((w) => sum(weekRows(w), (r) => r.net_sales) + ((COMP.find((r) => r.week_start === w) || {}).brewery_distro_revenue || 0)), vg != null && vg < 0 ? css('--bad') : css('--good'));
+    spark('sp-rev', last12().map((w) => sum(weekRows(w), (r) => r.net_sales) + ((COMP.find((r) => r.week_start === w) || {}).brewery_distro_revenue || 0)), css('--s1'));
     // ---- prime cost
     const pc = tapCost(rows), T = CFG.targets;
     $('k-prime').textContent = pc.prime == null ? '—' : pc.prime.toFixed(1) + '%';
@@ -937,7 +975,7 @@ details.feeds .st2{font-size:10.5px}
     $('k-prime').title = pc.basis === 'cogs' ? 'COGS % + direct labor %' : 'Food cost % + direct labor % (COGS not available)';
     $('l-food').innerHTML = pl(pc.food, '<' + T.foodCostPct + '%');
     $('l-labor').innerHTML = pl(pc.labor, '<' + T.laborPct + '%');
-    spark('sp-prime', last12().map((w) => tapCost(weekRows(w)).prime), css('--good'));
+    spark('sp-prime', last12().map((w) => tapCost(weekRows(w)).prime), css('--s1'));
     // ---- distribution
     if (DY.length) {
       const ty = sum(DY, (r) => r.ce_ytd), ly = sum(DY, (r) => r.ce_ytd_ly), g = ly ? (ty / ly - 1) * 100 : null;
@@ -950,7 +988,7 @@ details.feeds .st2{font-size:10.5px}
       }).join('') + `<div class="muted" style="font-size:11.5px">Through ${md(asOf, { month: 'short', day: 'numeric', year: 'numeric' })}</div>`;
       // whole VIP weeks only: the current, part-finished week would read as a collapse
       const vw = [...new Set(DW.map((r) => r.week_start))].sort().filter((w) => w <= addDays(state.week, 6) && addDays(w, 6) <= asOf).slice(-12);
-      spark('sp-dist', vw.map((w) => sum(DW.filter((r) => r.week_start === w), (r) => r.ce)), css('--good'));
+      spark('sp-dist', vw.map((w) => sum(DW.filter((r) => r.week_start === w), (r) => r.ce)), css('--s1'));
     } else { $('k-dist').textContent = '—'; pill('p-dist', 'na', 'VIP feed pending'); $('l-brands').innerHTML = ''; spark('sp-dist', []); }
     // ---- reputation (Leadership Scorecard sheet). Headline = the average of each taproom's score for the week,
     // which is how the sheet's "Average Score" reads; the lines name the best and the one to watch.
@@ -967,34 +1005,51 @@ details.feeds .st2{font-size:10.5px}
       $('l-top').innerHTML = `<b>${wkScore(top).toFixed(1)} ★</b> <span class="muted">(${int.format(top.reviews)} revs)</span>`;
       $('l-watchn').textContent = 'Watch: ' + low.location;
       $('l-watch').innerHTML = `<b class="${wkScore(low) < T.rating ? 'warn-t' : ''}">${wkScore(low).toFixed(1)} ★</b> <span class="muted">(last wk${low.new_reviews != null ? ', ' + low.new_reviews + ' new' : ''})</span>`;
-      spark('sp-rep', last12().map((w) => { const x = REP.filter((r) => r.week_start === w && wkScore(r) != null); return x.length ? sum(x, wkScore) / x.length : null; }), css('--s1'));
+      const hist = last12().map((w) => { const x = REP.filter((r) => r.week_start === w && wkScore(r) != null); return x.length ? sum(x, wkScore) / x.length : null; });
+      if (hist.filter((v) => v != null).length >= 2) spark('sp-rep', hist, css('--s1'));
+      else {
+        const el = $('sp-rep'), W = 96, H = 32, lo = 3.8, n = rw.length, bw = W / n - 3, ord = locOrder(rw.map((r) => r.location));
+        el.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        el.innerHTML = ord.map((l, i) => { const r = rw.find((x) => x.location === l), v = wkScore(r), h = Math.max(2, (Math.min(5, v) - lo) / (5 - lo) * (H - 2));
+          return `<rect x="${i * (bw + 3)}" y="${H - h}" width="${bw}" height="${h}" rx="1.5" fill="${v < T.rating ? css('--warn') : css('--s1')}" opacity="${v < T.rating ? 1 : .75}"><title>${esc(l)}: ${v.toFixed(1)}★</title></rect>`; }).join('');
+        el.setAttribute('aria-hidden', 'false'); el.setAttribute('role', 'img'); el.setAttribute('aria-label', 'Rating by taproom this week');
+      }
     } else {
       $('k-rep').textContent = '—'; pill('p-rep', 'na', 'Not in the sheet for this week');
       $('l-topn').textContent = 'Top'; $('l-top').textContent = '—'; $('l-watchn').textContent = 'Watch'; $('l-watch').textContent = '—'; spark('sp-rep', []);
     }
   }
 
+  // One location order for every panel (this week's taproom revenue, high to low), so the eye doesn't have to re-hunt.
+  function locOrder(list) {
+    const rev = new Map(weekRows(state.week).map((r) => [r.location, r.net_sales || 0]));
+    return [...new Set(list)].sort((a, b) => (rev.get(b) ?? -1) - (rev.get(a) ?? -1) || a.localeCompare(b));
+  }
+  const byOrder = (rows) => { const o = locOrder(rows.map((r) => r.location)); return [...rows].sort((a, b) => o.indexOf(a.location) - o.indexOf(b.location)); };
+
   function tier2(rows) {
     $('t2-n').textContent = `${rows.length} taproom operations`;
     // ---- revenue vs goal
-    const byRev = [...rows].sort((a, b) => b.net_sales - a.net_sales);
+    const byRev = byOrder(rows);
     const max = Math.max(...rows.map((r) => Math.max(r.net_sales, r.sales_goal || 0))) * 1.05;
     $('r-rev').innerHTML = byRev.map((r) => {
       const v = r.sales_goal ? r.net_sales - r.sales_goal : null;
       return `<div class="lr${markLoc(r.location)}"><div class="top"><span><span class="n">${esc(r.location)}</span>${r.sales_goal ? `<span class="g">Goal: ${money0.format(r.sales_goal)}</span>` : ''}</span>
         <span class="r num"><b>${money0.format(r.net_sales)}</b>${v == null ? '' : `<span class="chip ${v >= 0 ? 'good' : 'bad'}">${v >= 0 ? '+' : '−'}$${k1(Math.abs(v))}</span>`}</span></div>
-        <div class="track"><div class="fill" style="width:${r.net_sales / max * 100}%"></div>${r.sales_goal ? `<div class="goal" style="left:${r.sales_goal / max * 100}%"></div>` : ''}</div></div>`;
+        <div class="track"><div class="fill${v != null && v < 0 ? ' behind' : ''}" style="width:${r.net_sales / max * 100}%"></div>${r.sales_goal ? `<div class="goal" style="left:${r.sales_goal / max * 100}%"></div>` : ''}</div></div>`;
     }).join('');
+    const tS = sum(rows, (r) => r.net_sales), tG = sum(rows.filter((r) => r.sales_goal), (r) => r.sales_goal), nG = rows.filter((r) => r.sales_goal).length;
+    const ahead = rows.filter((r) => r.sales_goal && r.net_sales >= r.sales_goal).length;
+    $('rev-sum').innerHTML = tG ? `<span><b>${ahead} of ${nG}</b> taprooms at or above goal</span><span>Total <b>${money0.format(tS)}</b> vs ${money0.format(tG)} <span class="${tS >= tG ? 'good-t' : 'bad-t'}">(${sgn((tS / tG - 1) * 100)}%)</span></span>` : '';
     // ---- mix
     if (!rows.some((r) => r.food_sales != null)) { $('r-mix').innerHTML = '<div class="nofeed">Revenue mix needs the Store Director Portal feed (Toast categories + Tripleseat events).</div>'; }
-    else $('r-mix').innerHTML = [...rows].sort((a, b) => (b.food_sales / b.net_sales) - (a.food_sales / a.net_sales)).map((r) => {
+    else $('r-mix').innerHTML = byOrder(rows).map((r) => {
       const parts = [['Food', r.food_sales, '--s1'], ['Beer', r.beer_sales, '--s2'], ['Events', r.event_sales, '--s3'], ['Other', r.other_sales, '--sx']]
         .map(([n, v, c]) => [n, Math.max(0, v || 0), c]);
       const tot = parts.reduce((t, p) => t + p[1], 0) || 1; // Tripleseat events may sit outside Toast net sales, so shares are of the parts' total
       parts.forEach((p) => (p[1] = p[1] / tot * 100));
-      const txt = parts.filter((p) => p[1] >= 0.5).map((p) => `${Math.round(p[1])}% ${p[0]}`).join(' / ');
-      return `<div class="lr${markLoc(r.location)}"><div class="top"><span><span class="n">${esc(r.location)}</span><span class="g">($${k1(r.net_sales)})</span></span><span class="r" style="font-size:12px;color:var(--ink2)">${txt}</span></div>
-        <div class="stack">${parts.filter((p) => p[1] > 0).map((p) => `<span style="width:${p[1]}%;background:var(${p[2]})">${p[1] >= 9 ? Math.round(p[1]) + '%' : ''}</span>`).join('')}</div></div>`;
+      return `<div class="lr${markLoc(r.location)}"><div class="top"><span class="n">${esc(r.location)}</span><span class="amt num">$${k1(r.net_sales)} net sales</span></div>
+        <div class="stack">${parts.filter((p) => p[1] > 0).map((p) => `<span title="${p[0]}: ${p[1].toFixed(1)}%" style="width:${p[1]}%;background:var(${p[2]})">${p[1] >= 7 ? Math.round(p[1]) + '%' : ''}</span>`).join('')}</div></div>`;
     }).join('');
     // ---- quadrant
     quad(rows);
@@ -1002,26 +1057,29 @@ details.feeds .st2{font-size:10.5px}
     const withG = rows.filter((r) => r.guests != null), noG = rows.filter((r) => r.guests == null);
     const gmax = Math.max(1, ...withG.map((r) => r.guests)) * 1.05;
     $('g-total').innerHTML = withG.length ? `Reported total: <b>${int.format(sum(withG, (r) => r.guests))} guests</b>` : 'Guest counts need the Store Director Portal feed (Toast)';
-    $('r-guest').innerHTML = [...withG].sort((a, b) => b.guests - a.guests).map((r) => `<div class="lr${markLoc(r.location)}"><div class="top"><span class="n">${esc(r.location)}</span>
+    $('r-guest').innerHTML = byOrder(withG).map((r) => `<div class="lr${markLoc(r.location)}"><div class="top"><span class="n">${esc(r.location)}</span>
         <span class="r num"><span><b>${int.format(r.guests)}</b> <span class="muted">guests</span></span><span class="chip na">${money2.format(r.net_sales / r.guests)} avg</span></span></div>
-        <div class="track"><div class="fill" style="width:${r.guests / gmax * 100}%;opacity:.85"></div><div class="knob" style="left:${r.guests / gmax * 100}%"></div></div></div>`).join('')
+        <div class="track"><div class="fill" style="width:${r.guests / gmax * 100}%;opacity:.8"></div></div></div>`).join('')
       + noG.map((r) => `<div class="lr${markLoc(r.location)}"><div class="top" style="margin:0"><span class="n">${esc(r.location)}</span><span class="pending">● Traffic data pending</span></div></div>`).join('');
   }
 
   function quad(rows) {
     const T = CFG.targets, pts = rows.filter((r) => r.food_cost_pct != null && r.labor_pct != null);
-    $('q-zone').textContent = `Optimal zone: <${T.foodCostPct}% food & <${T.laborPct}% labor`;
+    const inZone = pts.filter((r) => r.food_cost_pct < T.foodCostPct && r.labor_pct < T.laborPct).length;
+    $('q-zone').textContent = `${inZone} of ${pts.length} in the target zone (<${T.foodCostPct}% food, <${T.laborPct}% labor) • dot size = net sales`;
+    $('q-zone').className = 'badge-in' + (inZone < pts.length ? ' warn' : '');
     const xs = pts.map((r) => r.food_cost_pct).concat(T.foodCostPct), ys = pts.map((r) => r.labor_pct).concat(T.laborPct);
     const ev = (v, f) => f(v / 2) * 2;
     const xmin = ev(Math.min(...xs) - 1, Math.floor), xmax = ev(Math.max(...xs) + 1, Math.ceil), ymin = ev(Math.min(...ys) - 1, Math.floor), ymax = ev(Math.max(...ys) + 1.5, Math.ceil);
     const colorOf = (r) => { const out = (r.food_cost_pct > T.foodCostPct) + (r.labor_pct > T.laborPct); return out === 0 ? css('--good') : out === 1 ? css('--warn') : css('--bad'); };
     const data = pts.map((r) => ({ x: r.food_cost_pct, y: r.labor_pct, loc: r.location, r }));
+    const smax = Math.max(1, ...pts.map((r) => r.net_sales || 0)), rad = (r) => 5 + 7 * Math.sqrt((r.net_sales || 0) / smax);
     const zone = {
       id: 'zone',
       beforeDatasetsDraw(ch) {
         const { ctx, chartArea: a, scales: { x, y } } = ch;
         const xr = Math.min(x.getPixelForValue(T.foodCostPct), a.right), yt = Math.max(y.getPixelForValue(T.laborPct), a.top);
-        ctx.save(); ctx.fillStyle = 'rgba(148,187,54,.12)'; ctx.fillRect(a.left, yt, xr - a.left, a.bottom - yt);
+        ctx.save(); ctx.fillStyle = 'rgba(47,107,18,.06)'; ctx.fillRect(a.left, yt, xr - a.left, a.bottom - yt);
         ctx.setLineDash([5, 4]); ctx.lineWidth = 1.2;
         ctx.strokeStyle = css('--warn'); ctx.beginPath(); ctx.moveTo(xr, a.top); ctx.lineTo(xr, a.bottom); ctx.stroke();
         ctx.strokeStyle = css('--bad'); ctx.beginPath(); ctx.moveTo(a.left, yt); ctx.lineTo(a.right, yt); ctx.stroke();
@@ -1038,10 +1096,10 @@ details.feeds .st2{font-size:10.5px}
         ctx.save(); ctx.font = '600 12px Jost, sans-serif'; ctx.textBaseline = 'middle';
         const dots = meta.data.map((el) => ({ x: el.x, y: el.y }));
         const clash = (bx) => placed.some((q) => bx.x < q.x + q.w + 4 && bx.x + bx.w + 4 > q.x && bx.y - 7 < q.y + 7 && bx.y + 7 > q.y - 7)
-          || dots.some((p) => p.x > bx.x - 6 && p.x < bx.x + bx.w + 6 && Math.abs(p.y - bx.y) < 9);
+          || dots.some((p) => p.x > bx.x - 10 && p.x < bx.x + bx.w + 10 && Math.abs(p.y - bx.y) < 12);
         meta.data.map((el, i) => ({ el, d: data[i] })).sort((p, q) => p.el.x - q.el.x).forEach(({ el, d }) => {
-          const w = ctx.measureText(d.loc).width;
-          const cands = [[el.x + 9, el.y], [el.x - 9 - w, el.y], [el.x - w / 2, el.y - 14], [el.x - w / 2, el.y + 14], [el.x + 9, el.y - 13], [el.x + 9, el.y + 13], [el.x - 9 - w, el.y - 13], [el.x - 9 - w, el.y + 13]]
+          const w = ctx.measureText(d.loc).width, o = (el.options.radius || 6) + 5;
+          const cands = [[el.x + o, el.y], [el.x - o - w, el.y], [el.x - w / 2, el.y - o - 5], [el.x - w / 2, el.y + o + 5], [el.x + o, el.y - 13], [el.x + o, el.y + 13], [el.x - o - w, el.y - 13], [el.x - o - w, el.y + 13]]
             .map(([x, y]) => ({ x, y, w })).filter((bx) => bx.x >= a.left && bx.x + w <= a.right + 6);
           const own = { x: el.x, y: el.y };
           const pick = cands.find((bx) => { const i = dots.indexOf(dots.find((p) => p.x === own.x && p.y === own.y)); const save = dots.splice(i, 1); const ok = !clash(bx); dots.splice(i, 0, ...save); return ok; }) || cands[0];
@@ -1055,9 +1113,9 @@ details.feeds .st2{font-size:10.5px}
     if (charts.quad) charts.quad.destroy();
     charts.quad = new Chart($('ch-quad'), {
       type: 'scatter',
-      data: { datasets: [{ data, pointRadius: data.map((p) => (p.loc === state.loc ? 8 : 6)), pointHoverRadius: 8,
+      data: { datasets: [{ data, pointRadius: data.map((p) => rad(p.r) + (p.loc === state.loc ? 2 : 0)), pointHoverRadius: data.map((p) => rad(p.r) + 2),
         pointBackgroundColor: data.map((p) => (state.loc !== 'all' && p.loc !== state.loc ? colorOf(p.r) + '55' : colorOf(p.r))),
-        pointBorderColor: '#fff', pointBorderWidth: 1.5 }] },
+        pointBorderColor: '#fff', pointBorderWidth: 2 }] },
       options: {
         responsive: true, maintainAspectRatio: false, animation: false, layout: { padding: { right: 8 } },
         scales: {
@@ -1067,7 +1125,7 @@ details.feeds .st2{font-size:10.5px}
             ticks: { callback: (v) => v + '%', color: css('--muted'), font: { family: 'Jost' } }, grid: { color: css('--grid') } },
         },
         plugins: { legend: { display: false },
-          tooltip: { callbacks: { label: (c) => { const r = c.raw.r; return [`${r.location}`, `Food cost ${r.food_cost_pct.toFixed(1)}%  •  Labor ${r.labor_pct.toFixed(1)}%`, `Prime (COGS + labor) ${r.cogs_pct != null ? (r.cogs_pct + r.labor_pct).toFixed(1) + '%' : '—'}`]; } } } },
+          tooltip: { callbacks: { label: (c) => { const r = c.raw.r; return [`${r.location} — $${k1(r.net_sales)} net sales`, `Food cost ${r.food_cost_pct.toFixed(1)}%  •  Labor ${r.labor_pct.toFixed(1)}%`, `Prime (COGS + labor) ${r.cogs_pct != null ? (r.cogs_pct + r.labor_pct).toFixed(1) + '%' : '—'}`]; } } } },
       },
       plugins: [zone],
     });
@@ -1081,7 +1139,7 @@ details.feeds .st2{font-size:10.5px}
       const ty = sum(rows, (r) => r.ce_ytd), ly = sum(rows, (r) => r.ce_ytd_ly), g = ly ? (ty / ly - 1) * 100 : null;
       const share = g == null || !goal ? 0 : Math.max(0, Math.min(1, g / goal));
       $(id).innerHTML = `<div class="top"><b>${esc(label)}</b><span class="num"><b class="${g >= goal ? 'good-t' : ''}">${g == null ? '—' : sgn(g, 2) + '%'}</b> <span class="muted">/ +${goal}% goal</span></span></div>
-        <div class="track"><div class="fill" style="width:${share * 100}%;background:${id === 'pg-home' ? css('--s1') : css('--green')}"></div></div>
+        <div class="track"><div class="fill" style="width:${share * 100}%"></div></div>
         <div class="foot num"><span>${g == null ? '' : (share * 100).toFixed(1) + '% of goal • ' + int.format(ty) + ' CEs'}</span><span>${esc(foot)}</span></div>`;
     };
     prog('pg-home', `In-${stateName(home)} YTD case growth`, DY.filter((r) => r.state === home), T.inIowaGrowthPct, 'Core market');
@@ -1091,9 +1149,15 @@ details.feeds .st2{font-size:10.5px}
         return `<div class="stat num"><span>${esc(label)}</span><span><b>${int.format(ty)}</b> ${g == null ? '' : `<span class="${g >= 0 ? 'good-t' : 'bad-t'}">(${sgn(g)}% YoY)</span>`}</span></div>`; };
       $('pods').innerHTML = `<div class="muted" style="font-size:11.5px">${esc(CFG.placementsLabel || 'Placements')}</div>` + stat('Active PODs (total)', PODS) + stat('Out-of-state PODs', PODS.filter((r) => r.state !== home));
     } else $('pods').innerHTML = '<div class="nofeed">Placements: VIP feed pending.</div>';
+    const out = DY.filter((r) => r.state !== home), sts = [...new Set(out.map((r) => r.state))].map((st) => {
+      const x = out.filter((r) => r.state === st), ty = sum(x, (r) => r.ce_ytd), ly = sum(x, (r) => r.ce_ytd_ly);
+      return { st, ty, g: ly ? (ty / ly - 1) * 100 : null };
+    }).sort((a, b) => b.ty - a.ty).slice(0, 8);
+    const smax = Math.max(1, ...sts.map((x) => x.ty));
+    $('states').innerHTML = sts.length ? `<div class="hd">Top markets outside ${esc(stateName(home))}, YTD CEs</div>` + sts.map((x) => `<div class="sr"><span class="st3">${esc(x.st)}</span><span class="bar"><i style="width:${x.ty / smax * 100}%"></i></span><span><b>${int.format(x.ty)}</b> ${x.g == null ? '<span class="muted">new</span>' : `<span class="${x.g >= 0 ? 'good-t' : 'bad-t'}">(${sgn(x.g)}%)</span>`}</span></div>`).join('') : '';
     holiday();
   }
-  const stateName = (s) => ({ IA: 'Iowa', NE: 'Nebraska', IL: 'Illinois', KS: 'Kansas' }[s] || s);
+  const stateName = (s) => ({ IA: 'Iowa', NE: 'Nebraska', IL: 'Illinois', KS: 'Kansas', MN: 'Minnesota', MO: 'Missouri', WI: 'Wisconsin', ND: 'North Dakota', SD: 'South Dakota' }[s] || s);
 
   // Holiday pacing, by week. Goal and last season come from the workbook's VMBG Targets tab (weekly, per taproom);
   // this season's guests come from Toast. Cumulative from the kickoff week.
@@ -1112,34 +1176,52 @@ details.feeds .st2{font-size:10.5px}
     const ly = weeks.map((w) => (b += wkSum(vt, w, 'guests_ly')));
     const act = weeks.map((w) => (lastData && w <= lastData ? (c += actWeek(w, focus)) : null));
     const goalTot = goal[nW - 1] || 0, lyTot = ly[nW - 1] || 0;
+    // Pace = guests so far vs the goal for the same days (the goal week the data is in is pro-rated by day).
+    const daysIn = (w) => (lastData && w <= lastData ? Math.min(7, (new Date(lastData) - new Date(w)) / 864e5 + 1) : 0);
+    const goalToDate = (rows) => weeks.reduce((t, w) => t + wkSum(rows, w, 'guests_goal') * daysIn(w) / 7, 0);
+    const actToDate = (loc) => weeks.reduce((t, w) => t + (daysIn(w) ? actWeek(w, loc) : 0), 0);
+    // For pace, count a taproom's guests only in weeks that carry a goal for it, so a location whose targets start later
+    // doesn't inflate the total.
+    const paceAct = (rows) => [...new Set(rows.map((r) => r.location))].reduce((t, l) => t + weeks.reduce((u, w) => u + (daysIn(w) && wkSum(rows.filter((r) => r.location === l), w, 'guests_goal') ? actWeek(w, l) : 0), 0), 0);
+    const paceCls = (p) => (p == null ? 'na' : p >= 100 ? 'good' : p >= 90 ? 'warn' : 'bad');
+    const gtd = goalToDate(vt), atd = actToDate(focus), pace = gtd ? paceAct(vt) / gtd * 100 : null;
     $('h-hol').textContent = H.title;
-    $('s-hol').textContent = `Cumulative guest visits, week of ${md(weeks[0])} – ${md(addDays(weeks[nW - 1], 6))}, vs. last season (${int.format(lyTot)})${focus ? ' — ' + focus : ''}`;
-    $('hol-target').textContent = VT.length ? `Target: ${int.format(goalTot)} guests (${sgn((goalTot - lyTot) / 1000, 1)}k YoY)` : 'Targets not loaded';
-    const kick = { id: 'kick', afterDatasetsDraw(ch) {
-      const { ctx, scales: { x, y } } = ch; const px = x.getPixelForValue(0), py = y.getPixelForValue(0);
-      ctx.save(); ctx.font = '600 11px Jost, sans-serif'; const t = H.kickoffLabel || 'Kickoff'; const w = ctx.measureText(t).width + 12;
-      ctx.fillStyle = css('--hl-bg'); ctx.strokeStyle = css('--s1'); ctx.beginPath(); ctx.roundRect(px + 6, py - 26, w, 18, 4); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = css('--s1'); ctx.textBaseline = 'middle'; ctx.fillText(t, px + 12, py - 17); ctx.restore(); } };
+    $('s-hol').textContent = `Cumulative guest visits, week of ${md(weeks[0])} – ${md(addDays(weeks[nW - 1], 6))}${focus ? ' — ' + focus : ''}`;
+    $('hol-target').textContent = VT.length ? `Season goal ${int.format(goalTot)} (${sgn((goalTot - lyTot) / 1000, 1)}k vs last season)` : 'Targets not loaded';
+    const hp = $('hol-pace');
+    if (pace == null) { hp.hidden = !lastData || !VT.length; hp.className = 'badge-in'; hp.textContent = 'Season not started'; }
+    else { hp.hidden = false; hp.className = 'badge-in num ' + paceCls(pace); hp.textContent = `${int.format(atd)} guests through ${md(lastData)} • ${Math.round(pace)}% of pace on weeks with goals`; }
+    const lastIdx = act.reduce((t, v, i) => (v != null ? i : t), -1);
+    const today = { id: 'today', afterDatasetsDraw(ch) {
+      if (lastIdx < 0) return;
+      const { ctx, chartArea: ar, scales: { x } } = ch, px = x.getPixelForValue(lastIdx);
+      ctx.save(); ctx.strokeStyle = css('--axis'); ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px, ar.top + 16); ctx.lineTo(px, ar.bottom); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font = '600 11px Jost, sans-serif'; const t = 'Through ' + md(lastData), w = ctx.measureText(t).width + 12, bx = Math.min(px - w / 2, ar.right - w) < ar.left ? ar.left : Math.min(px - w / 2, ar.right - w);
+      ctx.fillStyle = css('--hl-bg'); ctx.strokeStyle = css('--s1'); ctx.beginPath(); ctx.roundRect(bx, ar.top, w, 18, 4); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = css('--s1'); ctx.textBaseline = 'middle'; ctx.fillText(t, bx + 6, ar.top + 9); ctx.restore(); } };
     if (charts.hol) charts.hol.destroy();
     charts.hol = new Chart($('ch-hol'), {
       type: 'line',
       data: { labels: weeks.map((w) => md(w)), datasets: [
-        { label: `${H.start.slice(0, 4)} goal`, data: goal, borderColor: css('--good'), backgroundColor: 'rgba(148,187,54,.18)', fill: 'origin', borderWidth: 2, pointRadius: 2, tension: 0.25 },
+        { label: 'This season', data: act, borderColor: css('--s1'), backgroundColor: 'rgba(61,78,154,.14)', fill: 'origin', borderWidth: 3, pointRadius: 3.5, pointBackgroundColor: css('--s1'), tension: 0.2 },
+        { label: `${H.start.slice(0, 4)} goal`, data: goal, borderColor: css('--ink'), borderWidth: 1.6, pointRadius: 0, tension: 0.25 },
         { label: 'Last season', data: ly, borderColor: css('--sx'), borderDash: [4, 4], borderWidth: 1.6, pointRadius: 0, tension: 0.25 },
-        { label: 'This season', data: act, borderColor: css('--s1'), backgroundColor: css('--s1'), borderWidth: 2.4, pointRadius: 3, tension: 0.2 },
       ] },
-      options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
+      options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false }, layout: { padding: { top: 4 } },
         scales: { x: { ticks: { color: css('--muted'), font: { family: 'Jost' } }, grid: { display: false } },
-          y: { beginAtZero: true, ticks: { color: css('--muted'), font: { family: 'Jost' }, callback: (v) => k1(v) }, grid: { color: css('--grid') } } },
-        plugins: { legend: { position: 'top', align: 'end', labels: { boxWidth: 12, boxHeight: 2, color: css('--ink2'), font: { family: 'Jost', size: 12 } } },
+          y: { beginAtZero: true, ticks: { color: css('--muted'), font: { family: 'Jost' }, callback: (v) => k1(v), maxTicksLimit: 6 }, grid: { color: css('--grid') } } },
+        plugins: { legend: { position: 'top', align: 'end', labels: { boxWidth: 14, boxHeight: 3, color: css('--ink2'), font: { family: 'Jost', size: 12 } } },
           tooltip: { callbacks: { title: (it) => 'Through week of ' + it[0].label, label: (c) => `${c.dataset.label}: ${c.raw == null ? '—' : int.format(c.raw)}` } } } },
-      plugins: [kick],
+      plugins: [today],
     });
-    $('hol-cards').innerHTML = locs.map((l) => {
-      const rows = VT.filter((r) => r.location === l), g = sum(rows, (r) => r.guests_goal), p = sum(rows, (r) => r.guests_ly);
-      const ac = weeks.reduce((t, w) => t + (lastData && w <= lastData ? actWeek(w, l) : 0), 0);
-      return { g, html: `<div class="card${markLoc(l)}"><div class="n">${esc(l)}</div><div class="v num">${int.format(g)}</div><div class="d num">${sgn((g - p) / 1000)}k YoY</div><div class="a num">${ac ? int.format(ac) + ' to date' : 'Not started'}</div></div>` };
-    }).sort((x, y) => y.g - x.g).map((x) => x.html).join('');
+    $('hol-cards').innerHTML = locOrder(locs).map((l) => {
+      const rows = VT.filter((r) => r.location === l), g = sum(rows, (r) => r.guests_goal), gt = goalToDate(rows), ac = actToDate(l), pc = gt ? paceAct(rows) / gt * 100 : null;
+      const first = rows.filter((r) => r.guests_goal).map((r) => r.week_start).sort()[0];
+      return `<div class="card${markLoc(l)}"><div class="n">${esc(l)}</div><div class="v num">${ac ? int.format(ac) : '—'}</div>`
+        + `<div class="d num ${paceCls(pc)}">${pc != null ? Math.round(pc) + '% of pace' : first ? 'Goals start ' + md(first) : 'No goal'}</div><div class="a num">Season goal ${k1(g)}</div></div>`;
+    }).join('');
+    const missing = LOCS.filter((l) => !locs.includes(l));
+    $('hol-note').textContent = (lastData ? `Guests to date vs. the goal for the same days. ` : '') + (missing.length ? `No VMBG targets in the sheet for ${missing.join(' or ')}.` : '');
   }
 
   window.__esStart = () => load().catch((e) => { $('app').insertAdjacentHTML('afterbegin', `<p class="err">Could not load the scorecard: ${esc(e.message)}</p>`); console.error(e); });
@@ -1358,7 +1440,7 @@ details.feeds .st2{font-size:10.5px}
     document.documentElement.classList.remove('locked');
     const w = $('who'); w.hidden = false; w.innerHTML = '';
     w.append(document.createTextNode(a.name || a.email));
-    buildNav(a, w);
+    buildNav(a, $('tabs'));
     const so = document.createElement('a'); so.href = '#'; so.textContent = 'Sign out'; w.append(so);
     so.onclick = (e) => { e.preventDefault(); forget(); try { google.accounts.id.disableAutoSelect(); } catch {} location.reload(); };
     window.__esStart();
@@ -1395,7 +1477,7 @@ details.feeds .st2{font-size:10.5px}
   };
   window.__esGsiFail = () => setErr('The Google sign-in button could not load. Open this page directly in Chrome or Safari (not inside Gmail or Messages) and try again.');
 
-  if (local) { started = true; document.documentElement.classList.remove('locked'); const w = $('who'); w.hidden = false; w.textContent = 'Local preview'; buildNav({ role: '' }, w); window.__esStart(); return; }   // Troy's local preview
+  if (local) { started = true; document.documentElement.classList.remove('locked'); const w = $('who'); w.hidden = true; buildNav({ role: '' }, $('tabs')); window.__esStart(); return; }   // Troy's local preview
   const a = read();
   if (a && a.sid && a.bundle) {
     unlock(a);                                     // open right away from the remembered key, then re-check the roster

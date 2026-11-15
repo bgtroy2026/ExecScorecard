@@ -16,6 +16,7 @@ StorePortal and Sales Portal.
 | Preview on this Mac | Double-click **Preview locally.command** → opens http://localhost:8010 |
 | Publish changes | Double-click **Deploy ExecScorecard.command** (commits, pushes; Pages updates in ~1 min) |
 | See real numbers (this Mac only) | `python3 tools/build_local.py`, then Preview locally |
+| Publish automatically every day | Double-click **Install Auto-Deploy.command** once: runs the deploy at 6:47 AM daily (on wake if asleep) and right away. Log: `_deploy/auto_deploy.log`. Turn off with **Uninstall Auto-Deploy.command** |
 | Change placeholder targets | Edit `targets` in `site/config.json` (real goals come from the sheet into `config.local.json`) |
 
 The first deploy creates the GitHub repo, turns on Pages and initializes git in this folder, using the
