@@ -1,0 +1,1496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>document.documentElement.classList.add('locked');</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big Grove Brewery — Executive Leadership Scorecard</title>
+<link rel="icon" href="images/bgb-medallion-black.png">
+<link rel="preload" href="fonts/jost-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Jost';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/jost-latin-ext.woff2') format('woff2');unicode-range:U+0100-02AF,U+1E00-1EFF,U+2020,U+20A0-20AB,U+20AD-20CF,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Jost';font-style:normal;font-weight:100 900;font-display:swap;src:url('fonts/jost-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+/* Three tiers (Executive Pulse → Location Matrix → Growth Engines), laid out like the leadership wireframe,
+   in the Store Director Portal's tokens: navy band, Jost, white panels on a pale plane, green accent. */
+:root{
+  --navy:#1b2449;--navy2:#313757;--green:#94bb36;--ink:#1b2449;--ink2:#474e69;--muted:#6e7590;--grid:#e4e6ef;--axis:#c3c7d6;
+  --surface:#ffffff;--plane:#f2f3f7;--border:rgba(27,36,73,.13);--good:#2f6b12;--warn:#a86a00;--bad:#c8372f;
+  --good-bg:#eaf3dc;--warn-bg:#fbf0dc;--bad-bg:#fae3e1;--hl-bg:#eef0f8;
+  --s1:#3d4e9a;--s2:#cc8544;--s3:#7b62a8;--sx:#9a9eb0;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Brandon Grotesque','Jost','Avenir Next',Avenir,'Segoe UI',system-ui,sans-serif;font-size:14.5px;line-height:1.35;background:var(--plane);color:var(--ink);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- band ---------- */
+header.band{background:var(--navy);color:#fff}
+header .wrap{display:flex;align-items:center;gap:18px;padding-block:16px;flex-wrap:wrap}
+header img{height:24px;width:auto}
+header .titles{display:flex;flex-direction:column;gap:2px;flex:1 0 auto}
+header .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-left:auto}
+header h1{font-size:18px;white-space:nowrap;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+header .eyebrow{font-size:11.5px;letter-spacing:.06em;color:rgba(255,255,255,.72)}
+.badge{font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:4px 10px;border-radius:999px;border:1px solid var(--green);color:var(--green);white-space:nowrap}
+.ctl{display:flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.22);border-radius:8px;padding:6px 10px;background:var(--navy2)}
+.ctl label{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.7)}
+.ctl .dotlive{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.ctl select{font-family:inherit;font-size:14px;font-weight:600;color:#fff;background:transparent;border:0;appearance:none;padding-right:16px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,#fff 50%),linear-gradient(135deg,#fff 50%,transparent 50%);background-position:calc(100% - 7px) 55%,calc(100% - 2px) 55%;background-size:5px 5px;background-repeat:no-repeat}
+.ctl select option{color:var(--ink)}
+
+/* ---------- filter strip ---------- */
+.filter{display:none;align-items:center;gap:12px;flex-wrap:wrap;background:var(--hl-bg);border:1px solid var(--s1);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--ink2)}
+.filter.on{display:flex}
+.filter b{color:var(--ink)}
+.filter button{margin-left:auto;font-family:inherit;font-size:12.5px;border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:6px;padding:4px 10px;cursor:pointer}
+
+main{display:flex;flex-direction:column;gap:26px;padding-block:18px 40px}
+.note{font-size:12.5px;color:var(--ink2);border:1px dashed var(--axis);border-radius:8px;padding:8px 12px;background:var(--surface)}
+.tier{display:flex;flex-direction:column;gap:12px}
+.tier-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.tier-h h2{font-size:12.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+.tier-h span{font-size:12px;color:var(--muted)}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:12px}
+.grid2.t3{grid-template-columns:minmax(300px,2fr) minmax(380px,3fr)}
+@media (max-width:820px){.grid2,.grid2.t3{grid-template-columns:1fr}}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.ph h3{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.ph .sub{font-size:12px;color:var(--muted);margin-top:2px;text-transform:none;letter-spacing:0;font-weight:400}
+.tag{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--s1);border:1px solid currentColor;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:5px}
+.legend i.tick{width:2px;height:12px;background:var(--ink);border-radius:0}
+
+/* ---------- tier 1 tiles ---------- */
+.kpi{gap:6px}
+.kpi .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.kpi .lbl{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;line-height:1.25}
+.kpi .unit{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.kpi .row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:46px}
+.kpi .val{font-size:33px;font-weight:600;line-height:1.05}
+.kpi .val small{font-size:15px;font-weight:500;color:var(--ink2);margin-left:4px}
+.kpi svg.spark{width:90px;height:30px;flex:none;overflow:visible}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;align-self:flex-start;white-space:nowrap}
+.pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.na{background:var(--plane);color:var(--muted)}
+.kpi .lines{margin-top:auto;border-top:1px solid var(--grid);padding-top:10px;display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--ink2)}
+.kpi .lines div{display:flex;justify-content:space-between;gap:8px}
+.kpi .lines b{color:var(--ink);font-weight:600}
+.good-t{color:var(--good)} .warn-t{color:var(--warn)} .bad-t{color:var(--bad)} .muted{color:var(--muted)}
+
+/* ---------- tier 2 rows ---------- */
+.rows{display:flex;flex-direction:column;gap:6px}
+.lr{border:1px solid transparent;border-radius:8px;padding:7px 8px;transition:opacity .2s,background .2s,border-color .2s}
+.lr.hl{background:var(--hl-bg);border-color:var(--s1)}
+.lr.dim{opacity:.4}
+.lr .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px;font-size:13.5px}
+.lr .top .n{font-weight:600}
+.lr .top .g{font-size:12px;color:var(--muted);margin-left:6px;font-weight:400}
+.lr .top .r{display:flex;align-items:baseline;gap:8px}
+.chip{font-size:11.5px;font-weight:600;padding:1px 7px;border-radius:5px}
+.chip.good{background:var(--good-bg);color:var(--good)} .chip.bad{background:var(--bad-bg);color:var(--bad)} .chip.na{background:var(--plane);color:var(--muted);font-weight:500}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.track{position:relative;height:10px;border-radius:999px;background:var(--plane)}
+.track .fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--s1)}
+.track .goal{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.track .knob{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--s1);border:2px solid #fff;box-shadow:0 0 0 1px var(--s1)}
+.stack{display:flex;height:20px;border-radius:5px;overflow:hidden;font-size:11px;font-weight:600;color:#fff}
+.stack span{display:flex;align-items:center;justify-content:center;min-width:0;overflow:hidden;white-space:nowrap}
+.pending{font-size:12px;color:var(--warn);background:var(--warn-bg);border-radius:999px;padding:2px 10px}
+.chartbox{position:relative;flex:1;min-height:270px}
+.badge-in{display:inline-block;font-size:11.5px;color:var(--good);background:var(--good-bg);border-radius:6px;padding:3px 8px;align-self:flex-start}
+.total-chip{display:inline-block;font-size:12px;background:var(--plane);border-radius:6px;padding:3px 9px;align-self:flex-start;color:var(--ink2)}
+
+/* ---------- tier 3 ---------- */
+.prog .top{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;margin-bottom:6px}
+.prog .top b{font-weight:600}
+.prog .foot{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:5px}
+.prog .track{height:9px}
+.stat{display:flex;justify-content:space-between;align-items:center;background:var(--plane);border-radius:7px;padding:9px 12px;font-size:13.5px}
+.stat b{font-weight:600}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.card{border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center;transition:opacity .2s,background .2s,border-color .2s}
+.card.hl{background:var(--hl-bg);border-color:var(--s1)} .card.dim{opacity:.4}
+.card .n{font-size:12px;font-weight:600;color:var(--ink2)}
+.card .v{font-size:20px;font-weight:600;margin:2px 0}
+.card .d{font-size:11.5px;font-weight:600;color:var(--good)}
+.card .a{font-size:11px;color:var(--muted);margin-top:2px}
+.src{display:inline-block;font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:4px;padding:1px 5px;vertical-align:1px;white-space:nowrap;cursor:help}
+.src.feed{color:var(--good);border:1px solid rgba(47,107,18,.35)}
+.src.sheet{color:var(--warn);border:1px solid rgba(168,106,0,.4);background:var(--warn-bg)}
+.srcs{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.nofeed{font-size:12.5px;color:var(--muted);border:1px dashed var(--axis);border-radius:8px;padding:10px 12px}
+
+details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+summary{cursor:pointer;font-weight:600}
+details table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+details th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)}
+details td{padding:7px 8px;border-bottom:1px solid var(--grid);vertical-align:top}
+details h3{font-size:14px;margin-top:10px}
+details ul{margin:6px 0 10px 1.2em;line-height:1.6;font-size:13px}
+.st{font-size:11px;font-weight:600;padding:1px 7px;border-radius:5px;white-space:nowrap}
+.st.ok{background:var(--good-bg);color:var(--good)} .st.part{background:var(--warn-bg);color:var(--warn)} .st.gap{background:var(--bad-bg);color:var(--bad)}
+footer{font-size:12px;color:var(--muted);padding-block:0 32px}
+.err{color:var(--bad);font-size:14px;padding:20px 0}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+
+/* ---------- sign-in gate (Google sign-in, Store Director Portal backend) ---------- */
+html.locked main,html.locked footer,html.locked header .tools{display:none!important}
+#gate{display:none;max-width:440px;margin:56px auto;padding:28px 26px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);text-align:center}
+html.locked #gate{display:block}
+#gate h2{font-size:18px;font-weight:600;margin-bottom:8px}
+#gate p{color:var(--ink2);margin-bottom:18px}
+#gate #gbtn{display:flex;justify-content:center;min-height:44px}
+#gate .gerr{color:var(--bad);margin-top:14px;font-size:13.5px}
+#gate .gerr:empty{display:none}
+.who{font-size:12px;color:rgba(255,255,255,.72);white-space:nowrap}
+.who a{color:var(--green);margin-left:6px}
+.who a.on{color:#fff;text-decoration:underline}
+[hidden]{display:none!important}
+/* ---------- 2027 proposed views ---------- */
+.xview{padding-top:18px}
+.xview > div{display:flex;flex-direction:column;gap:14px}
+.xg2{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,7fr);gap:12px;align-items:start}
+.xg2s{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px}
+.xview .ph{flex-wrap:wrap}.xview .panel{padding:14px 12px}.xview .ph > div:first-child{flex:1 1 170px}.xview .ph .srcs{justify-content:flex-start}
+.xg3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;align-items:start}
+.xg3t{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
+@media (max-width:1100px){.xg3t{grid-template-columns:1fr}}
+.xg4{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;align-items:start}
+.xwk{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:12px;align-items:start}
+.xg2b{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+.xcol{display:flex;flex-direction:column;gap:12px;min-width:0}
+@media (max-width:980px){.xg2,.xwk,.xg2s{grid-template-columns:1fr}}
+.xt{width:100%;border-collapse:collapse;font-size:12px}
+.xt th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;text-align:right;padding:5px 4px;border-bottom:1px solid var(--border);white-space:nowrap}
+.xt th:first-child,.xt td:first-child{text-align:left}
+.xt td{padding:5px 4px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.xt tr.tgt td{background:var(--plane);font-weight:600}
+.xt tr:last-child td{border-bottom:0}
+.xt .sl{color:var(--axis);margin:0 3px}
+.xt .cmpon{color:var(--ink);font-weight:700}
+.ctl[hidden]{display:none!important}
+.trend .xt td:first-child{color:var(--ink2)}
+.dt{display:inline-block;width:7px;height:7px;border-radius:50%;margin-left:4px;vertical-align:1px}
+.dt.g{background:#3a9b2e}.dt.r{background:var(--bad)}.dt.n{background:transparent;border:1px solid var(--axis)}
+.src.none{color:var(--bad);border:1px solid rgba(200,55,47,.35);background:var(--bad-bg)}
+.src.typed{color:var(--muted);border:1px solid var(--axis)}
+.owner{font-size:11.5px;color:var(--muted)}
+.mile{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.mile > div{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.mile > div.owner{display:block;margin-top:-3px}
+.mugs{display:flex;gap:28px;justify-content:center;padding:4px 0}
+.mug{display:flex;flex-direction:column;align-items:center;gap:6px}
+.mugb{position:relative;width:58px;height:84px;border:2px solid var(--ink2);border-top-width:5px;border-radius:4px 4px 10px 10px;overflow:hidden;background:var(--plane)}
+.mugf{position:absolute;left:0;right:0;bottom:0;background:#f2b632}
+.mugf.g{background:#f2b632}.mugf.r{background:#e8a33a}.mugf.n{background:#d8dbe6}
+.mugv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:var(--ink)}
+details.feeds{margin-top:4px}
+details.feeds .st2{font-size:10.5px}
+
+#sources{padding-top:18px;padding-bottom:40px}
+#sources h2{font:600 20px/1.2 Jost,system-ui,sans-serif;margin:0 0 4px}
+#sources .sub{color:var(--muted);font-size:13px;margin-bottom:14px;max-width:900px}
+#sources .scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+#sources .sc{background:#fff;border:1px solid var(--grid);border-radius:10px;padding:12px 14px;border-left:4px solid var(--c)}
+#sources .sc b{display:block;font-size:24px;font-weight:600}
+#sources .sc span{font-size:12px;color:var(--muted)}
+#sources .plats{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-bottom:22px}
+#sources .pl{background:#fff;border:1px solid var(--grid);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--ink2)}
+#sources .pl h4{margin:0 0 3px;font:600 13.5px/1.3 Jost,system-ui,sans-serif;color:var(--ink);display:flex;justify-content:space-between;gap:8px}
+#sources details{background:#fff;border:1px solid var(--grid);border-radius:10px;margin-bottom:10px;overflow:hidden}
+#sources summary{cursor:pointer;padding:11px 14px;font:600 14.5px/1.3 Jost,system-ui,sans-serif;display:flex;justify-content:space-between;gap:10px;align-items:center}
+#sources summary .mini{display:flex;gap:4px;flex-wrap:wrap;font:500 11px/1 system-ui,sans-serif}
+#sources table{width:100%;border-collapse:collapse;font-size:13px}
+#sources th,#sources td{padding:7px 12px;text-align:left;border-top:1px solid var(--grid);vertical-align:top}
+#sources th{background:#f6f7f9;font-weight:600;font-size:12px}
+#sources td.snote{color:var(--muted);font-size:12px}
+.st2{display:inline-block;font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap;color:#fff;background:var(--c)}
+.st2.connected{--c:#2f6b12}.st2.ready{--c:#2b6cb0}.st2.needs{--c:#a86a00}.st2.manual{--c:#7a7f95}
+#sources .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:0 0 16px}
+
+#usage{padding-top:18px;padding-bottom:40px}
+#usage h2{font:600 20px/1.2 Jost,system-ui,sans-serif;margin:0 0 4px}
+#usage .sub{color:var(--muted,#667);font-size:13px;margin-bottom:14px}
+#usage .ucards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
+#usage .uc{background:#fff;border:1px solid var(--grid,#e3e6ea);border-radius:10px;padding:12px 14px}
+#usage .uc b{display:block;font-size:24px;font-weight:600}
+#usage .uc span{font-size:12px;color:var(--muted,#667)}
+#usage table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--grid,#e3e6ea);border-radius:10px;overflow:hidden;font-size:13px;margin-bottom:18px}
+#usage th,#usage td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--grid,#e3e6ea)}
+#usage th{background:#f6f7f9;font-weight:600;font-size:12px}
+#usage td.n{text-align:right;font-variant-numeric:tabular-nums}
+#usage .ev-signin{color:#1a7f37}#usage .ev-refused{color:#b42318}#usage .never{color:var(--muted,#999)}
+
+/* ---------- visual polish (Nov 2026) ---------- */
+/* nav as a real tab bar sitting on the bottom edge of the band */
+.tabs{flex-basis:100%;display:flex;gap:2px;margin:2px 0 -16px;overflow-x:auto;scrollbar-width:none}
+.tabs a{color:rgba(255,255,255,.66);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.02em;padding:9px 14px 10px;border-bottom:3px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.tabs a:hover{color:#fff}
+.tabs a.on{color:#fff;border-bottom-color:var(--green)}
+.tabs:empty{display:none}
+/* source labels: quiet dot + word instead of boxed badges; hover still gives the detail */
+#app .srcs{gap:9px;align-items:center;flex-wrap:nowrap;padding-top:2px}
+#app .srcs .src{border:0;background:none;padding:0;font-size:9.5px;font-weight:500;letter-spacing:.07em;color:var(--muted)}
+#app .srcs .src::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:1px;background:#8aa86a}
+#app .srcs .src.sheet::before{background:#d6a344}
+/* tier 1: fixed header height so the hero numbers line up across tiles */
+.kpi .top{min-height:32px}
+.kpi .lbl .unit{margin-left:4px}
+.kpi svg.spark{width:96px;height:32px}
+/* tier 2 */
+.track .fill.behind{background:var(--bad);opacity:.8}
+.lr .top .amt{font-size:12px;color:var(--muted);font-weight:500}
+.sumrow{margin-top:auto;display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-top:1px solid var(--grid);padding:10px 8px 0;font-size:13px;color:var(--ink2)}
+.sumrow b{color:var(--ink);font-weight:600}
+/* tier 3 */
+.statelist{display:flex;flex-direction:column;gap:7px;margin-top:4px;padding-top:12px;border-top:1px solid var(--grid)}
+.statelist .hd{font-size:11.5px;color:var(--muted)}
+.statelist .sr{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:10px;font-size:13px}
+.statelist .sr .st3{font-weight:600}
+.statelist .sr .bar{height:7px;border-radius:999px;background:var(--plane);position:relative}
+.statelist .sr .bar i{position:absolute;inset:0 auto 0 0;border-radius:999px;background:var(--s1);opacity:.75}
+.card .v{font-size:22px}
+.card .d.bad{color:var(--bad)} .card .d.warn{color:var(--warn)} .card .d.na{color:var(--muted);font-weight:500}
+.holnote{font-size:11.5px;color:var(--muted)}
+.badge-in.bad{color:var(--bad);background:var(--bad-bg)} .badge-in.warn{color:var(--warn);background:var(--warn-bg)}
+.hol-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap">
+    <img src="images/bgb-wordmark-white.svg" alt="Big Grove Brewery">
+    <div class="titles">
+      <h1><span id="yr">2026</span> Executive Leadership Scorecard</h1>
+      <span class="eyebrow">Big Grove Brewery &amp; Taprooms • Consolidated performance view</span>
+    </div>
+    <div class="tools">
+      <span class="who" id="who" hidden></span>
+      <span class="badge" id="data-badge">Sample data</span>
+      <div class="ctl"><span class="dotlive"></span><label for="sel-week" id="lbl-week">Period</label><select id="sel-week"></select></div>
+      <div class="ctl"><label for="sel-loc">Location</label><select id="sel-loc"></select></div>
+      <div class="ctl xonly" hidden><label for="sel-gran">View by</label><select id="sel-gran"><option value="week">Week</option><option value="month">Month</option><option value="quarter">Quarter</option><option value="ytd">Year to date</option></select></div>
+      <div class="ctl xonly" hidden><label for="sel-cmp">Compare to</label><select id="sel-cmp"><option value="target">Target</option><option value="py">Prior year</option><option value="pp">Prior period</option></select></div>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Views"></nav>
+  </div>
+</header>
+
+
+<section id="gate" aria-live="polite">
+  <h2>Leadership sign-in</h2>
+  <p>Sign in with your Big Grove Google account to view the scorecard.</p>
+  <div id="gbtn"></div>
+  <div class="gerr" id="gerr"></div>
+</section>
+
+<main class="wrap xview" id="exec" hidden><div id="v-exec"></div></main>
+<main class="wrap xview" id="weekly" hidden><div id="v-weekly"></div></main>
+<main class="wrap xview" id="byloc" hidden><div id="v-byloc"></div></main>
+
+<main class="wrap" id="sources" hidden>
+  <h2>Data sources — Leadership Scorecard workbook</h2>
+  <div class="sub">Every number on the Leadership Scorecard spreadsheet, tab by tab: which platform can supply it, and whether the scorecard already pulls it. Use it to decide what to connect next and what stays typed.</div>
+  <div class="scards" id="src-cards"></div>
+  <div class="legend">
+    <span><span class="st2 connected">Connected</span> pulled automatically today</span>
+    <span><span class="st2 ready">Ready</span> already in a platform we pull — just needs wiring</span>
+    <span><span class="st2 needs">Needs a connector</span> lives in a platform we don't pull yet</span>
+    <span><span class="st2 manual">Typed</span> goals and judgments no system holds</span>
+  </div>
+  <div class="plats" id="src-plats"></div>
+  <div id="src-tabs"></div>
+  <div class="sub" style="margin-top:14px">Last reviewed Nov 14, 2026, from all 16 tabs of the workbook.</div>
+</main>
+
+<main class="wrap" id="usage" hidden>
+  <h2>Usage</h2>
+  <div class="sub" id="u-sub">Who has signed in and opened the scorecard. Visible to roster Admins only.</div>
+  <div id="u-body">Loading…</div>
+</main>
+
+<main class="wrap" id="app">
+  <div class="note" id="sample-note">Framework preview. Every figure is a placeholder shaped like the leadership wireframe until the Store Director Portal and Sales Portal feeds are switched on. Labels show where each number comes from: <span class="src feed" title="System feed">Feed</span> is pulled automatically; <span class="src sheet" title="Spreadsheet">Sheet</span> is typed into the Leadership Scorecard workbook and is only as current as its last edit.</div>
+  <div class="filter" id="filter"><span>Filtered view: highlighting <b id="f-loc"></b> across revenue vs goal, revenue mix, the efficiency quadrant, guest traffic and holiday pacing.</span><button type="button" id="f-reset">Reset to all</button></div>
+
+  <!-- ===================== TIER 1 ===================== -->
+  <section class="tier">
+    <div class="tier-h"><h2>Tier 1 — Executive Pulse</h2><span>12-week trend sparklines</span></div>
+    <div class="grid4">
+      <div class="panel kpi">
+        <div class="top"><span class="lbl">Total weekly revenue <span class="unit" id="u-rev"></span></span><span class="srcs"><span class="src feed" title="Taproom net sales: Store Director Portal pipeline (Toast), refreshed nightly • Brewery distro revenue: Ekos invoices (Liberty + Gilbert), excluding keg deposits, by delivery date, from the Sales Portal daily Ekos download">Feed</span><span class="src sheet" title="Revenue goals and brewery distro last year: typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></span></div>
+        <div class="row"><div class="val num" id="k-rev">—</div><svg class="spark" id="sp-rev" aria-hidden="true"></svg></div>
+        <span class="pill" id="p-rev"></span>
+        <div class="lines num"><div><span id="l-tapn">Taprooms</span><span id="l-tap"></span></div><div><span>Brewery distro</span><span id="l-dist"></span></div></div>
+      </div>
+      <div class="panel kpi">
+        <div class="top"><span class="lbl">Taproom prime cost %</span><span class="srcs"><span class="src feed" title="Toast labor + MarginEdge purchases via the Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly. MarginEdge figures are provisional.">Feed</span></span></div>
+        <div class="row"><div class="val num" id="k-prime">—</div><svg class="spark" id="sp-prime" aria-hidden="true"></svg></div>
+        <span class="pill" id="p-prime"></span>
+        <div class="lines num"><div><span>COGS %</span><span id="l-cogs"></span></div><div><span>Food cost %</span><span id="l-food"></span></div><div><span>Direct labor %</span><span id="l-labor"></span></div></div>
+      </div>
+      <div class="panel kpi">
+        <div class="top"><span class="lbl">YTD distribution volume</span><span class="srcs"><span class="src feed" title="YTD volume, YoY growth and brand progress: VIP depletions, Sales Portal daily VIP refresh">Feed</span><span class="src sheet" title="Brand full-year goals only: Top Priorities tab of the Leadership Scorecard workbook (VIP carries no goals)">Sheet</span></span></div>
+        <div class="row"><div class="val num" id="k-dist">—</div><svg class="spark" id="sp-dist" aria-hidden="true"></svg></div>
+        <span class="pill" id="p-dist"></span>
+        <div class="lines num" id="l-brands"></div>
+      </div>
+      <div class="panel kpi">
+        <div class="top"><span class="lbl">Google reputation</span><span class="srcs"><span class="src sheet" title="Google ratings and review counts: Typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></span></div>
+        <div class="row"><div class="val num" id="k-rep">—</div><svg class="spark" id="sp-rep" aria-hidden="true"></svg></div>
+        <span class="pill" id="p-rep"></span>
+        <div class="lines num"><div><span id="l-topn">Top</span><span id="l-top"></span></div><div><span id="l-watchn">Watch</span><span id="l-watch"></span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TIER 2 ===================== -->
+  <section class="tier">
+    <div class="tier-h"><h2>Tier 2 — Location Performance Matrix</h2><span id="t2-n">Taproom operations</span></div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="ph"><div><h3>Taproom revenue vs. goal</h3><div class="sub">Weekly net sales against location budget targets</div></div>
+          <div class="srcs"><span class="src feed" title="Net sales: Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly">Feed</span><span class="src sheet" title="Goals: Typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></div></div>
+        <div class="legend" style="justify-content:flex-end;margin-top:-6px"><span><i style="background:var(--s1)"></i>At / above goal</span><span><i style="background:var(--bad);opacity:.8"></i>Below goal</span><span><i class="tick"></i>Goal</span></div>
+        <div class="rows" id="r-rev"></div>
+        <div class="sumrow num" id="rev-sum"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>Revenue mix by location</h3><div class="sub">Share of net sales: food, beer, events and other</div></div><div class="srcs"><span class="src feed" title="Toast sales categories + Tripleseat events: Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly">Feed</span></div></div>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Food</span><span><i style="background:var(--s2)"></i>Beer</span><span><i style="background:var(--s3)"></i>Events</span><span><i style="background:var(--sx)"></i>Other</span></div>
+        <div class="rows" id="r-mix"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>Prime cost efficiency quadrant</h3><div class="sub">Food cost % (across) vs. direct labor % (up) • hover a point for detail</div></div><div class="srcs"><span class="src feed" title="Toast labor + MarginEdge food purchases: Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly">Feed</span></div></div>
+        <span class="badge-in" id="q-zone"></span>
+        <div class="chartbox"><canvas id="ch-quad" role="img" aria-label="Scatter chart of food cost percent against labor percent by taproom, with target lines"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3>Guest traffic &amp; avg check</h3><div class="sub">Weekly guest counts paired with spend per guest</div></div><div class="srcs"><span class="src feed" title="Toast guest counts: Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly">Feed</span></div></div>
+        <span class="total-chip num" id="g-total"></span>
+        <div class="rows" id="r-guest"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TIER 3 ===================== -->
+  <section class="tier">
+    <div class="tier-h"><h2>Tier 3 — Growth Engines &amp; Q4 Initiatives</h2><span>Strategic priorities &amp; seasonal pacing</span></div>
+    <div class="grid2 t3">
+      <div class="panel">
+        <div class="ph"><div><h3>Distribution &amp; POD expansion</h3><div class="sub">YTD case growth and retail footprint</div></div><div class="srcs"><span class="src feed" title="In/outside-state case growth and POD counts (VIP effective placements, YTD vs same period LY): Sales Portal daily VIP refresh">Feed</span><span class="src sheet" title="Growth goals only: Leadership Scorecard workbook (VIP carries no goals)">Sheet</span></div></div>
+        <div class="prog" id="pg-home"></div>
+        <div class="prog" id="pg-out"></div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-top:12px;border-top:1px solid var(--grid)" id="pods"></div>
+        <div class="statelist num" id="states"></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><div><h3 id="h-hol">Holiday pacing</h3><div class="sub" id="s-hol"></div></div><div class="srcs"><span class="src feed" title="This season’s guests: Toast via the Store Director Portal pipeline (Toast, MarginEdge, Tripleseat), refreshed nightly">Feed</span><span class="src sheet" title="Weekly goals and last season: VMBG Targets tab. Typed into the Leadership Scorecard workbook each week; not a system feed">Sheet</span></div></div>
+        <div class="hol-head"><span class="badge-in num" id="hol-pace"></span><span class="total-chip num" id="hol-target"></span></div>
+        <div class="chartbox" style="min-height:220px"><canvas id="ch-hol" role="img" aria-label="Cumulative holiday guest visits this season against last season and the goal"></canvas></div>
+        <div class="cards" id="hol-cards"></div>
+        <div class="holnote" id="hol-note"></div>
+      </div>
+    </div>
+  </section>
+
+  <details id="notes">
+    <summary>Definitions and data sources</summary>
+    <table>
+      <thead><tr><th>Measure</th><th>Definition</th><th>Feed</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Taproom revenue, goal</td><td>Net sales after discounts, before tax and tips; goal is the monthly location target spread over the days of the week</td><td>Store Director Portal — Toast orders, <code>inputs/targets.csv</code></td><td><span class="st ok">Available</span></td></tr>
+        <tr><td>Brewery distro revenue, goal</td><td>Wholesale revenue for the week, prior year and goal</td><td>Revenue: Ekos invoices (Liberty + Gilbert), line totals excluding keg deposits, by delivery date, complete weeks since May 2026 — Sales Portal daily Ekos download. Goal and prior year: Leadership Scorecard workbook, Brewery row.</td><td><span class="st ok">Available</span></td></tr>
+        <tr><td>Revenue goals</td><td>Weekly goal per taproom and for the brewery</td><td>Leadership Scorecard workbook, Revenue by Location</td><td><span class="st part">Spreadsheet</span></td></tr>
+        <tr><td>Revenue mix</td><td>Food and beer from Toast sales categories; events from Tripleseat; other = the rest of net sales</td><td>Store Director Portal — Toast + Tripleseat</td><td><span class="st ok">Available</span></td></tr>
+        <tr><td>Food cost %, COGS %</td><td>Purchases ÷ sales (food purchases ÷ food sales; all purchases ÷ net sales). A purchasing proxy, not counted usage</td><td>Store Director Portal — MarginEdge invoices</td><td><span class="st part">Provisional</span></td></tr>
+        <tr><td>Direct labor %</td><td>Hourly labor cost (regular + overtime at 1.5×) ÷ net sales</td><td>Store Director Portal — Toast time entries</td><td><span class="st ok">Available</span></td></tr>
+        <tr><td>Prime cost %</td><td>COGS % + direct labor %, weighted by sales</td><td>Derived</td><td><span class="st part">Provisional</span></td></tr>
+        <tr><td>Guests, avg check</td><td>Guest count on orders; net sales ÷ guests</td><td>Store Director Portal — Toast</td><td><span class="st ok">Available</span></td></tr>
+        <tr><td>Google rating, reviews</td><td>Each taproom’s score for the week, review counts</td><td>Leadership Scorecard workbook, “2026 Leadership Scorecard” tab (typed in weekly)</td><td><span class="st part">Spreadsheet</span></td></tr>
+        <tr><td>Distribution volume, brand progress</td><td>Distributor depletions to retail in case equivalents, year to date vs same span last year</td><td>Sales Portal — VIP Rolling Scorecard export</td><td><span class="st ok">Available</span></td></tr>
+        <tr><td>In-state / out-of-state growth</td><td>YTD case growth for the home state and for everywhere else</td><td>Sales Portal — VIP Rolling Scorecard export</td><td><span class="st ok">Available</span></td></tr>
+        <tr><td>POD count</td><td>Points of distribution in and outside Iowa, vs prior year</td><td>Sales Portal — VIP Yearly Distributor Data (effective placements, YTD vs same period LY, by distributor state). The sheet&#39;s Pod Count uses a different definition.</td><td><span class="st ok">Available</span></td></tr>
+        <tr><td>Growth and brand goals</td><td>In/outside-Iowa growth goals; full-year brand CE goals</td><td>Leadership Scorecard workbook, “2026 Leadership Scorecard” and “Top Priorities” tabs</td><td><span class="st part">Spreadsheet</span></td></tr>
+        <tr><td>Holiday pacing</td><td>Cumulative guests at the pop-up taprooms by week vs goal and last season</td><td>Goal and last season: workbook “VMBG Targets” tab. This season: Store Director Portal — Toast guests</td><td><span class="st part">Sheet + feed</span></td></tr>
+      </tbody>
+    </table>
+    <h3>Open items</h3>
+    <ul>
+      <li>Spreadsheet items are only as current as the workbook. The “2026 Leadership Scorecard” tab holds one week at a time, so their history builds up from the weeks this site has captured.</li>
+      <li>Google reviews could become a feed through the Google Business Profile API.</li>
+      <li>Brewery distro revenue could become a feed from Ekos invoices (the Sales Portal already downloads them, from May 2026).</li>
+      <li>Access: Google sign-in + encrypted bundles like the other portals, before any real number is published.</li>
+    </ul>
+  </details>
+</main>
+<footer class="wrap" id="foot"></footer>
+
+<script src="vendor/chart.umd.min.js"></script>
+<script>
+(() => {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const money0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const money2 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 });
+  const int = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+  const k1 = (v) => (Math.abs(v) >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : Math.abs(v) >= 1e3 ? (v / 1e3).toFixed(1) + 'k' : String(Math.round(v)));
+  const sgn = (v, d = 1) => (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d);
+  const sum = (rows, f) => rows.reduce((a, r) => a + (+f(r) || 0), 0);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const D = (s) => new Date(s + 'T00:00:00Z');
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const addDays = (s, n) => iso(new Date(D(s).getTime() + n * 864e5));
+  const md = (s, o = { month: 'short', day: 'numeric' }) => D(s).toLocaleDateString('en-US', { ...o, timeZone: 'UTC' });
+  const isoWeek = (s) => { const d = D(s); d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7)); const y = new Date(Date.UTC(d.getUTCFullYear(), 0, 1)); return Math.ceil(((d - y) / 864e5 + 1) / 7); };
+
+  function parseCSV(text) {
+    const lines = text.trim().split(/\r?\n/);
+    const cols = lines.shift().split(',').map((s) => s.trim());
+    return lines.filter(Boolean).map((line) => {
+      const cells = line.split(',');
+      const o = {};
+      cols.forEach((c, i) => { const v = (cells[i] ?? '').trim(); o[c] = v === '' ? null : !isNaN(v) ? +v : v; });
+      return o;
+    });
+  }
+  async function getCSV(path) {
+    if (!path) return [];
+    try { const r = await fetch(path, { cache: 'no-store' }); return r.ok ? parseCSV(await r.text()) : []; } catch { return []; }
+  }
+
+  let CFG, TAP, COMP, REP, DW, DY, PODS, GD, VT, WEEKS, LOCS, charts = {};
+  let VW = [], PW = [], LW = [], DSW = [];
+  const state = { week: null, loc: 'all', gran: 'week', cmp: 'target' };
+  try { const v = JSON.parse(localStorage.getItem('execsc_view') || '{}'); if (v.gran) state.gran = v.gran; if (v.cmp) state.cmp = v.cmp; } catch {}
+
+  async function load() {
+    // Published site: everything comes from the encrypted bundle the sign-in unlocked (window.__esData).
+    // Local preview on Troy's Mac: config.local.json / config.json and the CSVs beside them.
+    const B = window.__esData || null;
+    CFG = B ? B.config : (await fetch('config.local.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null)
+      || await (await fetch('config.json', { cache: 'no-store' })).json());
+    const f = CFG.files;
+    const get = (name) => (B ? Promise.resolve(B.files[name] ? parseCSV(B.files[name]) : []) : getCSV(f[name]));
+    [TAP, COMP, REP, DW, DY, PODS, GD, VT, VW, PW, LW, DSW] = await Promise.all(['taproomWeekly', 'companyWeekly', 'reputationWeekly', 'distributionWeekly', 'distributionYtd', 'placements', 'guestsDaily', 'vmbgTargets', 'vipWeekly', 'podsWeekly', 'loyaltyWeekly', 'discountsWeekly'].map(get));
+    if (!TAP.length) throw new Error('No taproom data at ' + f.taproomWeekly);
+    if (CFG.dataSource === 'sample') { $('data-badge').textContent = 'Sample data'; }
+    else { $('data-badge').textContent = B ? 'Live' : (CFG.dataSource === 'local' ? 'Local preview' : 'Live'); $('sample-note').hidden = true; }
+    WEEKS = [...new Set(TAP.map((r) => r.week_start))].sort();
+    LOCS = [...new Set(TAP.map((r) => r.location))];
+    const sw = $('sel-week');
+    [...WEEKS].reverse().forEach((w) => sw.add(new Option(`${md(w)} – ${md(addDays(w, 6), { month: 'short', day: 'numeric', year: 'numeric' })}`, w)));
+    state.week = WEEKS[WEEKS.length - 1];
+    const sl = $('sel-loc');
+    sl.add(new Option(`All locations (${LOCS.length})`, 'all'));
+    LOCS.forEach((l) => sl.add(new Option(l, l)));
+    sw.addEventListener('change', () => { state.week = sw.value; render(); });
+    const sg = $('sel-gran'), sc = $('sel-cmp');
+    sg.value = state.gran; sc.value = state.cmp;
+    const keep = () => { try { localStorage.setItem('execsc_view', JSON.stringify({ gran: state.gran, cmp: state.cmp })); } catch {} };
+    sg.addEventListener('change', () => { state.gran = sg.value; keep(); window.__esRenderViews(); });
+    sc.addEventListener('change', () => { state.cmp = sc.value; keep(); window.__esRenderViews(); });
+    sl.addEventListener('change', () => { state.loc = sl.value; render(); });
+    $('f-reset').addEventListener('click', () => { sl.value = 'all'; state.loc = 'all'; render(); });
+    $('foot').textContent = `Big Grove Brewery • Executive Leadership Scorecard • ${CFG.dataLabel}. Updated ${CFG.updated}.`;
+    if (CFG.taproomSource === 'sheet') {
+      document.querySelectorAll('.src.feed').forEach((e) => { if (/Store Director Portal/.test(e.title) && !/VIP/.test(e.title)) { e.className = 'src sheet'; e.textContent = 'Sheet'; e.title = 'Taproom figures from the Leadership Scorecard workbook until the Store Director Portal feed is connected here'; } });
+      document.querySelectorAll('.srcs').forEach((g) => { const sh = g.querySelectorAll('.src.sheet'); for (let i = 1; i < sh.length; i++) { sh[0].title += ' • ' + sh[i].title; sh[i].remove(); } });
+    }
+    render();
+  }
+
+  // ---------------------------------------------------------------- helpers
+  function spark(id, vals, color) {
+    const el = $(id), v = vals.filter((x) => x != null && isFinite(x));
+    if (v.length < 2) { el.innerHTML = ''; return; }
+    const W = 90, H = 30, lo = Math.min(...v), hi = Math.max(...v), r = hi - lo || 1;
+    const pts = vals.map((x, i) => (x == null ? null : [i * W / (vals.length - 1), H - 3 - (x - lo) / r * (H - 6)])).filter(Boolean);
+    const last = pts[pts.length - 1];
+    el.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    el.innerHTML = `<polyline fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" points="${pts.map((p) => p.join(',')).join(' ')}"/><circle cx="${last[0]}" cy="${last[1]}" r="2.6" fill="${color}"/>`;
+  }
+  function pill(id, cls, text) { const e = $(id); e.className = 'pill ' + cls; e.textContent = text; }
+  const weekRows = (w) => TAP.filter((r) => r.week_start === w);
+  const last12 = () => WEEKS.filter((w) => w <= state.week).slice(-12);
+  function wavg(rows, k, wk) { const den = sum(rows.filter((r) => r[k] != null), (r) => r[wk]); return den ? sum(rows.filter((r) => r[k] != null), (r) => r[k] * r[wk]) / den : null; }
+  function tapCost(rows) {
+    const cogs = wavg(rows, 'cogs_pct', 'net_sales'), labor = wavg(rows, 'labor_pct', 'net_sales'), food = rows.some((r) => r.food_sales) ? wavg(rows, 'food_cost_pct', 'food_sales') : wavg(rows, 'food_cost_pct', 'net_sales');
+    const prime = labor == null ? null : cogs != null ? cogs + labor : food != null ? food + labor : null;
+    return { cogs, labor, food, prime, basis: cogs != null ? 'cogs' : 'food' };
+  }
+  const markLoc = (name) => (state.loc === 'all' ? '' : name === state.loc ? ' hl' : ' dim');
+
+
+  // ================================================================ 2027 proposed views (Execution Card, Weekly Scorecard, By Location)
+  // Laid out like "2027 Proposed Weekly Leadership Scorecard" (3 slides), in this page's tokens.
+  // Controls (header, these three pages only): View by (week / month / quarter / year to date), Compare to (target /
+  // prior year / prior period), and the Period menu, which is the "through" week. A month or quarter is the weeks whose
+  // Thursday falls in it (ISO convention), cut at the through week, so the latest one reads "to date".
+  const ORDER = ['Solon', 'Iowa City', 'Des Moines', 'Cedar Rapids', 'Omaha', 'Prairie Village'];
+  const SHORT = { 'Solon': 'Solon', 'Iowa City': 'IC', 'Des Moines': 'DSM', 'Cedar Rapids': 'CR', 'Omaha': 'Omaha', 'Prairie Village': 'PV' };
+  const fin = (v) => v != null && isFinite(v);
+  const dt = (ok) => `<i class="dt ${ok == null ? 'n' : ok ? 'g' : 'r'}"></i>`;
+  const usd = (v) => (fin(v) ? money0.format(v) : '—');
+  const hl$ = (v) => (fin(v) ? (v < 0 ? '(' + money0.format(-v) + ')' : money0.format(v)) : '—');
+  const p1 = (v) => (fin(v) ? v.toFixed(1) + '%' : '—');
+  const hln = (v) => (fin(v) ? (v < 0 ? '(' + int.format(-v) + ')' : int.format(v)) : '—');
+  const usdK = (v) => (fin(v) ? (Math.abs(v) >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : Math.abs(v) >= 1e4 ? '$' + Math.round(v / 1e3) + 'k' : '$' + (v / 1e3).toFixed(1) + 'k') : '—');
+  const hlK = (v) => (fin(v) ? (v < 0 ? '(' + usdK(-v) + ')' : usdK(v)) : '—');
+  const hlpS = (v) => (fin(v) ? (v < 0 ? '(' + Math.abs(v).toFixed(1) + ')' : '+' + v.toFixed(1)) : '—');
+  const T = () => CFG.targets || {};
+  const XO = (k) => (CFG.execTargets || {})[k] || null;
+  const XT = (k) => { const o = XO(k); return o ? o.target : null; };
+  const XTn = (k) => { const v = XT(k); const n = v == null ? null : parseFloat(String(v).replace(/[$,%+]/g, '')); return fin(n) ? n : null; };
+  const wkTitle = (w) => `${md(w)}–${md(addDays(w, 6))}`;
+  const SRC = {
+    toast: ['feed', 'Toast', 'Toast via the Store Director Portal, nightly'],
+    me: ['feed', 'MarginEdge', 'MarginEdge purchases via the Store Director Portal, nightly'],
+    ekos: ['feed', 'Ekos', 'Ekos invoices (Liberty + Gilbert) excluding keg deposits; weeks before Apr 27 from the workbook history'],
+    vip: ['feed', 'VIP', 'VIP depletions / placements via the Sales Portal daily refresh'],
+    thanx: ['feed', 'Thanx via Toast', 'Thanx members identified on Toast checks and promo redemptions as Toast discounts, via the Store Director Portal'],
+    sheet: ['sheet', 'Sheet', 'Leadership Scorecard workbook'],
+    google: ['none', 'Google — not connected', 'Shown from the workbook until the Places API is connected'],
+    typed: ['typed', 'Typed target', "Add it to an 'Exec Targets' tab in the Leadership Scorecard workbook (column A name, B target, C actual)"],
+    none: ['none', 'Not connected', 'No platform connected for this yet'],
+  };
+  const chips = (...ks) => `<div class="srcs">${ks.map((k) => { const s = SRC[k]; return `<span class="src ${s[0]}" title="${esc(s[2])}">${esc(s[1])}</span>`; }).join('')}</div>`;
+  const panel = (title, sub, src, body, cls = '') => `<section class="panel ${cls}"><div class="ph"><div><h3>${title}</h3>${sub ? `<div class="sub">${sub}</div>` : ''}</div>${src}</div>${body}</section>`;
+  const notSet = (k) => `<span class="muted" title="Add '${esc(k)}' to an 'Exec Targets' tab in the workbook">not set</span>`;
+
+  // ---------------------------------------------------------------- periods
+  const GRAN = () => state.gran || 'week', CMP = () => state.cmp || 'target';
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function bucket(w, g) {
+    if (g === 'week') return w;
+    const th = addDays(w, 3), y = th.slice(0, 4), m = +th.slice(5, 7);
+    return g === 'month' ? th.slice(0, 7) : g === 'quarter' ? `${y}-Q${Math.ceil(m / 3)}` : y;
+  }
+  // One period: its key, its weeks (cut at the through week), and labels.
+  function mkPeriod(key, weeks, g) {
+    const full = WEEKS.filter((w) => bucket(w, g) === key);
+    const partial = weeks.length < full.length || (g === 'ytd');
+    let label;
+    if (g === 'week') label = md(key);
+    else if (g === 'month') label = `${MON[+key.slice(5, 7) - 1]} ${key.slice(0, 4)}`;
+    else if (g === 'quarter') label = `${key.slice(5)} ${key.slice(0, 4)}`;
+    else label = `${key} YTD`;
+    const to = g === 'week' ? '' : partial && g !== 'ytd' ? (g === 'month' ? ' MTD' : ' QTD') : '';
+    return { key, weeks, label: label + to, title: weeks.length ? `${md(weeks[0])} – ${md(addDays(weeks[weeks.length - 1], 6), { month: 'short', day: 'numeric', year: 'numeric' })} (${weeks.length} wk)` : '' };
+  }
+  // The n most recent periods ending with the one that holds the through week (newest first).
+  function periods(n) {
+    const g = GRAN(), upto = WEEKS.filter((w) => w <= state.week);
+    if (g === 'ytd') {
+      // Year to date = Jan 1 to the same week of the year, for this year and the years before it.
+      const yr = +state.week.slice(0, 4), out = [];
+      for (let k = 0; k < n; k++) {
+        const ws = upto.filter((w) => bucket(w, 'ytd') === String(yr - k) && addDays(w, 364 * k) <= state.week);
+        if (!ws.length || ws[0] > `${yr - k}-01-08`) break;      // only years the data covers from the first week
+        out.push(mkPeriod(String(yr - k), ws, g));
+      }
+      return out;
+    }
+    const keys = [...new Set(upto.map((w) => bucket(w, g)))].slice(-n).reverse();
+    return keys.map((k) => mkPeriod(k, upto.filter((w) => bucket(w, g) === k), g));
+  }
+  const pyWeeks = (ws) => ws.map((w) => addDays(w, -364));
+  function prevPeriod(p) {
+    const g = GRAN();
+    if (g === 'ytd') return null;
+    const keys = [...new Set(WEEKS.map((w) => bucket(w, g)))], i = keys.indexOf(p.key);
+    return i > 0 ? mkPeriod(keys[i - 1], WEEKS.filter((w) => bucket(w, g) === keys[i - 1]), g) : null;
+  }
+  const colLbl = (p, i) => (GRAN() === 'week' ? (i ? `LCW – ${i}` : 'LCW') : p.label);
+  const unitWord = () => ({ week: 'week', month: 'month', quarter: 'quarter', ytd: 'year to date' }[GRAN()]);
+  const cmpWord = () => ({ target: 'target', py: 'prior year', pp: 'prior ' + ({ week: 'week', month: 'month', quarter: 'quarter', ytd: 'period' }[GRAN()]) }[CMP()]);
+
+  // ---------------------------------------------------------------- aggregates over a list of weeks
+  const wavgR = (rows, k, wk) => { const r = rows.filter((x) => fin(x[k]) && x[wk]); const d = sum(r, (x) => x[wk]); return d ? sum(r, (x) => x[k] * x[wk]) / d : null; };
+  function storeAgg(ws, loc) {
+    const rows = TAP.filter((r) => ws.includes(r.week_start) && (!loc || r.location === loc));
+    if (!rows.length) return null;
+    const wb = rows.every((r) => r.goal_src === 'sheet'), comp = rows.filter((r) => r.net_sales_ly > 0);
+    const hasFood = rows.some((r) => r.food_sales);
+    return {
+      n: new Set(rows.map((r) => r.week_start)).size, rev: sum(rows, (r) => r.net_sales), goal: wb ? sum(rows, (r) => r.sales_goal) || null : null, refGoal: wb ? null : sum(rows, (r) => r.sales_goal) || null,
+      revLfl: comp.length ? sum(comp, (r) => r.net_sales) : null, revLY: comp.length ? sum(comp, (r) => r.net_sales_ly) : null,
+      labor: wavgR(rows, 'labor_pct', 'net_sales'), food: hasFood ? wavgR(rows, 'food_cost_pct', 'food_sales') : wavgR(rows, 'food_cost_pct', 'net_sales'),
+    };
+  }
+  function distroAgg(ws) {
+    const rows = COMP.filter((r) => ws.includes(r.week_start) && fin(r.brewery_distro_revenue));
+    if (!rows.length) return null;
+    return { n: rows.length, rev: sum(rows, (r) => r.brewery_distro_revenue), goal: rows.every((r) => r.brewery_distro_goal) ? sum(rows, (r) => r.brewery_distro_goal) : null,
+      py: rows.every((r) => r.brewery_distro_py) ? sum(rows, (r) => r.brewery_distro_py) : null };
+  }
+  const isHome = (st) => st === (T().homeState || 'IA');
+  const H = (s) => isHome(s), X = (s) => !isHome(s), A = () => true;
+  function casesAgg(ws, f) {
+    const rows = VW.filter((r) => ws.includes(r.week_start) && f(r.state)), ty = sum(rows, (r) => r.ce), ly = sum(rows, (r) => r.ce_ly);
+    return rows.length && ly ? { g: (ty / ly - 1) * 100, d: ty - ly, ty } : null;
+  }
+  function podsAt(ws, f) {
+    if (!ws.length) return null;
+    const last = ws[ws.length - 1], snaps = [...new Set(PW.map((r) => r.week_start))].filter((x) => x <= last).sort();
+    const wk = snaps.pop();
+    if (!wk || !ws.includes(wk)) return null;           // no snapshot inside this period
+    const rows = PW.filter((r) => r.week_start === wk && f(r.state)), ty = sum(rows, (r) => r.placements), ly = sum(rows, (r) => r.placements_ly);
+    return ly ? { g: (ty / ly - 1) * 100, n: ty, asOf: rows[0].as_of } : null;
+  }
+  const loyalAt = (ws) => { const r = LW.filter((x) => x.location === 'All' && ws.includes(x.week_start)).sort((a, b) => (a.week_start < b.week_start ? 1 : -1)); return r.length ? { ...r[0], first: sum(r, (x) => x.first_seen) } : null; };
+  const RE_PINT = /free\s*pint/i, RE_SAMPLER = /sampler/i, RE_PENNY = /(\$?0?\.01|penny|1\s*cent)/i;
+  const promoAgg = (ws, re) => (DSW.length ? sum(DSW.filter((r) => r.location === 'All' && ws.includes(r.week_start) && re.test(r.name)), (r) => r.n) : null);
+  const repWeeks = () => [...new Set(REP.map((r) => r.week_start))].filter((w) => w <= state.week).sort().reverse();
+
+  // ---------------------------------------------------------------- comparisons (driven by "Compare to")
+  // Each returns { ref, d, ok } for one period: the comparison value, the difference, and whether it's good.
+  function cmpRev(p, getAgg, goalKey = 'goal') {
+    const a = getAgg(p.weeks); if (!a) return null;
+    const c = CMP();
+    if (c === 'target') return a[goalKey] ? { ref: a[goalKey], d: a.rev - a[goalKey], ok: a.rev >= a[goalKey] } : null;
+    if (c === 'py') {
+      if (a.revLfl != null) return { ref: a.revLY, d: a.revLfl - a.revLY, ok: a.revLfl >= a.revLY };
+      if (a.py != null) return { ref: a.py, d: a.rev - a.py, ok: a.rev >= a.py };
+      // Last year only counts when it covers as many weeks as this period (distribution history starts Oct 2025).
+      const b = getAgg(pyWeeks(p.weeks));
+      if (!b || !b.rev || b.n !== a.n || (a.dn != null && b.dn !== a.dn)) return null;
+      return { ref: b.rev, d: a.rev - b.rev, ok: a.rev >= b.rev };
+    }
+    // A partial (to-date) period against a full prior one is pro-rated by weeks, so one week of November is
+    // compared with one week's worth of October rather than all of it.
+    const pp = prevPeriod(p); const b = pp && getAgg(pp.weeks);
+    if (!b) return null;
+    const ref = b.rev * (p.weeks.length / pp.weeks.length);
+    return { ref, d: a.rev - ref, ok: a.rev >= ref, prorated: pp.weeks.length !== p.weeks.length };
+  }
+  function cmpPct(p, k, tgt, loc) {            // lower is better (cost %)
+    const a = storeAgg(p.weeks, loc); if (!a || !fin(a[k])) return null;
+    const c = CMP();
+    const ref = c === 'target' ? tgt : c === 'py' ? (storeAgg(pyWeeks(p.weeks), loc) || {})[k] : ((prevPeriod(p) && storeAgg(prevPeriod(p).weeks, loc)) || {})[k];
+    return fin(ref) ? { v: a[k], ref, d: a[k] - ref, ok: a[k] <= ref } : { v: a[k], ref: null, d: null, ok: null };
+  }
+  function cmpGrowth(p, f, tgt) {              // case volume growth vs LY
+    const a = casesAgg(p.weeks, f); if (!a) return null;
+    const c = CMP();
+    if (c === 'target') return { v: a.g, ref: tgt, d: fin(tgt) ? a.g - tgt : null, ok: fin(tgt) ? a.g >= tgt : null };
+    if (c === 'py') return { v: a.g, ref: null, d: a.d, ok: a.d >= 0, ces: true };
+    const pp = prevPeriod(p), b = pp && casesAgg(pp.weeks, f);
+    return { v: a.g, ref: b ? b.g : null, d: b ? a.g - b.g : null, ok: b ? a.g >= b.g : null };
+  }
+  const isPerWeek = (p) => { const pp = CMP() === 'pp' ? prevPeriod(p) : null; return pp && pp.weeks.length !== p.weeks.length; };
+
+  // ---------------------------------------------------------------- shared boxes
+  function reviewsBox(compact) {
+    const w = repWeeks()[0], rows = w ? REP.filter((r) => r.week_start === w) : [], tgt = T().rating || 4.7;
+    const body = rows.length ? `<table class="xt"><thead><tr><th></th><th>Avg stars</th><th>Reviews</th><th>Ct H/(L) LCW</th></tr></thead><tbody>${
+      ORDER.map((l) => { const r = rows.find((x) => x.location === l); return r ? `<tr><td>${SHORT[l]}</td><td>${fin(r.rating) ? r.rating.toFixed(1) : '—'}${dt(fin(r.rating) ? r.rating >= tgt : null)}</td><td>${fin(r.reviews) ? int.format(r.reviews) : '—'}</td><td>${hln(r.new_reviews)}</td></tr>` : ''; }).join('')}</tbody></table>
+      <div class="owner">Latest captured week (${md(w)}) · target ${tgt}+ stars</div>` : '<div class="nofeed">No review figures captured yet.</div>';
+    return panel(`Google reviews: ${tgt}+ stars`, compact ? '' : 'Average stars, total reviews, new reviews last week', chips('sheet', 'google'), body);
+  }
+  function rewardsBox(owner) {
+    const p = periods(1)[0], l = p && loyalAt(p.weeks), ta = XTn('Active users'), te = XTn('Engaged users');
+    const body = l ? `<div class="mile">
+        <div><span><b>Active users</b> ${int.format(l.members_28)} <span class="owner">(seen in the 28 days to ${md(addDays(l.week_start, 6))})</span></span>${dt(ta == null ? null : l.members_28 >= ta)}</div><div class="owner">Target active users: ${ta == null ? notSet('Active users') : int.format(ta)}</div>
+        <div><span><b>Engaged users</b> ${int.format(l.engaged_28)} <span class="owner">(2+ visit days)</span></span>${dt(te == null ? null : l.engaged_28 >= te)}</div><div class="owner">Target engaged users: ${te == null ? notSet('Engaged users') : int.format(te)}</div>
+        <div class="owner">Members seen for the first time, ${esc(p.label)}: ${int.format(l.first)}</div></div>`
+      : `<div class="nofeed">No loyalty figures for this period.</div>`;
+    return panel('Rewards: acquisition &amp; engagement', owner ? 'Owner: ' + owner : '', chips('thanx', 'typed'), body);
+  }
+  function milestoneBox(name, owner) {
+    const line = (lbl, key) => { const o = XO(key); return `<div><span><b>${lbl}:</b> ${o ? esc(o.target) : notSet(key)}${o && o.actual ? ` <span class="owner">· ${esc(o.actual)}</span>` : ''}</span>${dt(null)}</div>`; };
+    return panel(`${name} opening`, owner ? 'Owner: ' + owner : '', chips('typed'),
+      `<div class="mile">${line('Target opening date', name + ' opening date')}${line('Target hire dates', name + ' hire dates')}${line('Target revenue', name + ' revenue target')}</div>`);
+  }
+  function promoBox(owner) {
+    const p = periods(1)[0], pint = p && promoAgg(p.weeks, RE_PINT), samp = p && promoAgg(p.weeks, RE_SAMPLER), tp = XTn('Free pint redemptions'), ts = XTn('Sampler card redemptions');
+    const body = DSW.length ? `<div class="mile">
+      <div><span><b>Free Pint redemptions:</b> ${int.format(pint || 0)}</span>${dt(tp == null ? null : pint >= tp)}</div><div class="owner">${esc(p.label)} · target: ${tp == null ? notSet('Free pint redemptions') : int.format(tp)}</div>
+      <div><span><b>Sampler card redemptions:</b> ${int.format(samp || 0)}</span>${dt(ts == null ? null : samp >= ts)}</div><div class="owner">Target: ${ts == null ? notSet('Sampler card redemptions') : int.format(ts)}</div>
+      ${!pint && !samp ? '<div class="owner">No Toast discount named "Free Pint" or "Sampler" yet — tell us the exact names if they differ.</div>' : ''}</div>`
+      : `<div class="nofeed">Waiting on the Store Director Portal's nightly run (Toast discounts by name).</div>`;
+    return panel('Free Pint &amp; sampler cards', owner ? 'Owner: ' + owner : '', chips('thanx', 'typed'), body);
+  }
+  const head = (title) => `<div class="tier-h"><h2>${title}</h2><span>By ${unitWord()} · compared with ${cmpWord()} · through week of ${wkTitle(state.week)}</span></div>`;
+  const perWeekNote = '<div class="owner">When the current period is only partly done (to date), dollar and count comparisons with the prior period are pro-rated by weeks; percentages compare as they are.</div>';
+
+  // ---------------------------------------------------------------- Execution Card (slide 1)
+  function viewExec() {
+    const ps = periods(GRAN() === 'ytd' ? 3 : 8), t = T(), c = CMP();
+    const refRowLbl = { target: 'Target', py: 'Prior year', pp: 'Prior period' }[c];
+    const sRows = ps.map((p, i) => {
+      const a = storeAgg(p.weeks); if (!a) return '';
+      const r = cmpRev(p, storeAgg), fl = cmpPct(p, 'food', t.foodCostPct), lb = cmpPct(p, 'labor', t.laborPct);
+      return `<tr><td title="${p.title}">${colLbl(p, i)}${GRAN() === 'week' ? ` <span class="owner">${md(p.key)}</span>` : ''}</td>
+        <td>${usd(a.rev)}${dt(r ? r.ok : null)}</td><td>${p1(a.labor)}${dt(lb ? lb.ok : null)}</td><td>${p1(a.food)}${dt(fl ? fl.ok : null)}</td></tr>`; }).join('');
+    const p0 = ps[0], a0 = p0 && storeAgg(p0.weeks), r0 = p0 && cmpRev(p0, storeAgg), l0 = p0 && cmpPct(p0, 'labor', t.laborPct), f0 = p0 && cmpPct(p0, 'food', t.foodCostPct);
+    const refRow = c === 'target'
+      ? `<td>${a0 && a0.goal ? usd(a0.goal) : `<span class="muted" title="No workbook goal for every week of this period">—</span>`}</td><td>≤ ${t.laborPct}%</td><td>≤ ${t.foodCostPct}%</td>`
+      : `<td>${r0 ? usd(r0.ref) : '—'}</td><td>${l0 ? p1(l0.ref) : '—'}</td><td>${f0 ? p1(f0.ref) : '—'}</td>`;
+    const storeP = panel('Store metrics', 'Owner: Rachel Hart · all taprooms', chips('toast', 'me', 'sheet'),
+      `<table class="xt"><thead><tr><th></th><th>Revenue</th><th>Hrly labor %</th><th>Food cost %</th></tr></thead><tbody>
+       <tr class="tgt"><td>${refRowLbl}${c !== 'target' ? ` <span class="owner">(for ${esc(p0 ? colLbl(p0, 0) : '')})</span>` : ''}</td>${refRow}</tr>${sRows}</tbody></table>
+       <div class="owner">Dots compare each row with its own ${cmpWord()}. ${c === 'target' ? 'Revenue goals come from the workbook, which only holds the weeks it was captured.' : c === 'py' ? 'Prior-year revenue compares taprooms open both years.' : ''} Labor = Toast hourly labor ÷ net sales; food cost = MarginEdge food purchases ÷ food sales.</div>`);
+    const tg = (k) => (fin(k) ? '+' + k + '%' : '—');
+    const podT = XTn('POD growth %'), podIA = XTn('IA POD growth %'), podX = XTn('xIA POD growth %');
+    const podCell = (o, tt) => (o ? `${p1(o.g)}${dt(c === 'target' ? (tt == null ? null : o.g >= tt) : null)}` : '<span class="muted">—</span>');
+    const gc = (p, f, tgt) => { const o = cmpGrowth(p, f, tgt); return o ? p1(o.v) + dt(o.ok) : '—'; };
+    const dRows = ps.map((p, i) => {
+      const d = distroAgg(p.weeks), dr = cmpRev(p, distroAgg);
+      return `<tr><td title="${p.title}">${colLbl(p, i)}${GRAN() === 'week' ? ` <span class="owner">${md(p.key)}</span>` : ''}</td><td>${d ? usdK(d.rev) + dt(dr ? dr.ok : null) : '—'}</td>
+        <td>${gc(p, A, t.totalGrowthPct)}</td><td>${gc(p, H, t.inIowaGrowthPct)}</td><td>${gc(p, X, t.outsideIowaGrowthPct)}</td>
+        <td>${podCell(podsAt(p.weeks, A), podT)}</td><td>${podCell(podsAt(p.weeks, H), podIA)}</td><td>${podCell(podsAt(p.weeks, X), podX)}</td></tr>`; }).join('');
+    const d0 = p0 && distroAgg(p0.weeks), dr0 = p0 && cmpRev(p0, distroAgg);
+    const g0 = (f, tgt) => { const o = p0 && cmpGrowth(p0, f, tgt); return c === 'target' ? tg(tgt) : c === 'py' ? (o ? `${hln(o.d)} CEs` : '—') : (o && fin(o.ref) ? p1(o.ref) : '—'); };
+    const distP = panel('Distribution metrics', `Owner: Mike Wehr · case vol % = cases vs the same weeks last year`, chips('ekos', 'vip', 'sheet', 'typed'),
+      `<div style="overflow-x:auto"><table class="xt"><thead><tr><th></th><th>Rev</th><th>Case vol %</th><th>IA cs vol %</th><th>xIA cs vol %</th><th>POD %</th><th>IA POD %</th><th>xIA POD %</th></tr></thead><tbody>
+       <tr class="tgt"><td>${refRowLbl}</td><td>${c === 'target' ? usdK(d0 && d0.goal) : dr0 ? usdK(dr0.ref) : '—'}</td><td>${g0(A, t.totalGrowthPct)}</td><td>${g0(H, t.inIowaGrowthPct)}</td><td>${g0(X, t.outsideIowaGrowthPct)}</td>
+         <td>${c !== 'target' ? '—' : podT == null ? notSet('POD growth %') : tg(podT)}</td><td>${c !== 'target' ? '—' : podIA == null ? notSet('IA POD growth %') : tg(podIA)}</td><td>${c !== 'target' ? '—' : podX == null ? notSet('xIA POD growth %') : tg(podX)}</td></tr>${dRows}</tbody></table></div>
+       <div class="owner">${c === 'py' ? 'Against prior year, a case-volume dot is green when cases grew. ' : ''}POD % = VIP effective placements YTD vs the same period last year, at the last weekly snapshot in each period (kept from Oct 26 on).</div>`);
+    // YTD revenue (always year to date)
+    const yr = state.week.slice(0, 4), yw = WEEKS.filter((w) => w.startsWith(yr) && w <= state.week);
+    const ys = storeAgg(yw), yd = distroAgg(yw), act = (ys ? ys.rev : 0) + (yd ? yd.rev : 0);
+    const annual = XTn('Annual revenue target');
+    const y0 = Date.UTC(+yr, 0, 1), elapsed = Math.min(1, (D(addDays(state.week, 7)) - y0) / (Date.UTC(+yr + 1, 0, 1) - y0));
+    const tgtY = annual ? annual * elapsed : null, pctA = annual ? act / annual * 100 : null, pctT = annual ? elapsed * 100 : null;
+    const yp = storeAgg(pyWeeks(yw)), ypd = distroAgg(pyWeeks(yw)), actPY = (yp ? yp.rev : 0) + (ypd ? ypd.rev : 0);
+    const mug = (lbl, pct, cls) => `<div class="mug"><div class="mugb"><div class="mugf ${cls}" style="height:${Math.max(0, Math.min(100, pct || 0))}%"></div><div class="mugv">${fin(pct) ? Math.round(pct) + '%' : '—'}</div></div><div class="owner">${lbl}</div></div>`;
+    const ytdP = panel('YTD total Big Grove revenue', `Taprooms + distribution, Jan 1 – ${md(addDays(state.week, 6))}`, chips('toast', 'ekos', 'sheet', 'typed'),
+      `<div class="mugs">${mug('Actual', pctA, 'g')}${mug('Target', pctT, 'n')}</div>
+       <div class="mile"><div><span>Actual YTD</span><b>${usd(act)}</b></div>
+       <div><span>Target to date</span><b>${annual ? usd(tgtY) : notSet('Annual revenue target')}</b></div>${annual ? `<div><span>vs target</span><b class="${act >= tgtY ? 'good-t' : 'bad-t'}">${hl$(act - tgtY)}${dt(act >= tgtY)}</b></div>` : ''}
+       <div><span>Same weeks last year</span><b>${actPY ? usd(actPY) : '—'}</b></div>
+       <div class="owner">${annual ? `Actual = % of the ${usd(annual)} annual target; Target = % of the year gone.` : 'Add "Annual revenue target" to Exec Targets to fill the mugs.'} Last year's distribution before Oct 2025 isn't in any feed, so the prior-year total is taprooms plus what history exists.</div></div>`);
+    $('v-exec').innerHTML = `${head('Leadership Execution Card — Total Big Grove')}
+      <div class="xg2"><div class="xcol">${storeP}<div class="xg2s">${reviewsBox(true)}${rewardsBox('Bryan Farrell')}</div></div><div class="xcol">${distP}</div></div>
+      <div class="tier-h"><h2>Annual goals</h2><span>Owners as on the proposal</span></div>
+      <div class="xg4">${milestoneBox('Palatine', 'Mike Wehr')}${milestoneBox('Madison', 'Matt Swift')}${promoBox('Bryan Farrell')}${ytdP}</div>
+      ${sourcesFor('exec')}`;
+  }
+
+  // ---------------------------------------------------------------- Weekly Scorecard (slide 2)
+  function trendBox(title, rows, src, note) {
+    const ps = periods(GRAN() === 'ytd' ? 3 : 5);
+    return `<section class="panel trend"><div class="ph"><div><h3>${title}</h3></div>${src}</div><div style="overflow-x:auto"><table class="xt"><thead><tr><th></th>${ps.map((p, i) => `<th title="${p.title}">${colLbl(p, i)}</th>`).join('')}</tr></thead><tbody>${
+      rows.map(([lbl, f]) => `<tr><td>${lbl}</td>${ps.map((p) => `<td>${f(p)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>${note ? `<div class="owner">${note}</div>` : ''}</section>`;
+  }
+  function viewWeekly() {
+    const t = T(), c = CMP();
+    // Every box shows the value plus the comparison picked in "Compare to" (and prior year / target as fixed rows,
+    // so the deck's three-row layout stays: value, vs PY, vs target — the picked one is highlighted).
+    const totAgg = (ws) => { const s = storeAgg(ws), d = distroAgg(ws); if (!s) return null;
+      return { n: s.n, dn: d ? d.n : 0, rev: s.rev + (d ? d.rev : 0), goal: s.goal ? s.goal + (d && d.goal ? d.goal : 0) : null,
+        revLfl: s.revLfl != null && d && d.py ? s.revLfl + d.rev : null, revLY: s.revLY != null && d && d.py ? s.revLY + d.py : null }; };
+    const withCmp = (k, fn) => (p) => { const saved = state.cmp; state.cmp = k; try { return fn(p); } finally { state.cmp = saved; } };
+    const $cell = (agg) => (p) => { const r = cmpRev(p, agg); return r ? hlK(r.d) + dt(r.ok) : '—'; };
+    const $rows = (agg) => [
+      ['$', (p) => { const a = agg(p.weeks); return a ? usdK(a.rev) : '—'; }],
+      [hlRow('py', 'vs PY'), withCmp('py', $cell(agg))],
+      [hlRow('target', 'vs target'), withCmp('target', $cell(agg))],
+      [hlRow('pp', 'vs prior ' + (GRAN() === 'ytd' ? 'period' : GRAN())), withCmp('pp', $cell(agg))],
+    ];
+    const pctCell = (k, tgt) => (p) => { const o = cmpPct(p, k, tgt); return o && fin(o.d) ? hlpS(o.d) + dt(o.ok) : '—'; };
+    const pctRows = (k, tgt) => [
+      ['%', (p) => { const a = storeAgg(p.weeks); return a ? p1(a[k]) : '—'; }],
+      [hlRow('py', 'vs PY (pts)'), withCmp('py', pctCell(k, tgt))],
+      [hlRow('target', 'vs tgt (pts)'), withCmp('target', pctCell(k, tgt))],
+      [hlRow('pp', 'vs prior (pts)'), withCmp('pp', pctCell(k, tgt))],
+    ];
+    const cntRows = (re, key) => {
+      const g = XTn(key);
+      return [
+        ['#', (p) => { const n = promoAgg(p.weeks, re); return n == null ? '—' : int.format(n); }],
+        [hlRow('py', 'vs PY'), () => '<span class="muted" title="New program — no prior year">n/a</span>'],
+        [hlRow('target', g == null ? `vs target (${notSet(key)})` : 'vs target'), (p) => { const n = promoAgg(p.weeks, re); return g == null || n == null ? '—' : hln(n - g * p.weeks.length) + dt(n >= g * p.weeks.length); }],
+        [hlRow('pp', 'vs prior'), withCmp('pp', (p) => { const pp = prevPeriod(p), n = promoAgg(p.weeks, re), m = pp && promoAgg(pp.weeks, re); if (n == null || m == null) return '—'; const r = m * (p.weeks.length / pp.weeks.length); return hln(n - r) + dt(n >= r); })],
+      ];
+    };
+    const caseCell = (f, tgt) => (p) => { const o = cmpGrowth(p, f, tgt); return !o || !fin(o.d) ? '—' : (o.ces ? hln(o.d) : hlpS(o.d)) + dt(o.ok); };
+    const caseRows = (f, tgt) => [
+      ['%', (p) => { const a = casesAgg(p.weeks, f); return a ? p1(a.g) : '—'; }],
+      [hlRow('py', 'vs PY (CEs)'), withCmp('py', caseCell(f, tgt))],
+      [hlRow('target', 'vs tgt (pts)'), withCmp('target', caseCell(f, tgt))],
+      [hlRow('pp', 'vs prior (pts)'), withCmp('pp', caseCell(f, tgt))],
+    ];
+    const boxes = [
+      trendBox('Total revenue', $rows(totAgg), chips('toast', 'ekos', 'sheet'), 'vs PY compares taprooms open both years, plus distribution where last year is in the workbook history.'),
+      trendBox('Store revenue', $rows(storeAgg), chips('toast', 'sheet')),
+      trendBox('Dist. revenue', $rows(distroAgg), chips('ekos', 'sheet')),
+      trendBox('Food cost %', pctRows('food', t.foodCostPct), chips('me', 'toast')),
+      trendBox('Labor cost %', pctRows('labor', t.laborPct), chips('toast'), 'Hourly labor (Toast) ÷ net sales; salaried labor needs payroll.'),
+      trendBox('Free Pint count', cntRows(RE_PINT, 'Free pint weekly target'), chips('thanx', 'typed'), 'Weekly target × weeks in the period.'),
+      trendBox('Sampler cards', cntRows(RE_SAMPLER, 'Sampler card weekly target'), chips('thanx', 'typed')),
+      trendBox('Case vol %', caseRows(A, t.totalGrowthPct), chips('vip', 'sheet')),
+      trendBox('IA case vol %', caseRows(H, t.inIowaGrowthPct), chips('vip', 'sheet')),
+      trendBox('xIA case vol %', caseRows(X, t.outsideIowaGrowthPct), chips('vip', 'sheet')),
+    ];
+    $('v-weekly').innerHTML = `${head('Leadership Scorecard — Total Big Grove')}
+      <div class="xwk"><div class="xg2b">${boxes.join('')}</div><div class="xcol">${milestoneBox('Palatine', '')}${milestoneBox('Madison', '')}${rewardsBox('')}${reviewsBox(true)}</div></div>
+      ${c === 'pp' ? perWeekNote : ''}${sourcesFor('weekly')}`;
+  }
+  const hlRow = (k, lbl) => (CMP() === k ? `<b class="cmpon">${lbl}</b>` : lbl);
+
+  // ---------------------------------------------------------------- By Location (slide 3, Option 2)
+  function viewByLoc() {
+    const ps = periods(3), t = T(), c = CMP();
+    const cell = (v, d, good, fmt, fmtD, noDot) => (fin(v) ? `${fmt(v)}<span class="sl">/</span><span class="${good == null ? '' : good ? 'good-t' : 'bad-t'}">${fmtD(d)}</span>${noDot ? '' : dt(good)}` : '—');
+    const thead = `<thead><tr><th></th>${ps.map((p, i) => `<th title="${p.title}">${colLbl(p, i)}</th>`).join('')}</tr></thead>`;
+    const revCell = (p, agg) => { const a = agg(p.weeks); if (!a) return '—'; const r = cmpRev(p, agg); return r ? cell(a.rev, r.d, r.ok, usdK, hlK) : usdK(a.rev) + '<span class="sl">/</span><span class="muted">—</span>'; };
+    const locAgg = (l) => (ws) => storeAgg(ws, l);
+    const totAgg = (ws) => { const s = storeAgg(ws), d = distroAgg(ws); if (!s) return null;
+      return { n: s.n, dn: d ? d.n : 0, rev: s.rev + (d ? d.rev : 0), goal: s.goal ? s.goal + (d && d.goal ? d.goal : 0) : null,
+        revLfl: s.revLfl != null && d && d.py ? s.revLfl + d.rev : null, revLY: s.revLY != null && d && d.py ? s.revLY + d.py : null }; };
+    const revRows = ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${ps.map((p) => `<td>${revCell(p, locAgg(l))}</td>`).join('')}</tr>`).join('')
+      + `<tr><td>Brewery</td>${ps.map((p) => `<td>${revCell(p, distroAgg)}</td>`).join('')}</tr>`
+      + `<tr class="tgt"><td>Total</td>${ps.map((p) => `<td>${revCell(p, totAgg)}</td>`).join('')}</tr>`;
+    const pctTable = (k, tgt) => ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${ps.map((p) => { const o = cmpPct(p, k, tgt, l); return `<td>${o ? cell(o.v, o.d, o.ok, p1, hlpS, true) : '—'}</td>`; }).join('')}</tr>`).join('')
+      + `<tr class="tgt"><td>Total</td>${ps.map((p) => { const o = cmpPct(p, k, tgt); return `<td>${o ? cell(o.v, o.d, o.ok, p1, hlpS, true) : '—'}</td>`; }).join('')}</tr>`;
+    const vs = cmpWord();
+    const revP = panel(`Revenue H/(L) vs ${vs}`, `Actual / H(L) vs ${vs}`, chips('toast', 'ekos', 'sheet'), `<div style="overflow-x:auto"><table class="xt">${thead}<tbody>${revRows}</tbody></table></div>`);
+    const foodP = panel(`Food COGS % H/(L) vs ${vs}`, `Target ≤ ${t.foodCostPct}% · actual / pts`, chips('me', 'toast'), `<div style="overflow-x:auto"><table class="xt">${thead}<tbody>${pctTable('food', t.foodCostPct)}</tbody></table></div>`);
+    const labP = panel(`Labor % H/(L) vs ${vs}`, `Target ≤ ${t.laborPct}% · hourly labor (Toast) · actual / pts`, chips('toast'), `<div style="overflow-x:auto"><table class="xt">${thead}<tbody>${pctTable('labor', t.laborPct)}</tbody></table></div>`);
+    const rw = repWeeks().slice(0, 3), tg = t.rating || 4.7;
+    const gP = panel('Google rating', `Target: ${tg}+ stars by location · latest captured weeks`, chips('sheet', 'google'),
+      `<div style="overflow-x:auto"><table class="xt"><thead><tr><th></th>${rw.map((w) => `<th colspan="2" title="${wkTitle(w)}">${md(w)}</th>`).join('')}</tr><tr><th></th>${rw.map(() => '<th>Stars</th><th>Count</th>').join('')}</tr></thead><tbody>${
+        ORDER.map((l) => `<tr><td>${SHORT[l]}</td>${rw.map((w) => { const r = REP.find((x) => x.week_start === w && x.location === l); return r ? `<td>${fin(r.rating) ? r.rating.toFixed(1) : '—'}${dt(fin(r.rating) ? r.rating >= tg : null)}</td><td>${fin(r.reviews) ? int.format(r.reviews) : '—'}</td>` : '<td>—</td><td>—</td>'; }).join('')}</tr>`).join('')}</tbody></table></div>
+       ${rw.length < 3 ? '<div class="owner">Earlier weeks fill in as the workbook is captured each week (or once Google is connected).</div>' : ''}`);
+    const p0 = ps[0];
+    const gl = (f, tgt) => { const o = p0 && cmpGrowth(p0, f, tgt); return o ? `${p1(o.v)}${dt(o.ok)}` : '—'; };
+    const ref = (f, tgt) => { const o = p0 && cmpGrowth(p0, f, tgt); return c === 'target' ? `target +${tgt}%` : c === 'py' ? (o ? `${hln(o.d)} CEs vs last year` : '') : (o && fin(o.ref) ? `prior period ${p1(o.ref)}` : ''); };
+    const cvP = panel('Case volume growth', `${p0 ? esc(p0.label) : ''} vs the same weeks last year`, chips('vip', 'sheet'), `<div class="mile">
+      <div><span>Total case volume</span><b>${gl(A, t.totalGrowthPct)}</b></div><div class="owner">${ref(A, t.totalGrowthPct)}</div>
+      <div><span>In Iowa case volume</span><b>${gl(H, t.inIowaGrowthPct)}</b></div><div class="owner">${ref(H, t.inIowaGrowthPct)}</div>
+      <div><span>Outside Iowa case volume</span><b>${gl(X, t.outsideIowaGrowthPct)}</b></div><div class="owner">${ref(X, t.outsideIowaGrowthPct)}</div></div>`);
+    const line = (lbl, val, key, note) => `<div><span><b>${lbl}:</b> ${val}</span>${dt(null)}</div><div class="owner">Goal: ${XT(key) ? esc(XT(key)) : notSet(key)}${note ? ' · ' + note : ''}</div>`;
+    const waiting = '<span class="muted">waiting on feed</span>';
+    const gcan = XO('Golden Can rollout date');
+    const goldP = panel('Leveraging the Golden Triangle', p0 ? esc(p0.label) : '', chips('thanx', 'none', 'typed'), `<div class="mile">
+      ${line('Free Pint coupon on 12-packs — redemptions', DSW.length ? int.format(promoAgg(p0.weeks, RE_PINT) || 0) : waiting, 'Free pint redemptions', 'Toast discount')}
+      ${line('6-pack for $0.01 with Rewards sign-up', DSW.length ? int.format(promoAgg(p0.weeks, RE_PENNY) || 0) : waiting, '6-pack sign-up count', 'Toast discount')}
+      ${line('Trade industry nights', '<span class="muted">not connected</span>', 'Industry nights per month', 'where are they booked?')}
+      ${line('Golden Can campaign rollout', gcan && gcan.actual ? esc(gcan.actual) : '<span class="muted">—</span>', 'Golden Can rollout date', '')}</div>`);
+    const techP = panel("Implementing Big Grove's technology for the future", '', chips('typed'), `<div class="mile">${
+      ['Big Grove Brain', 'Brewery and Finance ERP', 'LMS', 'Security'].map((n) => { const o = XO(n + ' launch date'); return `<div><span><b>${n}:</b> ${o && o.actual ? esc(o.actual) : '<span class="muted">not launched</span>'}</span>${dt(null)}</div><div class="owner">Target launch: ${o ? esc(o.target) : notSet(n + ' launch date')}</div>`; }).join('')}</div>`);
+    $('v-byloc').innerHTML = `${head('Leadership Scorecard — Total Big Grove · Option 2 (by location)')}
+      <div class="xg3">${milestoneBox('Palatine', '')}${milestoneBox('Madison', '')}${cvP}</div>
+      <div class="xg3t">${revP}${foodP}${labP}</div>
+      <div class="xg3">${gP}${rewardsBox('')}${goldP}</div>
+      <div class="xg3">${techP}</div>
+      ${c === 'pp' ? perWeekNote : ''}${sourcesFor('byloc')}`;
+  }
+
+  // ---------------------------------------------------------------- what feeds each page
+  const FEEDS = {
+    exec: [
+      ['Store metrics — revenue, hourly labor %, food cost %', 'Toast · MarginEdge', 'connected', 'Targets: weekly taproom goals (workbook), labor / food % targets'],
+      ['Google reviews', 'Workbook today → Google Places API', 'needs', 'Waiting on Google Cloud billing OK'],
+      ['Rewards: active / engaged users', 'Thanx via Toast', 'connected', 'Active = members seen in 28 days; engaged = 2+ visit days. Sign-ups need Thanx itself. Targets typed'],
+      ['Distribution — revenue', 'Ekos (+ workbook history before Apr 27)', 'connected', 'Weekly goal from the workbook'],
+      ['Distribution — case vol % (total / IA / xIA)', 'VIP', 'connected', 'Growth goals from the workbook'],
+      ['Distribution — POD % (total / IA / xIA)', 'VIP', 'connected', 'Weekly snapshots kept from Oct 26; POD targets typed'],
+      ['Palatine / Madison openings', 'Typed', 'manual', "Exec Targets rows: '<Name> opening date', '<Name> hire dates', '<Name> revenue target'"],
+      ['Free Pint / sampler redemptions', 'Thanx via Toast (discount names)', 'connected', 'Counts Toast discounts named "Free Pint" / "Sampler"; targets typed'],
+      ['YTD total revenue', 'Toast · Ekos · workbook', 'connected', "Annual target typed ('Annual revenue target')"],
+    ],
+    weekly: [
+      ['Total / store / dist. revenue vs PY, target, prior period', 'Toast · Ekos · workbook', 'connected', 'Dist. prior year from the workbook history (Oct 2025 on)'],
+      ['Food cost %, labor cost %', 'MarginEdge · Toast', 'connected', 'PY = same weeks last year'],
+      ['Free Pint count, sampler cards', 'Thanx via Toast', 'connected', 'Weekly targets typed; no PY (new programs)'],
+      ['Case vol % total / IA / xIA', 'VIP', 'connected', 'Same VIP weeks last year'],
+      ['Palatine / Madison', 'Typed', 'manual', ''],
+      ['Rewards', 'Thanx via Toast', 'connected', ''],
+      ['Google reviews', 'Workbook → Google Places API', 'needs', ''],
+    ],
+    byloc: [
+      ['Revenue by location + brewery', 'Toast · Ekos · workbook goals', 'connected', ''],
+      ['Food COGS % and labor % by location', 'MarginEdge · Toast', 'connected', ''],
+      ['Google rating and count by location', 'Workbook → Google Places API', 'needs', ''],
+      ['Case volume growth', 'VIP', 'connected', ''],
+      ['Rewards: active / engaged users', 'Thanx via Toast', 'connected', ''],
+      ['Golden Triangle — Free Pint coupon, $0.01 6-pack', 'Thanx via Toast (discount names)', 'connected', 'Confirm the Toast discount names'],
+      ['Golden Triangle — trade industry nights', 'Not connected', 'needs', 'Where are they booked (Tripleseat event type? Toast?)'],
+      ['Golden Can rollout; technology launches', 'Typed', 'manual', ''],
+    ],
+  };
+  function sourcesFor(v) {
+    const L = { connected: 'Connected', needs: 'Needs a connector', manual: 'Typed' };
+    return `<details class="feeds"><summary>What feeds this page</summary><table><thead><tr><th>Box</th><th>Platform</th><th>Status</th><th>Notes</th></tr></thead><tbody>${
+      FEEDS[v].map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td><span class="st2 ${r[2]}">${L[r[2]]}</span></td><td class="muted">${esc(r[3])}</td></tr>`).join('')}</tbody></table>
+      <div class="owner">Typed targets come from an optional <b>Exec Targets</b> tab in the Leadership Scorecard workbook: column A the name shown next to "not set", column B the target, column C the actual or status. The nightly feed picks it up.</div></details>`;
+  }
+  function renderViews() {
+    if (!WEEKS || !WEEKS.length) return;
+    const on = (id) => $(id) && !$(id).hidden;
+    if (on('exec')) viewExec();
+    if (on('weekly')) viewWeekly();
+    if (on('byloc')) viewByLoc();
+  }
+  window.__esRenderViews = () => { try { renderViews(); } catch (e) { console.error(e); } };
+
+  // ---------------------------------------------------------------- render
+  function render() {
+    if (window.__esRenderViews) window.__esRenderViews();
+    const rows = weekRows(state.week);
+    $('yr').textContent = state.week.slice(0, 4);
+    $('filter').classList.toggle('on', state.loc !== 'all');
+    $('f-loc').textContent = state.loc;
+    tier1(rows); tier2(rows); tier3();
+  }
+
+  function tier1(rows) {
+    const wkN = isoWeek(state.week);
+    $('u-rev').textContent = 'Wk ' + wkN;
+    // ---- revenue
+    const tap = sum(rows, (r) => r.net_sales), tapGoal = sum(rows, (r) => r.sales_goal);
+    const c = COMP.find((r) => r.week_start === state.week);
+    const dist = c ? c.brewery_distro_revenue : null, distGoal = c ? c.brewery_distro_goal : null;
+    const tot = tap + (dist || 0), goal = tapGoal + (distGoal || 0);
+    $('k-rev').textContent = money0.format(tot);
+    // Ekos has distro revenue for every week, but the sheet only carries a distro goal for the weeks it was filled in.
+    // Without that goal, compare the taprooms with their own goal rather than all revenue with a partial goal.
+    const noDistGoal = dist != null && !distGoal;
+    const vg = noDistGoal ? (tapGoal ? (tap / tapGoal - 1) * 100 : null) : (goal ? (tot / goal - 1) * 100 : null);
+    if (vg == null) pill('p-rev', 'na', 'No goal loaded');
+    else if (noDistGoal) pill('p-rev', vg >= 0 ? 'good' : 'bad', `${vg >= 0 ? '▲' : '▼'} ${sgn(vg)}% taprooms vs goal (no distro goal this week)`);
+    else pill('p-rev', vg >= 0 ? 'good' : 'bad', `${vg >= 0 ? '▲' : '▼'} ${sgn(vg)}% vs goal (${'$' + k1(goal)})`);
+    const vt = tapGoal ? (tap / tapGoal - 1) * 100 : null;
+    $('l-tapn').textContent = `Taprooms (${rows.length})`;
+    $('l-tap').innerHTML = `<b>${money0.format(tap)}</b>` + (vt == null ? '' : ` <span class="${vt >= 0 ? 'good-t' : 'bad-t'}">(${sgn(vt)}%)</span>`);
+    $('l-dist').innerHTML = dist == null ? '<span class="muted">Feed pending</span>'
+      : `<b class="${distGoal && dist < distGoal ? 'bad-t' : ''}">${money0.format(dist)}</b>` + (distGoal ? ` <span class="${dist >= distGoal ? 'good-t' : 'bad-t'}">(${sgn((dist / distGoal - 1) * 100)}%)</span>` : '');
+    spark('sp-rev', last12().map((w) => sum(weekRows(w), (r) => r.net_sales) + ((COMP.find((r) => r.week_start === w) || {}).brewery_distro_revenue || 0)), css('--s1'));
+    // ---- prime cost
+    const pc = tapCost(rows), T = CFG.targets;
+    $('k-prime').textContent = pc.prime == null ? '—' : pc.prime.toFixed(1) + '%';
+    if (pc.prime == null) pill('p-prime', 'na', 'Cost feed pending');
+    else { const d = T.primeCostPct - pc.prime; pill('p-prime', d >= 0 ? 'good' : 'bad', `${d >= 0 ? '▲' : '▼'} ${Math.abs(d).toFixed(1)} pts ${d >= 0 ? 'under' : 'over'} goal (${T.primeCostPct}%)`); }
+    const pl = (v, goal) => (v == null ? '<span class="muted">—</span>' : `<b>${v.toFixed(1)}%</b> <span class="muted">(goal ${goal})</span>`);
+    $('l-cogs').innerHTML = pc.cogs != null ? `<b>${pc.cogs.toFixed(1)}%</b>` : '<span class="muted">needs the MarginEdge feed</span>';
+    $('k-prime').title = pc.basis === 'cogs' ? 'COGS % + direct labor %' : 'Food cost % + direct labor % (COGS not available)';
+    $('l-food').innerHTML = pl(pc.food, '<' + T.foodCostPct + '%');
+    $('l-labor').innerHTML = pl(pc.labor, '<' + T.laborPct + '%');
+    spark('sp-prime', last12().map((w) => tapCost(weekRows(w)).prime), css('--s1'));
+    // ---- distribution
+    if (DY.length) {
+      const ty = sum(DY, (r) => r.ce_ytd), ly = sum(DY, (r) => r.ce_ytd_ly), g = ly ? (ty / ly - 1) * 100 : null;
+      $('k-dist').innerHTML = int.format(ty) + '<small>CEs</small>';
+      pill('p-dist', g == null ? 'na' : g >= 0 ? 'good' : 'bad', g == null ? '' : `${g >= 0 ? '▲' : '▼'} ${sgn(g)}% YoY growth`);
+      const asOf = DY[0].as_of;
+      $('l-brands').innerHTML = (CFG.brandGoals || []).map((b) => {
+        const v = sum(DY.filter((r) => r.brand === b.brand || (b.match || []).includes(r.brand)), (r) => r.ce_ytd);
+        return `<div><span>${esc(b.brand)}</span><span><b>${int.format(v)}</b> <span class="muted">/ ${k1(b.goal)} goal</span></span></div>`;
+      }).join('') + `<div class="muted" style="font-size:11.5px">Through ${md(asOf, { month: 'short', day: 'numeric', year: 'numeric' })}</div>`;
+      // whole VIP weeks only: the current, part-finished week would read as a collapse
+      const vw = [...new Set(DW.map((r) => r.week_start))].sort().filter((w) => w <= addDays(state.week, 6) && addDays(w, 6) <= asOf).slice(-12);
+      spark('sp-dist', vw.map((w) => sum(DW.filter((r) => r.week_start === w), (r) => r.ce)), css('--s1'));
+    } else { $('k-dist').textContent = '—'; pill('p-dist', 'na', 'VIP feed pending'); $('l-brands').innerHTML = ''; spark('sp-dist', []); }
+    // ---- reputation (Leadership Scorecard sheet). Headline = the average of each taproom's score for the week,
+    // which is how the sheet's "Average Score" reads; the lines name the best and the one to watch.
+    const wkScore = (r) => r.rating_week ?? r.rating;
+    const rw = REP.filter((r) => r.week_start === state.week && wkScore(r) != null);
+    if (rw.length) {
+      const avg = sum(rw, wkScore) / rw.length;
+      $('k-rep').innerHTML = avg.toFixed(1) + ' <span style="color:#e3a21a">★</span>';
+      const ok = +avg.toFixed(1) >= T.rating;
+      pill('p-rep', ok ? 'good' : 'warn', `● ${ok ? 'Meets' : 'Below'} ${T.rating}★ target`);
+      const top = [...rw].sort((a, b) => wkScore(b) - wkScore(a) || b.reviews - a.reviews)[0];
+      const low = [...rw].sort((a, b) => wkScore(a) - wkScore(b) || b.reviews - a.reviews)[0];
+      $('l-topn').textContent = 'Top: ' + top.location;
+      $('l-top').innerHTML = `<b>${wkScore(top).toFixed(1)} ★</b> <span class="muted">(${int.format(top.reviews)} revs)</span>`;
+      $('l-watchn').textContent = 'Watch: ' + low.location;
+      $('l-watch').innerHTML = `<b class="${wkScore(low) < T.rating ? 'warn-t' : ''}">${wkScore(low).toFixed(1)} ★</b> <span class="muted">(last wk${low.new_reviews != null ? ', ' + low.new_reviews + ' new' : ''})</span>`;
+      const hist = last12().map((w) => { const x = REP.filter((r) => r.week_start === w && wkScore(r) != null); return x.length ? sum(x, wkScore) / x.length : null; });
+      if (hist.filter((v) => v != null).length >= 2) spark('sp-rep', hist, css('--s1'));
+      else {
+        const el = $('sp-rep'), W = 96, H = 32, lo = 3.8, n = rw.length, bw = W / n - 3, ord = locOrder(rw.map((r) => r.location));
+        el.setAttribute('viewBox', `0 0 ${W} ${H}`);
+        el.innerHTML = ord.map((l, i) => { const r = rw.find((x) => x.location === l), v = wkScore(r), h = Math.max(2, (Math.min(5, v) - lo) / (5 - lo) * (H - 2));
+          return `<rect x="${i * (bw + 3)}" y="${H - h}" width="${bw}" height="${h}" rx="1.5" fill="${v < T.rating ? css('--warn') : css('--s1')}" opacity="${v < T.rating ? 1 : .75}"><title>${esc(l)}: ${v.toFixed(1)}★</title></rect>`; }).join('');
+        el.setAttribute('aria-hidden', 'false'); el.setAttribute('role', 'img'); el.setAttribute('aria-label', 'Rating by taproom this week');
+      }
+    } else {
+      $('k-rep').textContent = '—'; pill('p-rep', 'na', 'Not in the sheet for this week');
+      $('l-topn').textContent = 'Top'; $('l-top').textContent = '—'; $('l-watchn').textContent = 'Watch'; $('l-watch').textContent = '—'; spark('sp-rep', []);
+    }
+  }
+
+  // One location order for every panel (this week's taproom revenue, high to low), so the eye doesn't have to re-hunt.
+  function locOrder(list) {
+    const rev = new Map(weekRows(state.week).map((r) => [r.location, r.net_sales || 0]));
+    return [...new Set(list)].sort((a, b) => (rev.get(b) ?? -1) - (rev.get(a) ?? -1) || a.localeCompare(b));
+  }
+  const byOrder = (rows) => { const o = locOrder(rows.map((r) => r.location)); return [...rows].sort((a, b) => o.indexOf(a.location) - o.indexOf(b.location)); };
+
+  function tier2(rows) {
+    $('t2-n').textContent = `${rows.length} taproom operations`;
+    // ---- revenue vs goal
+    const byRev = byOrder(rows);
+    const max = Math.max(...rows.map((r) => Math.max(r.net_sales, r.sales_goal || 0))) * 1.05;
+    $('r-rev').innerHTML = byRev.map((r) => {
+      const v = r.sales_goal ? r.net_sales - r.sales_goal : null;
+      return `<div class="lr${markLoc(r.location)}"><div class="top"><span><span class="n">${esc(r.location)}</span>${r.sales_goal ? `<span class="g">Goal: ${money0.format(r.sales_goal)}</span>` : ''}</span>
+        <span class="r num"><b>${money0.format(r.net_sales)}</b>${v == null ? '' : `<span class="chip ${v >= 0 ? 'good' : 'bad'}">${v >= 0 ? '+' : '−'}$${k1(Math.abs(v))}</span>`}</span></div>
+        <div class="track"><div class="fill${v != null && v < 0 ? ' behind' : ''}" style="width:${r.net_sales / max * 100}%"></div>${r.sales_goal ? `<div class="goal" style="left:${r.sales_goal / max * 100}%"></div>` : ''}</div></div>`;
+    }).join('');
+    const tS = sum(rows, (r) => r.net_sales), tG = sum(rows.filter((r) => r.sales_goal), (r) => r.sales_goal), nG = rows.filter((r) => r.sales_goal).length;
+    const ahead = rows.filter((r) => r.sales_goal && r.net_sales >= r.sales_goal).length;
+    $('rev-sum').innerHTML = tG ? `<span><b>${ahead} of ${nG}</b> taprooms at or above goal</span><span>Total <b>${money0.format(tS)}</b> vs ${money0.format(tG)} <span class="${tS >= tG ? 'good-t' : 'bad-t'}">(${sgn((tS / tG - 1) * 100)}%)</span></span>` : '';
+    // ---- mix
+    if (!rows.some((r) => r.food_sales != null)) { $('r-mix').innerHTML = '<div class="nofeed">Revenue mix needs the Store Director Portal feed (Toast categories + Tripleseat events).</div>'; }
+    else $('r-mix').innerHTML = byOrder(rows).map((r) => {
+      const parts = [['Food', r.food_sales, '--s1'], ['Beer', r.beer_sales, '--s2'], ['Events', r.event_sales, '--s3'], ['Other', r.other_sales, '--sx']]
+        .map(([n, v, c]) => [n, Math.max(0, v || 0), c]);
+      const tot = parts.reduce((t, p) => t + p[1], 0) || 1; // Tripleseat events may sit outside Toast net sales, so shares are of the parts' total
+      parts.forEach((p) => (p[1] = p[1] / tot * 100));
+      return `<div class="lr${markLoc(r.location)}"><div class="top"><span class="n">${esc(r.location)}</span><span class="amt num">$${k1(r.net_sales)} net sales</span></div>
+        <div class="stack">${parts.filter((p) => p[1] > 0).map((p) => `<span title="${p[0]}: ${p[1].toFixed(1)}%" style="width:${p[1]}%;background:var(${p[2]})">${p[1] >= 7 ? Math.round(p[1]) + '%' : ''}</span>`).join('')}</div></div>`;
+    }).join('');
+    // ---- quadrant
+    quad(rows);
+    // ---- guests
+    const withG = rows.filter((r) => r.guests != null), noG = rows.filter((r) => r.guests == null);
+    const gmax = Math.max(1, ...withG.map((r) => r.guests)) * 1.05;
+    $('g-total').innerHTML = withG.length ? `Reported total: <b>${int.format(sum(withG, (r) => r.guests))} guests</b>` : 'Guest counts need the Store Director Portal feed (Toast)';
+    $('r-guest').innerHTML = byOrder(withG).map((r) => `<div class="lr${markLoc(r.location)}"><div class="top"><span class="n">${esc(r.location)}</span>
+        <span class="r num"><span><b>${int.format(r.guests)}</b> <span class="muted">guests</span></span><span class="chip na">${money2.format(r.net_sales / r.guests)} avg</span></span></div>
+        <div class="track"><div class="fill" style="width:${r.guests / gmax * 100}%;opacity:.8"></div></div></div>`).join('')
+      + noG.map((r) => `<div class="lr${markLoc(r.location)}"><div class="top" style="margin:0"><span class="n">${esc(r.location)}</span><span class="pending">● Traffic data pending</span></div></div>`).join('');
+  }
+
+  function quad(rows) {
+    const T = CFG.targets, pts = rows.filter((r) => r.food_cost_pct != null && r.labor_pct != null);
+    const inZone = pts.filter((r) => r.food_cost_pct < T.foodCostPct && r.labor_pct < T.laborPct).length;
+    $('q-zone').textContent = `${inZone} of ${pts.length} in the target zone (<${T.foodCostPct}% food, <${T.laborPct}% labor) • dot size = net sales`;
+    $('q-zone').className = 'badge-in' + (inZone < pts.length ? ' warn' : '');
+    const xs = pts.map((r) => r.food_cost_pct).concat(T.foodCostPct), ys = pts.map((r) => r.labor_pct).concat(T.laborPct);
+    const ev = (v, f) => f(v / 2) * 2;
+    const xmin = ev(Math.min(...xs) - 1, Math.floor), xmax = ev(Math.max(...xs) + 1, Math.ceil), ymin = ev(Math.min(...ys) - 1, Math.floor), ymax = ev(Math.max(...ys) + 1.5, Math.ceil);
+    const colorOf = (r) => { const out = (r.food_cost_pct > T.foodCostPct) + (r.labor_pct > T.laborPct); return out === 0 ? css('--good') : out === 1 ? css('--warn') : css('--bad'); };
+    const data = pts.map((r) => ({ x: r.food_cost_pct, y: r.labor_pct, loc: r.location, r }));
+    const smax = Math.max(1, ...pts.map((r) => r.net_sales || 0)), rad = (r) => 5 + 7 * Math.sqrt((r.net_sales || 0) / smax);
+    const zone = {
+      id: 'zone',
+      beforeDatasetsDraw(ch) {
+        const { ctx, chartArea: a, scales: { x, y } } = ch;
+        const xr = Math.min(x.getPixelForValue(T.foodCostPct), a.right), yt = Math.max(y.getPixelForValue(T.laborPct), a.top);
+        ctx.save(); ctx.fillStyle = 'rgba(47,107,18,.06)'; ctx.fillRect(a.left, yt, xr - a.left, a.bottom - yt);
+        ctx.setLineDash([5, 4]); ctx.lineWidth = 1.2;
+        ctx.strokeStyle = css('--warn'); ctx.beginPath(); ctx.moveTo(xr, a.top); ctx.lineTo(xr, a.bottom); ctx.stroke();
+        ctx.strokeStyle = css('--bad'); ctx.beginPath(); ctx.moveTo(a.left, yt); ctx.lineTo(a.right, yt); ctx.stroke();
+        ctx.setLineDash([]); ctx.font = '600 11px Jost, sans-serif'; ctx.textAlign = 'right';
+        ctx.fillStyle = css('--warn'); ctx.fillText(`Food target (${T.foodCostPct}%)`, xr - 4, a.top + 12);
+        ctx.fillStyle = css('--bad'); ctx.fillText(`Labor target (${T.laborPct}%)`, a.right - 4, yt - 5);
+        ctx.restore();
+      },
+      afterDatasetsDraw(ch) {
+        // Point labels with simple collision avoidance: place right of the point, nudge vertically away from
+        // any label already placed, flip left when it would run off the chart. Fixes the Des Moines / Prairie
+        // Village overlap in the wireframe.
+        const { ctx, chartArea: a } = ch, meta = ch.getDatasetMeta(0), placed = [];
+        ctx.save(); ctx.font = '600 12px Jost, sans-serif'; ctx.textBaseline = 'middle';
+        const dots = meta.data.map((el) => ({ x: el.x, y: el.y }));
+        const clash = (bx) => placed.some((q) => bx.x < q.x + q.w + 4 && bx.x + bx.w + 4 > q.x && bx.y - 7 < q.y + 7 && bx.y + 7 > q.y - 7)
+          || dots.some((p) => p.x > bx.x - 10 && p.x < bx.x + bx.w + 10 && Math.abs(p.y - bx.y) < 12);
+        meta.data.map((el, i) => ({ el, d: data[i] })).sort((p, q) => p.el.x - q.el.x).forEach(({ el, d }) => {
+          const w = ctx.measureText(d.loc).width, o = (el.options.radius || 6) + 5;
+          const cands = [[el.x + o, el.y], [el.x - o - w, el.y], [el.x - w / 2, el.y - o - 5], [el.x - w / 2, el.y + o + 5], [el.x + o, el.y - 13], [el.x + o, el.y + 13], [el.x - o - w, el.y - 13], [el.x - o - w, el.y + 13]]
+            .map(([x, y]) => ({ x, y, w })).filter((bx) => bx.x >= a.left && bx.x + w <= a.right + 6);
+          const own = { x: el.x, y: el.y };
+          const pick = cands.find((bx) => { const i = dots.indexOf(dots.find((p) => p.x === own.x && p.y === own.y)); const save = dots.splice(i, 1); const ok = !clash(bx); dots.splice(i, 0, ...save); return ok; }) || cands[0];
+          placed.push(pick);
+          const dim = state.loc !== 'all' && d.loc !== state.loc;
+          ctx.globalAlpha = dim ? 0.35 : 1; ctx.fillStyle = css('--ink'); ctx.fillText(d.loc, pick.x, pick.y);
+        });
+        ctx.restore();
+      },
+    };
+    if (charts.quad) charts.quad.destroy();
+    charts.quad = new Chart($('ch-quad'), {
+      type: 'scatter',
+      data: { datasets: [{ data, pointRadius: data.map((p) => rad(p.r) + (p.loc === state.loc ? 2 : 0)), pointHoverRadius: data.map((p) => rad(p.r) + 2),
+        pointBackgroundColor: data.map((p) => (state.loc !== 'all' && p.loc !== state.loc ? colorOf(p.r) + '55' : colorOf(p.r))),
+        pointBorderColor: '#fff', pointBorderWidth: 2 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false, layout: { padding: { right: 8 } },
+        scales: {
+          x: { min: xmin, max: xmax, title: { display: true, text: 'Food cost %', color: css('--muted'), font: { family: 'Jost', size: 12 } },
+            ticks: { callback: (v) => v + '%', color: css('--muted'), font: { family: 'Jost' } }, grid: { color: css('--grid') } },
+          y: { min: ymin, max: ymax, title: { display: true, text: 'Direct labor %', color: css('--muted'), font: { family: 'Jost', size: 12 } },
+            ticks: { callback: (v) => v + '%', color: css('--muted'), font: { family: 'Jost' } }, grid: { color: css('--grid') } },
+        },
+        plugins: { legend: { display: false },
+          tooltip: { callbacks: { label: (c) => { const r = c.raw.r; return [`${r.location} — $${k1(r.net_sales)} net sales`, `Food cost ${r.food_cost_pct.toFixed(1)}%  •  Labor ${r.labor_pct.toFixed(1)}%`, `Prime (COGS + labor) ${r.cogs_pct != null ? (r.cogs_pct + r.labor_pct).toFixed(1) + '%' : '—'}`]; } } } },
+      },
+      plugins: [zone],
+    });
+  }
+
+  function tier3() {
+    const T = CFG.targets, home = T.homeState || 'IA';
+    // ---- distribution growth
+    const prog = (id, label, rows, goal, foot) => {
+      if (!rows.length) { $(id).innerHTML = `<div class="nofeed">${esc(label)}: VIP feed pending.</div>`; return; }
+      const ty = sum(rows, (r) => r.ce_ytd), ly = sum(rows, (r) => r.ce_ytd_ly), g = ly ? (ty / ly - 1) * 100 : null;
+      const share = g == null || !goal ? 0 : Math.max(0, Math.min(1, g / goal));
+      $(id).innerHTML = `<div class="top"><b>${esc(label)}</b><span class="num"><b class="${g >= goal ? 'good-t' : ''}">${g == null ? '—' : sgn(g, 2) + '%'}</b> <span class="muted">/ +${goal}% goal</span></span></div>
+        <div class="track"><div class="fill" style="width:${share * 100}%"></div></div>
+        <div class="foot num"><span>${g == null ? '' : (share * 100).toFixed(1) + '% of goal • ' + int.format(ty) + ' CEs'}</span><span>${esc(foot)}</span></div>`;
+    };
+    prog('pg-home', `In-${stateName(home)} YTD case growth`, DY.filter((r) => r.state === home), T.inIowaGrowthPct, 'Core market');
+    prog('pg-out', `Outside-${stateName(home)} YTD case growth`, DY.filter((r) => r.state !== home), T.outsideIowaGrowthPct, 'Regional expansion');
+    if (PODS.length) {
+      const stat = (label, rows) => { const ty = sum(rows, (r) => r.placements), ly = sum(rows, (r) => r.placements_ly), g = ly ? (ty / ly - 1) * 100 : null;
+        return `<div class="stat num"><span>${esc(label)}</span><span><b>${int.format(ty)}</b> ${g == null ? '' : `<span class="${g >= 0 ? 'good-t' : 'bad-t'}">(${sgn(g)}% YoY)</span>`}</span></div>`; };
+      $('pods').innerHTML = `<div class="muted" style="font-size:11.5px">${esc(CFG.placementsLabel || 'Placements')}</div>` + stat('Active PODs (total)', PODS) + stat('Out-of-state PODs', PODS.filter((r) => r.state !== home));
+    } else $('pods').innerHTML = '<div class="nofeed">Placements: VIP feed pending.</div>';
+    const out = DY.filter((r) => r.state !== home), sts = [...new Set(out.map((r) => r.state))].map((st) => {
+      const x = out.filter((r) => r.state === st), ty = sum(x, (r) => r.ce_ytd), ly = sum(x, (r) => r.ce_ytd_ly);
+      return { st, ty, g: ly ? (ty / ly - 1) * 100 : null };
+    }).sort((a, b) => b.ty - a.ty).slice(0, 8);
+    const smax = Math.max(1, ...sts.map((x) => x.ty));
+    $('states').innerHTML = sts.length ? `<div class="hd">Top markets outside ${esc(stateName(home))}, YTD CEs</div>` + sts.map((x) => `<div class="sr"><span class="st3">${esc(x.st)}</span><span class="bar"><i style="width:${x.ty / smax * 100}%"></i></span><span><b>${int.format(x.ty)}</b> ${x.g == null ? '<span class="muted">new</span>' : `<span class="${x.g >= 0 ? 'good-t' : 'bad-t'}">(${sgn(x.g)}%)</span>`}</span></div>`).join('') : '';
+    holiday();
+  }
+  const stateName = (s) => ({ IA: 'Iowa', NE: 'Nebraska', IL: 'Illinois', KS: 'Kansas', MN: 'Minnesota', MO: 'Missouri', WI: 'Wisconsin', ND: 'North Dakota', SD: 'South Dakota' }[s] || s);
+
+  // Holiday pacing, by week. Goal and last season come from the workbook's VMBG Targets tab (weekly, per taproom);
+  // this season's guests come from Toast. Cumulative from the kickoff week.
+  function holiday() {
+    const H = CFG.holiday;
+    if (!H) return;
+    const nW = H.weeks || 8, weeks = Array.from({ length: nW }, (_, i) => addDays(H.start, i * 7));
+    const focus = state.loc !== 'all' && VT.some((r) => r.location === state.loc) ? state.loc : null;
+    const vt = VT.filter((r) => !focus || r.location === focus);
+    const locs = [...new Set(VT.map((r) => r.location))];
+    const wkSum = (rows, w, k) => sum(rows.filter((r) => r.week_start === w), (r) => r[k]);
+    const actWeek = (w, loc) => sum(GD.filter((r) => r.date >= w && r.date <= addDays(w, 6) && (loc ? r.location === loc : locs.includes(r.location))), (r) => r.guests);
+    const lastData = GD.length ? GD.map((r) => r.date).sort().pop() : null;
+    let a = 0, b = 0, c = 0;
+    const goal = weeks.map((w) => (a += wkSum(vt, w, 'guests_goal')));
+    const ly = weeks.map((w) => (b += wkSum(vt, w, 'guests_ly')));
+    const act = weeks.map((w) => (lastData && w <= lastData ? (c += actWeek(w, focus)) : null));
+    const goalTot = goal[nW - 1] || 0, lyTot = ly[nW - 1] || 0;
+    // Pace = guests so far vs the goal for the same days (the goal week the data is in is pro-rated by day).
+    const daysIn = (w) => (lastData && w <= lastData ? Math.min(7, (new Date(lastData) - new Date(w)) / 864e5 + 1) : 0);
+    const goalToDate = (rows) => weeks.reduce((t, w) => t + wkSum(rows, w, 'guests_goal') * daysIn(w) / 7, 0);
+    const actToDate = (loc) => weeks.reduce((t, w) => t + (daysIn(w) ? actWeek(w, loc) : 0), 0);
+    // For pace, count a taproom's guests only in weeks that carry a goal for it, so a location whose targets start later
+    // doesn't inflate the total.
+    const paceAct = (rows) => [...new Set(rows.map((r) => r.location))].reduce((t, l) => t + weeks.reduce((u, w) => u + (daysIn(w) && wkSum(rows.filter((r) => r.location === l), w, 'guests_goal') ? actWeek(w, l) : 0), 0), 0);
+    const paceCls = (p) => (p == null ? 'na' : p >= 100 ? 'good' : p >= 90 ? 'warn' : 'bad');
+    const gtd = goalToDate(vt), atd = actToDate(focus), pace = gtd ? paceAct(vt) / gtd * 100 : null;
+    $('h-hol').textContent = H.title;
+    $('s-hol').textContent = `Cumulative guest visits, week of ${md(weeks[0])} – ${md(addDays(weeks[nW - 1], 6))}${focus ? ' — ' + focus : ''}`;
+    $('hol-target').textContent = VT.length ? `Season goal ${int.format(goalTot)} (${sgn((goalTot - lyTot) / 1000, 1)}k vs last season)` : 'Targets not loaded';
+    const hp = $('hol-pace');
+    if (pace == null) { hp.hidden = !lastData || !VT.length; hp.className = 'badge-in'; hp.textContent = 'Season not started'; }
+    else { hp.hidden = false; hp.className = 'badge-in num ' + paceCls(pace); hp.textContent = `${int.format(atd)} guests through ${md(lastData)} • ${Math.round(pace)}% of pace on weeks with goals`; }
+    const lastIdx = act.reduce((t, v, i) => (v != null ? i : t), -1);
+    const today = { id: 'today', afterDatasetsDraw(ch) {
+      if (lastIdx < 0) return;
+      const { ctx, chartArea: ar, scales: { x } } = ch, px = x.getPixelForValue(lastIdx);
+      ctx.save(); ctx.strokeStyle = css('--axis'); ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px, ar.top + 16); ctx.lineTo(px, ar.bottom); ctx.stroke(); ctx.setLineDash([]);
+      ctx.font = '600 11px Jost, sans-serif'; const t = 'Through ' + md(lastData), w = ctx.measureText(t).width + 12, bx = Math.min(px - w / 2, ar.right - w) < ar.left ? ar.left : Math.min(px - w / 2, ar.right - w);
+      ctx.fillStyle = css('--hl-bg'); ctx.strokeStyle = css('--s1'); ctx.beginPath(); ctx.roundRect(bx, ar.top, w, 18, 4); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = css('--s1'); ctx.textBaseline = 'middle'; ctx.fillText(t, bx + 6, ar.top + 9); ctx.restore(); } };
+    if (charts.hol) charts.hol.destroy();
+    charts.hol = new Chart($('ch-hol'), {
+      type: 'line',
+      data: { labels: weeks.map((w) => md(w)), datasets: [
+        { label: 'This season', data: act, borderColor: css('--s1'), backgroundColor: 'rgba(61,78,154,.14)', fill: 'origin', borderWidth: 3, pointRadius: 3.5, pointBackgroundColor: css('--s1'), tension: 0.2 },
+        { label: `${H.start.slice(0, 4)} goal`, data: goal, borderColor: css('--ink'), borderWidth: 1.6, pointRadius: 0, tension: 0.25 },
+        { label: 'Last season', data: ly, borderColor: css('--sx'), borderDash: [4, 4], borderWidth: 1.6, pointRadius: 0, tension: 0.25 },
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false }, layout: { padding: { top: 4 } },
+        scales: { x: { ticks: { color: css('--muted'), font: { family: 'Jost' } }, grid: { display: false } },
+          y: { beginAtZero: true, ticks: { color: css('--muted'), font: { family: 'Jost' }, callback: (v) => k1(v), maxTicksLimit: 6 }, grid: { color: css('--grid') } } },
+        plugins: { legend: { position: 'top', align: 'end', labels: { boxWidth: 14, boxHeight: 3, color: css('--ink2'), font: { family: 'Jost', size: 12 } } },
+          tooltip: { callbacks: { title: (it) => 'Through week of ' + it[0].label, label: (c) => `${c.dataset.label}: ${c.raw == null ? '—' : int.format(c.raw)}` } } } },
+      plugins: [today],
+    });
+    $('hol-cards').innerHTML = locOrder(locs).map((l) => {
+      const rows = VT.filter((r) => r.location === l), g = sum(rows, (r) => r.guests_goal), gt = goalToDate(rows), ac = actToDate(l), pc = gt ? paceAct(rows) / gt * 100 : null;
+      const first = rows.filter((r) => r.guests_goal).map((r) => r.week_start).sort()[0];
+      return `<div class="card${markLoc(l)}"><div class="n">${esc(l)}</div><div class="v num">${ac ? int.format(ac) : '—'}</div>`
+        + `<div class="d num ${paceCls(pc)}">${pc != null ? Math.round(pc) + '% of pace' : first ? 'Goals start ' + md(first) : 'No goal'}</div><div class="a num">Season goal ${k1(g)}</div></div>`;
+    }).join('');
+    const missing = LOCS.filter((l) => !locs.includes(l));
+    $('hol-note').textContent = (lastData ? `Guests to date vs. the goal for the same days. ` : '') + (missing.length ? `No VMBG targets in the sheet for ${missing.join(' or ')}.` : '');
+  }
+
+  window.__esStart = () => load().catch((e) => { $('app').insertAdjacentHTML('afterbegin', `<p class="err">Could not load the scorecard: ${esc(e.message)}</p>`); console.error(e); });
+})();
+</script>
+
+<script>
+/* ---------- Data sources page (static map of the Leadership Scorecard workbook) ---------- */
+(() => {
+  const P = {
+    toast: ['Toast', 'Point of sale for all six taprooms: sales, categories, labor, guests, comps, discounts, DoorDash orders.', 'Connected — via the Store Director Portal, nightly'],
+    me: ['MarginEdge', 'Purchases and inventory counts by category (food, beer, liquor, wine).', 'Connected — via the Store Director Portal, nightly'],
+    ts: ['Tripleseat', 'Private events, bookings and leads, with event revenue.', 'Connected — via the Store Director Portal, nightly'],
+    vip: ['VIP', 'Distributor depletions (cases), placements and accounts.', 'Connected — via the Sales Portal daily refresh'],
+    ekos: ['Ekos', 'Brewery invoices for Liberty and Gilbert (distribution revenue); production and orders.', 'Connected for invoices — via the Sales Portal daily download'],
+    karma: ['KARMA', 'Sales rep account visits and activity.', 'Pulled by the Sales Portal — not yet wired here'],
+    google: ['Google reviews', 'Star rating and review count per taproom (Places API).', 'Not connected — waiting on Google Cloud billing OK'],
+    thanx: ['Thanx (loyalty)', 'Loyalty sign-ups and rewards customers.', 'Not connected'],
+    payroll: ['Payroll', 'Salaried and hourly totals, production labor.', 'Not connected — system to confirm'],
+    resv: ['Reservations', '"A Very Merry Big Grove" pop-up reservations (not in Tripleseat).', 'Not connected — system to confirm'],
+    sheet: ['Typed in the workbook', 'Goals, targets and audit scores.', 'Stays manual'],
+  };
+  const C = 'connected', R = 'ready', N = 'needs', M = 'manual';
+  const T = [
+    ['2026 Leadership Scorecard', 'The weekly leadership summary', [
+      ['Google reviews: last-week score, average score, review counts', 'google', N, 'Rating + total count via Places API; weekly new reviews from the change in count. The weekly average of new reviews needs the Business Profile API, which is not being pursued.'],
+      ['Revenue by location: current year, prior year', 'toast', C, ''],
+      ['Revenue goals by location', 'sheet', M, 'Store Director also holds monthly targets — pick one source of truth.'],
+      ['Brewery revenue', 'ekos', C, 'Invoice lines excluding keg deposits, by delivery date; matches the sheet within ~1-2%.'],
+      ['Brewery prior year and goal', 'sheet', M, 'Ekos starts May 2026, so no prior year from it yet.'],
+      ['Food cost % by location, rolling 4-week average', 'me', C, 'From purchases; the inventory-adjusted version needs weekly counts in MarginEdge.'],
+      ['Direct labor % by location, rolling 4-week average', 'toast', C, ''],
+      ['Holiday pop-up guests vs goal', 'toast', C, 'Actual guests from Toast; goals typed.'],
+      ['Total case volume growth: last 4 weeks, YTD (in / outside Iowa)', 'vip', C, 'YTD connected; last-4-week view ready.'],
+      ['Case volume growth goals', 'sheet', M, ''],
+      ['POD count (in / outside Iowa) vs prior year', 'vip', C, 'Scorecard uses YTD effective placements; the sheet uses last 90 days. A 90-day VIP report would match it.'],
+    ]],
+    ['2026 Taproom Scorecard', 'Week vs prior year, goal and 4-week average, per taproom', [
+      ['Location total revenue, prior year, avg L4W', 'toast', C, ''],
+      ['Location food revenue and beer revenue', 'toast', C, ''],
+      ['Location total labor', 'toast', C, ''],
+      ['Location food costs', 'me', C, ''],
+      ['Event revenue and event count', 'ts', C, ''],
+      ['Guest count and prior year', 'toast', C, ''],
+      ['DoorDash sales', 'toast', R, 'Toast order channels.'],
+      ['Comp % of sales', 'toast', R, 'Toast discounts (loyalty redemptions excluded).'],
+      ['Loyalty sign-ups', 'thanx', N, ''],
+      ['Distro revenue and CEs', 'ekos', C, 'Revenue from Ekos; CEs from VIP.'],
+      ['Production labor and labor %', 'payroll', N, ''],
+      ['Order fulfillment', 'ekos', N, 'Needs an order (not invoice) export; calculation to confirm.'],
+      ['Goals', 'sheet', M, ''],
+    ]],
+    ['All Company Scorecard', 'Owner rows by week', [
+      ['Location revenue, labor, labor %', 'toast', C, ''],
+      ['Location food revenue, food costs, food cost %', 'me', C, 'Food revenue from Toast, costs from MarginEdge.'],
+      ['Location bar sales, bar costs, bar cost %', 'me', R, 'Bar sales from Toast, costs from MarginEdge.'],
+      ['Total guests, average spend per guest', 'toast', C, ''],
+      ['Total comps, comp % of sales', 'toast', R, ''],
+      ['Event revenue, total events', 'ts', C, ''],
+      ['DoorDash sales', 'toast', R, ''],
+      ['Distribution revenue', 'ekos', C, ''],
+      ["CE's weekly vs weekly goal; total CEs weekly / annual vs LY", 'vip', C, 'Goals typed.'],
+      ["New market CE's (1st year)", 'vip', R, 'Distributors / states with no prior-year volume.'],
+      ['Quality account visits', 'karma', R, ''],
+      ['Hourly production labor, hourly total, salary total, total labor %', 'payroll', N, ''],
+      ['Beer waste %', 'ekos', N, 'Calculation to confirm.'],
+      ['Order fulfillment', 'ekos', N, 'Calculation to confirm.'],
+    ]],
+    ['Location tabs (DSM, Cedar Rapids, Iowa City, Omaha, Solon, Prairie Village)', 'One weekly ledger per taproom', [
+      ['Food cost: beginning inventory, purchases, ending inventory, food cost %', 'me', R, 'Purchases are in; inventory needs weekly counts in MarginEdge.'],
+      ['Bar costs: inventory, purchases, bar cost %', 'me', R, ''],
+      ['Food sales, bar sales, beer sales, total sales', 'toast', C, ''],
+      ['Labor weekly $, labor %', 'toast', C, ''],
+      ['Hourly labor %', 'toast', R, ''],
+      ['Total guests, average spend per guest', 'toast', C, ''],
+      ['Total comps, comp % of sales', 'toast', R, ''],
+      ['% of comps from Thanx', 'thanx', N, ''],
+      ['Loyalty sign-ups', 'thanx', N, ''],
+      ['DoorDash sales', 'toast', R, ''],
+      ['Event revenue, total events', 'ts', C, ''],
+      ['"A Very Merry Big Grove" reservation count', 'resv', N, 'Not found in Tripleseat — confirm where the pop-up books.'],
+    ]],
+    ['VMBG Targets', 'Holiday pop-up weekly guest targets', [
+      ['2025 weekly guests by location', 'toast', R, 'Toast history via the Store Director Portal.'],
+      ['2026 weekly guest goals', 'sheet', M, ''],
+      ['2026 actual guests (cumulative)', 'toast', C, ''],
+    ]],
+    ['Rewards by Week', 'Loyalty program', [
+      ['Location-attributed sign-ups, total sign-ups', 'thanx', N, ''],
+      ['Unique customer purchases', 'thanx', N, 'Toast sees loyalty check-ins, which could stand in once confirmed.'],
+    ]],
+    ['Distributor Data - L4W', 'VIP export, last 4 weeks', [['Cases by distributor, last 4 weeks vs LY; IA vs outside IA', 'vip', R, '']]],
+    ['Distributor - YTD', 'VIP export, year to date', [['Cases by distributor, YTD vs LY; IA vs outside IA', 'vip', C, '']]],
+    ['Placements', 'VIP export, 90 days', [['Effective placements by distributor, 90 days vs LY', 'vip', C, 'Connected as YTD; 90-day window needs that report in the daily VIP download.']]],
+    ['Location Overview', 'Toast summary, last week and rolling 4 weeks', [
+      ['Net sales, labor %', 'toast', C, ''],
+      ['Discounts, refunds, gross sales', 'toast', R, ''],
+    ]],
+    ['Audit Scores / Mystery Shops', 'Monthly scores by location', [
+      ['Mystery shop scores', 'sheet', M, 'Third-party reports.'],
+      ['Audit results', 'sheet', M, 'Internal audit sheets.'],
+    ]],
+  ];
+  const LBL = { connected: 'Connected', ready: 'Ready', needs: 'Needs a connector', manual: 'Typed' };
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  window.__esRenderSources = () => {
+    if ($id('src-tabs').firstChild) return;
+    const all = T.flatMap((t) => t[2]), cnt = (k) => all.filter((r) => r[2] === k).length;
+    $id('src-cards').innerHTML = [['connected', '#2f6b12'], ['ready', '#2b6cb0'], ['needs', '#a86a00'], ['manual', '#7a7f95']]
+      .map(([k, c]) => `<div class="sc" style="--c:${c}"><b>${cnt(k)}</b><span>${LBL[k]}</span></div>`).join('');
+    const used = new Set(all.map((r) => r[1]));
+    $id('src-plats').innerHTML = Object.entries(P).filter(([k]) => used.has(k)).map(([k, p]) => {
+      const n = all.filter((r) => r[1] === k).length;
+      return `<div class="pl"><h4><span>${esc(p[0])}</span><span style="font-weight:500;color:var(--muted)">${n} item${n === 1 ? '' : 's'}</span></h4>${esc(p[1])}<div style="margin-top:4px;font-weight:600;color:var(--ink)">${esc(p[2])}</div></div>`;
+    }).join('');
+    $id('src-tabs').innerHTML = T.map(([tab, sub, rows], i) => {
+      const mini = ['connected', 'ready', 'needs', 'manual'].map((k) => { const n = rows.filter((r) => r[2] === k).length; return n ? `<span class="st2 ${k}">${n} ${LBL[k]}</span>` : ''; }).join('');
+      return `<details${i < 2 ? ' open' : ''}><summary><span>${esc(tab)} <span style="font:400 12px system-ui;color:var(--muted)">— ${esc(sub)}</span></span><span class="mini">${mini}</span></summary>
+        <table><thead><tr><th style="width:38%">Number on the sheet</th><th style="width:16%">Platform</th><th style="width:14%">Status</th><th>Notes</th></tr></thead><tbody>
+        ${rows.map((r) => `<tr><td>${esc(r[0])}</td><td>${esc(P[r[1]][0])}</td><td><span class="st2 ${r[2]}">${LBL[r[2]]}</span></td><td class="snote">${esc(r[3])}</td></tr>`).join('')}
+        </tbody></table></details>`;
+    }).join('');
+  };
+  function $id(i) { return document.getElementById(i); }
+})();
+</script>
+
+<script>
+/* ---------- Sign-in gate + encrypted data ----------
+   Google ID token -> "Exec Scorecard Login" Apps Script (its own roster sheet) -> {bundle:{id,key}, sid}.
+   The data is published only as data/enc/<id>.bin (AES-256-GCM over gzip JSON, tools/build_bundle.py); without a
+   key from the backend there is nothing readable on the site. The remembered session (30 days) is re-checked on
+   every open, so removing someone from the roster signs them out on their next visit. To revoke keys already
+   handed out, bump the epoch in .exec-secret.json AND the EXEC_EPOCH script property, then deploy. */
+(() => {
+  const AUTH = {
+    CLIENT_ID: '169287489700-t5en62nibhp9ttn24vfimd7k974dgl9i.apps.googleusercontent.com',
+    API_URL: 'https://script.google.com/macros/s/AKfycbzkjZ81_MikqQCvEU_8dW27mrAhUuoEI-MlacDIY2M5SXk-7YaVFzqaOkCVhyY0pDkeaA/exec',
+    KEY: 'execsc_auth_v2',
+  };
+  const $ = (id) => document.getElementById(id);
+  const local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  const store = (() => { try { localStorage.setItem('_t', '1'); localStorage.removeItem('_t'); return localStorage; } catch { return sessionStorage; } })();
+  const save = (a) => { try { store.setItem(AUTH.KEY, JSON.stringify(a)); } catch {} };
+  const read = () => { try { return JSON.parse(store.getItem(AUTH.KEY) || 'null'); } catch { return null; } };
+  const forget = () => { try { store.removeItem(AUTH.KEY); localStorage.removeItem('execsc_auth'); } catch {} };
+  const setErr = (m) => { $('gerr').innerHTML = m || ''; };
+  const NO = 'This account doesn’t have access to the Executive Scorecard. Ask Troy to add you.';
+
+  const ub64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  async function openBundle(b) {
+    const r = await fetch('data/enc/' + b.id + '.bin', { cache: 'no-store' });
+    if (!r.ok) throw new Error('data bundle not found (' + r.status + ')');
+    const buf = new Uint8Array(await r.arrayBuffer());
+    const key = await crypto.subtle.importKey('raw', ub64(b.key), 'AES-GCM', false, ['decrypt']);
+    const gz = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.slice(0, 12) }, key, buf.slice(12));
+    const text = await new Response(new Blob([gz]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+    return JSON.parse(text);
+  }
+  const uesc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const ago = (ms) => { const m = Math.round(ms / 6e4); return m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' d ago'; };
+  async function showUsage(a) {
+    const body = $('u-body'); body.textContent = 'Loading…';
+    let j;
+    try { j = await post({ a: 'usage', s: a.sid }); } catch (e) { body.textContent = 'Could not reach the sign-in service.'; return; }
+    if (!j || !j.ok) { body.textContent = (j && j.error) === 'admins only' ? 'Usage is visible to roster Admins only.' : 'Could not load usage: ' + ((j && j.error) || 'unknown'); return; }
+    const now = Date.now(), D = 864e5, rows = j.rows.map((r) => ({ t: new Date(r[0]).getTime(), email: String(r[1]).toLowerCase(), name: r[2], ev: r[3] }));
+    const seen = rows.filter((r) => r.ev === 'signin' || r.ev === 'open');
+    const people = new Map(j.roster.map((r) => [r[0], { email: r[0], name: r[1] || r[0], role: r[2], last: 0, d7: 0, d30: 0, all: 0 }]));
+    seen.forEach((r) => { const p = people.get(r.email) || people.set(r.email, { email: r.email, name: r.name || r.email, role: '(not on roster)', last: 0, d7: 0, d30: 0, all: 0 }).get(r.email);
+      p.all++; if (r.t > p.last) p.last = r.t; if (now - r.t < 7 * D) p.d7++; if (now - r.t < 30 * D) p.d30++; });
+    const list = [...people.values()].sort((x, y) => y.last - x.last);
+    const act7 = list.filter((p) => p.d7).length, act30 = list.filter((p) => p.d30).length;
+    const refused = rows.filter((r) => r.ev === 'refused' && now - r.t < 30 * D).length;
+    const fmt = (t) => new Date(t).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    body.innerHTML = `<div class="ucards">
+        <div class="uc"><b>${act7} / ${people.size}</b><span>people active in the last 7 days</span></div>
+        <div class="uc"><b>${act30} / ${people.size}</b><span>people active in the last 30 days</span></div>
+        <div class="uc"><b>${seen.filter((r) => now - r.t < 7 * D).length}</b><span>visits in the last 7 days</span></div>
+        <div class="uc"><b>${refused}</b><span>refused sign-ins, last 30 days</span></div></div>
+      <table><thead><tr><th>Person</th><th>Role</th><th>Last visit</th><th class="n">7 days</th><th class="n">30 days</th><th class="n">All</th></tr></thead><tbody>
+      ${list.map((p) => `<tr><td>${uesc(p.name)}<br><span class="never">${uesc(p.email)}</span></td><td>${uesc(p.role)}</td>
+        <td>${p.last ? fmt(p.last) + ' <span class="never">(' + ago(now - p.last) + ')</span>' : '<span class="never">never</span>'}</td>
+        <td class="n">${p.d7}</td><td class="n">${p.d30}</td><td class="n">${p.all}</td></tr>`).join('')}</tbody></table>
+      <table><thead><tr><th>When</th><th>Person</th><th>Event</th></tr></thead><tbody>
+      ${rows.slice(0, 100).map((r) => `<tr><td>${fmt(r.t)}</td><td>${uesc(r.name || r.email)} <span class="never">${uesc(r.email)}</span></td><td class="ev-${uesc(r.ev)}">${uesc(r.ev === 'open' ? 'opened' : r.ev === 'signin' ? 'signed in' : r.ev)}</td></tr>`).join('') || '<tr><td colspan="3" class="never">No visits logged yet.</td></tr>'}</tbody></table>`;
+    $('u-sub').textContent = `Who has signed in and opened the scorecard — ${rows.length} events logged (latest 100 listed). Visible to roster Admins only; logins before Nov 14 were not logged as visits.`;
+  }
+  function buildNav(a, w) {
+    // views: Scorecard | Data sources | Usage (Admins only — the backend checks too)
+    const views = [['app', 'Dashboard'], ['exec', 'Execution Card'], ['weekly', 'Weekly Scorecard'], ['byloc', 'By Location'], ['sources', 'Data sources']].concat(/^admin$/i.test(a.role || '') && a.sid ? [['usage', 'Usage']] : []);
+    const links = {};
+    const show = (v) => {
+      views.forEach(([id]) => { $(id).hidden = id !== v; links[id].classList.toggle('on', id === v); });
+      const period = ['app', 'exec', 'weekly', 'byloc'].includes(v);
+      const xv = ['exec', 'weekly', 'byloc'].includes(v);
+      document.querySelectorAll('header .ctl').forEach((c) => {
+        if (c.classList.contains('xonly')) { c.hidden = !xv; return; }
+        if (c.querySelector('#sel-loc')) { c.hidden = v !== 'app'; return; }
+        c.hidden = !period;
+      });
+      $('lbl-week').textContent = xv ? 'Through' : 'Period';
+      if (v === 'usage') showUsage(a); else if (v === 'sources') window.__esRenderSources(); else if (window.__esRenderViews) window.__esRenderViews();
+      window.scrollTo(0, 0);
+    };
+    views.forEach(([id, label]) => { const l = document.createElement('a'); l.href = '#'; l.textContent = label; l.onclick = (e) => { e.preventDefault(); show(id); }; links[id] = l; w.append(l); });
+    links.app.classList.add('on');
+  }
+  let started = false;
+  async function unlock(a) {
+    if (started) return;
+    setErr('');
+    try { window.__esData = await openBundle(a.bundle); }
+    catch (e) { forget(); return lockUI('Could not open the scorecard data — please sign in again.'); }
+    started = true;
+    document.documentElement.classList.remove('locked');
+    const w = $('who'); w.hidden = false; w.innerHTML = '';
+    w.append(document.createTextNode(a.name || a.email));
+    buildNav(a, $('tabs'));
+    const so = document.createElement('a'); so.href = '#'; so.textContent = 'Sign out'; w.append(so);
+    so.onclick = (e) => { e.preventDefault(); forget(); try { google.accounts.id.disableAutoSelect(); } catch {} location.reload(); };
+    window.__esStart();
+  }
+  function lockUI(msg) {
+    document.documentElement.classList.add('locked'); $('who').hidden = true; setErr(msg); renderButton();
+    if (started) location.reload();
+  }
+  async function post(body) {
+    const r = await fetch(AUTH.API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+    return r.json();
+  }
+  function remember(j) {
+    const a = { sid: j.sid, email: j.profile.email, name: j.profile.name, role: j.profile.role, bundle: j.bundle };
+    save(a); return a;
+  }
+  async function onCred(resp) {
+    setErr(''); $('gbtn').style.opacity = .5;
+    try {
+      const j = await post({ a: 'signin', t: resp.credential });
+      if (!j || !j.ok || !j.bundle) { forget(); return lockUI(j && j.error === 'not on the roster' ? NO : 'Sign-in refused: ' + ((j && j.error) || 'unknown')); }
+      await unlock(remember(j));
+    } catch (e) { setErr('Could not reach the sign-in service. Check your connection and try again.'); }
+    finally { $('gbtn').style.opacity = 1; }
+  }
+  let gsiReady = false;
+  function renderButton() {
+    if (!gsiReady || $('gbtn').firstChild) return;
+    google.accounts.id.renderButton($('gbtn'), { theme: 'filled_blue', size: 'large', shape: 'pill', width: 280 });
+  }
+  window.__esGsi = () => {
+    try { google.accounts.id.initialize({ client_id: AUTH.CLIENT_ID, callback: onCred, auto_select: false }); gsiReady = true; if (!started) renderButton(); }
+    catch (e) { setErr('The Google sign-in button could not load. Open this page directly in Chrome or Safari and try again.'); }
+  };
+  window.__esGsiFail = () => setErr('The Google sign-in button could not load. Open this page directly in Chrome or Safari (not inside Gmail or Messages) and try again.');
+
+  if (local) { started = true; document.documentElement.classList.remove('locked'); const w = $('who'); w.hidden = true; buildNav({ role: '' }, $('tabs')); window.__esStart(); return; }   // Troy's local preview
+  const a = read();
+  if (a && a.sid && a.bundle) {
+    unlock(a);                                     // open right away from the remembered key, then re-check the roster
+    post({ a: 'refresh', s: a.sid }).then((j) => {
+      if (j && j.ok && j.bundle) {
+        const n = remember(j);
+        if (n.bundle.id !== a.bundle.id) location.reload();   // keys were rotated
+        else if ((n.role || '') !== (a.role || '')) location.reload();   // role changed (e.g. first visit since roles were remembered)
+      } else if (j && !j.ok) { forget(); lockUI(j.error === 'not on the roster' ? NO : 'Your sign-in has ended — please sign in again.'); }
+    }).catch(() => {});
+  }
+})();
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="__esGsi()" onerror="__esGsiFail()"></script>
+</body>
+</html>

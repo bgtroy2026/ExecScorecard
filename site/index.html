@@ -26,8 +26,9 @@ body{font-family:'Brandon Grotesque','Jost','Avenir Next',Avenir,'Segoe UI',syst
 
 /* ---------- band ---------- */
 header.band{background:var(--navy);color:#fff}
-header .wrap{display:flex;align-items:center;gap:18px;padding-block:16px;flex-wrap:wrap}
-header img{height:24px;width:auto}
+header .wrap{display:flex;align-items:center;gap:18px;padding-block:8px;flex-wrap:wrap}
+header img.logo{height:60px;width:auto;display:block;margin-right:2px}
+header .titles{border-left:1px solid rgba(255,255,255,.22);padding-left:18px}
 header .titles{display:flex;flex-direction:column;gap:2px;flex:1 0 auto}
 header .tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-left:auto}
 header h1{font-size:18px;white-space:nowrap;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
@@ -264,7 +265,7 @@ details.feeds .st2{font-size:10.5px}
 <body>
 <header class="band">
   <div class="wrap">
-    <img src="images/bgb-wordmark-white.svg" alt="Big Grove Brewery">
+    <img class="logo" src="images/bgb-hopcorn-color-white.png" alt="Big Grove Brewery">
     <div class="titles">
       <h1><span id="yr">2026</span> Executive Leadership Scorecard</h1>
       <span class="eyebrow">Big Grove Brewery &amp; Taprooms • Consolidated performance view</span>
